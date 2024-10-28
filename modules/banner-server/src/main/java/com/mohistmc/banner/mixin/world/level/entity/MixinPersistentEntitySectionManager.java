@@ -61,7 +61,7 @@ public abstract class MixinPersistentEntitySectionManager<T extends EntityAccess
      */
     @Overwrite
     private boolean storeChunkSections(long l, Consumer<T> consumer) {
-        PersistentEntitySectionManager.ChunkLoadStatus chunkLoadStatus = (PersistentEntitySectionManager.ChunkLoadStatus)this.chunkLoadStatuses.get(l);
+        PersistentEntitySectionManager.ChunkLoadStatus chunkLoadStatus = this.chunkLoadStatuses.get(l);
         if (chunkLoadStatus == PersistentEntitySectionManager.ChunkLoadStatus.PENDING) {
             return false;
         } else {
@@ -72,8 +72,7 @@ public abstract class MixinPersistentEntitySectionManager<T extends EntityAccess
                 if (chunkLoadStatus == PersistentEntitySectionManager.ChunkLoadStatus.LOADED) {
                     this.permanentStorage.storeEntities(new ChunkEntities(new ChunkPos(l), ImmutableList.of()));
                     if (banner$fireEvent) {
-                        CraftEventFactory.callEntitiesUnloadEvent(((EntityStorage) permanentStorage).level, new ChunkPos(l),
-                                list.stream().map(entity -> (Entity) entity).collect(Collectors.toList()));
+                        CraftEventFactory.callEntitiesUnloadEvent(((EntityStorage) permanentStorage).level, new ChunkPos(l), ImmutableList.of());
                     }
                 }
                 return true;
