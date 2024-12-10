@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.7-SNAPSHOT'
+    id 'fabric-loom' version '1.9-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -196,9 +196,9 @@ jar {
 import groovy.json.JsonSlurper
 static String ci_version() {
     try {
-        def data = new JsonSlurper().parseText(new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.21.3/api/json").getText("UTF-8"))
+        def data = new JsonSlurper().parseText(new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.21.4/api/json").getText("UTF-8"))
         return data.builds["number"][0]
     } catch (Exception ignored) {
-        return "1.21.2"
+        return "1.21.4"
     }
 }

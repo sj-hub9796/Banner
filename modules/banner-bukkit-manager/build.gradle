@@ -2,8 +2,8 @@ archivesBaseName = project.archives_base_name + "-bukkit-manager"
 version = getSubprojectVersion(project)
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
-    compileOnly(fileTree("lib/banner-1.21.3-dev.jar"))
+    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly(fileTree("lib/banner-1.21.4-dev.jar"))
 }
 
 moduleDependencies(project, [
