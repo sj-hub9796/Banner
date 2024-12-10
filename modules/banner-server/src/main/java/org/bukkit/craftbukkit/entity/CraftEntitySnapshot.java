@@ -66,8 +66,7 @@ public class CraftEntitySnapshot implements EntitySnapshot {
 
     public static CraftEntitySnapshot create(CraftEntity entity) {
         CompoundTag tag = new CompoundTag();
-        // Banner TODO fixme
-        if (!entity.getHandle().saveAsPassenger(tag/*, false*/)) {
+        if (!entity.getHandle().saveAsPassenger(tag, false)) {
             return null;
         }
 

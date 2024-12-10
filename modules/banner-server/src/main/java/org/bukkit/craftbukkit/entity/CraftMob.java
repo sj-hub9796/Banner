@@ -18,7 +18,7 @@ public abstract class CraftMob extends CraftLivingEntity implements Mob {
 
     @Override
     public void setTarget(LivingEntity target) {
-        Preconditions.checkState(!this.getHandle().bridge$generation(), "Cannot set target during world generation");
+        Preconditions.checkState(!this.getHandle().generation, "Cannot set target during world generation");
 
         net.minecraft.world.entity.Mob entity = this.getHandle();
         if (target == null) {
@@ -37,12 +37,12 @@ public abstract class CraftMob extends CraftLivingEntity implements Mob {
 
     @Override
     public void setAware(boolean aware) {
-        this.getHandle().banner$setAware(aware);
+        this.getHandle().aware = aware;
     }
 
     @Override
     public boolean isAware() {
-        return this.getHandle().bridge$aware();
+        return this.getHandle().aware;
     }
 
     @Override

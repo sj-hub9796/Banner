@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.component.DataComponentPredicate;
@@ -44,7 +42,7 @@ public class CraftBeacon extends CraftBlockEntityState<BeaconBlockEntity> implem
         if (tileEntity instanceof BeaconBlockEntity) {
             BeaconBlockEntity beacon = (BeaconBlockEntity) tileEntity;
 
-            Collection<Player> nms = BukkitMethodHooks.getHumansInRange(beacon.getLevel(), beacon.getBlockPos(), beacon.levels);
+            Collection<Player> nms = BeaconBlockEntity.getHumansInRange(beacon.getLevel(), beacon.getBlockPos(), beacon.levels);
             Collection<LivingEntity> bukkit = new ArrayList<LivingEntity>(nms.size());
 
             for (Player human : nms) {

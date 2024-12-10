@@ -7,7 +7,6 @@ import com.google.common.io.Files;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Dynamic;
@@ -47,11 +46,13 @@ import org.bukkit.UnsafeValues;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.CraftFeatureFlag;
 import org.bukkit.craftbukkit.CraftRegistry;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.attribute.CraftAttribute;
+import org.bukkit.craftbukkit.block.CraftBiome;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.damage.CraftDamageEffect;
 import org.bukkit.craftbukkit.damage.CraftDamageSourceBuilder;
@@ -105,10 +106,10 @@ public final class CraftMagicNumbers implements UnsafeValues {
     }
 
     // ========================================================================
-    public static Map<Block, Material> BLOCK_MATERIAL = new HashMap<>();
-    public static Map<Item, Material> ITEM_MATERIAL = new HashMap<>();
-    public static Map<Material, Item> MATERIAL_ITEM = new HashMap<>();
-    public static Map<Material, Block> MATERIAL_BLOCK = new HashMap<>();
+    private static final Map<Block, Material> BLOCK_MATERIAL = new HashMap<>();
+    private static final Map<Item, Material> ITEM_MATERIAL = new HashMap<>();
+    private static final Map<Material, Item> MATERIAL_ITEM = new HashMap<>();
+    private static final Map<Material, Block> MATERIAL_BLOCK = new HashMap<>();
 
     static {
         for (Block block : BuiltInRegistries.BLOCK) {
@@ -232,7 +233,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
      * @return string
      */
     public String getMappingsVersion() {
-        return "ec8b033a89c54252f1dfcb809eab710a";
+        return "60ac387ca8007aa018e6aeb394a6988c";
     }
 
     @Override
@@ -245,7 +246,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 
         try {
-            nmsStack.applyComponents(new ItemParser(Commands.createValidationContext(BukkitMethodHooks.getDefaultRegistryAccess())).parse(new StringReader(arguments)).components());
+            nmsStack.applyComponents(new ItemParser(Commands.createValidationContext(MinecraftServer.getDefaultRegistryAccess())).parse(new StringReader(arguments)).components());
         } catch (CommandSyntaxException ex) {
             Logger.getLogger(CraftMagicNumbers.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -298,7 +299,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
     @Override
     public void checkSupported(PluginDescriptionFile pdf) throws InvalidPluginException {
         ApiVersion toCheck = ApiVersion.getOrCreateVersion(pdf.getAPIVersion());
-        ApiVersion minimumVersion = BukkitMethodHooks.getServer().bridge$server().minimumAPI;
+        ApiVersion minimumVersion = BukkitMethodHooks.getServer().server.minimumAPI;
 
         if (toCheck.isNewerThan(ApiVersion.CURRENT)) {
             // Newer than supported
@@ -368,7 +369,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
 
     @Override
     public String getTranslationKey(final Attribute attribute) {
-        return CraftAttribute.bukkitToMinecraft(attribute).getDescriptionId();
+        return attribute.getTranslationKey();
     }
 
     @Override
@@ -409,6 +410,16 @@ public final class CraftMagicNumbers implements UnsafeValues {
     public <B extends Keyed> B get(Registry<B> registry, NamespacedKey namespacedKey) {
         // We currently do not have any version-dependent remapping, so we can use current version
         return CraftRegistry.get(registry, namespacedKey, ApiVersion.CURRENT);
+    }
+
+    private Biome customBiome;
+    @Override
+    public Biome getCustomBiome() {
+        if (customBiome == null) {
+            customBiome = new CraftBiome(NamespacedKey.minecraft("custom"), null);
+        }
+
+        return customBiome;
     }
 
     /**

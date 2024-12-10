@@ -328,12 +328,7 @@ public enum EntityType implements Keyed, Translatable {
     PALE_OAK_CHEST_BOAT("pale_oak_chest_boat", PaleOakChestBoat.class, -1),
     SPRUCE_BOAT("spruce_boat", SpruceBoat.class, -1),
     SPRUCE_CHEST_BOAT("spruce_chest_boat", SpruceChestBoat.class, -1),
-    @ApiStatus.Experimental
-    @MinecraftExperimental(MinecraftExperimental.Requires.WINTER_DROP)
     CREAKING("creaking", Creaking.class, -1),
-    @ApiStatus.Experimental
-    @MinecraftExperimental(MinecraftExperimental.Requires.WINTER_DROP)
-    CREAKING_TRANSIENT("creaking_transient", CreakingTransient.class, -1),
     /**
      * A fishing line and bobber.
      */
@@ -354,10 +349,10 @@ public enum EntityType implements Keyed, Translatable {
     private final Class<? extends Entity> clazz;
     private final short typeId;
     private final boolean independent, living;
-    public NamespacedKey key;
+    private final NamespacedKey key;
 
-    public static Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
-    public static Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
+    private static final Map<String, EntityType> NAME_MAP = new HashMap<String, EntityType>();
+    private static final Map<Short, EntityType> ID_MAP = new HashMap<Short, EntityType>();
 
     static {
         for (EntityType type : values()) {

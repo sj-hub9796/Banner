@@ -6,8 +6,6 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.MinecraftServer;

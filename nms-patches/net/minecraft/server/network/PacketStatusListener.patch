@@ -29,7 +29,7 @@
 -            this.connection.send(new PacketStatusOutServerInfo(this.status));
 +            // CraftBukkit start
 +            // this.connection.send(new PacketStatusOutServerInfo(this.status));
-+            MinecraftServer server = MinecraftServer.getServer();
++            MinecraftServer server = BukkitMethodHooks.getServer();
 +            final Object[] players = server.getPlayerList().players.toArray();
 +            class ServerListPingEvent extends org.bukkit.event.server.ServerListPingEvent {
 +

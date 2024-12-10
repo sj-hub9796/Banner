@@ -5,7 +5,7 @@ import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.RenderType;
 
-final class CraftScoreboardTranslations {
+public final class CraftScoreboardTranslations {
     static final int MAX_DISPLAY_SLOT = 19;
     static final ImmutableBiMap<DisplaySlot, String> SLOTS = ImmutableBiMap.<DisplaySlot, String>builder()
             .put(DisplaySlot.BELOW_NAME, "below_name")
@@ -31,11 +31,11 @@ final class CraftScoreboardTranslations {
 
     private CraftScoreboardTranslations() {}
 
-    static DisplaySlot toBukkitSlot(net.minecraft.world.scores.DisplaySlot minecraft) {
+    public static DisplaySlot toBukkitSlot(net.minecraft.world.scores.DisplaySlot minecraft) {
         return CraftScoreboardTranslations.SLOTS.inverse().get(minecraft.getSerializedName());
     }
 
-    static net.minecraft.world.scores.DisplaySlot fromBukkitSlot(DisplaySlot slot) {
+    public static net.minecraft.world.scores.DisplaySlot fromBukkitSlot(DisplaySlot slot) {
         return net.minecraft.world.scores.DisplaySlot.CODEC.byName(CraftScoreboardTranslations.SLOTS.get(slot));
     }
 

@@ -10,7 +10,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.serialization.DynamicOps;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -96,6 +95,7 @@ import org.bukkit.craftbukkit.block.CraftBlockType;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.enchantments.CraftEnchantment;
 import org.bukkit.craftbukkit.inventory.CraftMetaItem.ItemMetaKey.Specific;
+import org.bukkit.craftbukkit.inventory.components.CraftCustomModelDataComponent;
 import org.bukkit.craftbukkit.inventory.components.CraftEquippableComponent;
 import org.bukkit.craftbukkit.inventory.components.CraftFoodComponent;
 import org.bukkit.craftbukkit.inventory.components.CraftJukeboxComponent;
@@ -119,6 +119,7 @@ import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.Repairable;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.bukkit.inventory.meta.components.EquippableComponent;
 import org.bukkit.inventory.meta.components.FoodComponent;
 import org.bukkit.inventory.meta.components.JukeboxPlayableComponent;
@@ -208,7 +209,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         }
 
         <T> Applicator putIfAbsent(TypedDataComponent<?> component) {
-            if (!this.builder.build().isSet(component.type())) {
+            if (!this.builder.isSet(component.type())) {
                 this.builder.set(component);
             }
             return this;
@@ -279,7 +280,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
     private Component displayName;
     private Component itemName;
     private List<Component> lore; // null and empty are two different states internally
-    private Integer customModelData;
+    private CraftCustomModelDataComponent customModelData;
     private Integer enchantableValue;
     private Map<String, String> blockData;
     private Map<Enchantment, Integer> enchantments;
@@ -326,7 +327,9 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             this.lore = new ArrayList<Component>(meta.lore);
         }
 
-        this.customModelData = meta.customModelData;
+        if (meta.hasCustomModelData()) {
+            this.customModelData = new CraftCustomModelDataComponent(meta.customModelData);
+        }
         this.enchantableValue = meta.enchantableValue;
         this.blockData = meta.blockData;
 
@@ -369,7 +372,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         }
         this.damage = meta.damage;
         this.maxDamage = meta.maxDamage;
-        this.unhandledTags.build().copy(meta.unhandledTags.build());
+        this.unhandledTags.copy(meta.unhandledTags.build());
         this.removedTags.addAll(meta.removedTags);
         this.persistentDataContainer.putAll(meta.persistentDataContainer.getRaw());
 
@@ -396,7 +399,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         });
 
         CraftMetaItem.getOrEmpty(tag, CraftMetaItem.CUSTOM_MODEL_DATA).ifPresent((i) -> {
-            this.customModelData = i.value();
+            this.customModelData = new CraftCustomModelDataComponent(i);
         });
         CraftMetaItem.getOrEmpty(tag, CraftMetaItem.ENCHANTABLE).ifPresent((i) -> {
             this.enchantableValue = i.value();
@@ -580,9 +583,11 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             CraftMetaItem.safelyAdd(lore, this.lore = new ArrayList<Component>(), true);
         }
 
-        Integer customModelData = SerializableMeta.getObject(Integer.class, map, CraftMetaItem.CUSTOM_MODEL_DATA.BUKKIT, true);
-        if (customModelData != null) {
-            this.setCustomModelData(customModelData);
+        Object customModelData = SerializableMeta.getObject(Object.class, map, CUSTOM_MODEL_DATA.BUKKIT, true);
+        if (customModelData instanceof CustomModelDataComponent component) {
+            setCustomModelDataComponent(component);
+        } else {
+            setCustomModelData((Integer) customModelData);
         }
         Integer enchantmentValue = SerializableMeta.getObject(Integer.class, map, CraftMetaItem.ENCHANTABLE.BUKKIT, true);
         if (enchantmentValue != null) {
@@ -733,15 +738,15 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             ByteArrayInputStream buf = new ByteArrayInputStream(Base64.getDecoder().decode(unhandled));
             try {
                 CompoundTag unhandledTag = NbtIo.readCompressed(buf, NbtAccounter.unlimitedHeap());
-                DataComponentPatch unhandledPatch = DataComponentPatch.CODEC.parse(BukkitMethodHooks.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), unhandledTag).result().get();
-                this.unhandledTags.build().copy(unhandledPatch);
+                DataComponentPatch unhandledPatch = DataComponentPatch.CODEC.parse(MinecraftServer.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), unhandledTag).result().get();
+                this.unhandledTags.copy(unhandledPatch);
 
                 for (Entry<DataComponentType<?>, Optional<?>> entry : unhandledPatch.entrySet()) {
                     // Move removed unhandled tags to dedicated removedTags
                     if (!entry.getValue().isPresent()) {
                         DataComponentType<?> key = entry.getKey();
 
-                        this.unhandledTags.build().clear(key);
+                        this.unhandledTags.clear(key);
                         this.removedTags.add(key);
                     }
                 }
@@ -913,7 +918,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         }
 
         if (this.hasCustomModelData()) {
-            itemTag.put(CraftMetaItem.CUSTOM_MODEL_DATA, new CustomModelData(this.customModelData));
+            itemTag.put(CraftMetaItem.CUSTOM_MODEL_DATA, customModelData.getHandle());
         }
 
         if (this.hasEnchantable()) {
@@ -1012,7 +1017,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         }
 
         for (DataComponentType<?> removed : this.removedTags) {
-            if (!itemTag.builder.build().isSet(removed)) {
+            if (!itemTag.builder.isSet(removed)) {
                 itemTag.builder.remove(removed);
             }
         }
@@ -1279,12 +1284,24 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
     @Override
     public int getCustomModelData() {
         Preconditions.checkState(this.hasCustomModelData(), "We don't have CustomModelData! Check hasCustomModelData first!");
-        return this.customModelData;
+        List<Float> floats = customModelData.getFloats();
+        Preconditions.checkState(!floats.isEmpty(), "No numeric custom model data");
+        return floats.get(0).intValue();
+    }
+
+    @Override
+    public CustomModelDataComponent getCustomModelDataComponent() {
+        return (this.hasCustomModelData()) ? new CraftCustomModelDataComponent(this.customModelData) : new CraftCustomModelDataComponent(new CustomModelData(List.of(), List.of(), List.of(), List.of()));
     }
 
     @Override
     public void setCustomModelData(Integer data) {
-        this.customModelData = data;
+        this.customModelData = (data == null) ? null : new CraftCustomModelDataComponent(new CustomModelData(List.of(data.floatValue()), List.of(), List.of(), List.of()));
+    }
+
+    @Override
+    public void setCustomModelDataComponent(CustomModelDataComponent customModelData) {
+        this.customModelData = (customModelData == null) ? null : new CraftCustomModelDataComponent((CraftCustomModelDataComponent) customModelData);
     }
 
     @Override
@@ -1316,7 +1333,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     @Override
     public void setBlockData(BlockData blockData) {
-        this.blockData = (blockData == null) ? null : ((CraftBlockData) blockData).toStates();
+        this.blockData = (blockData == null) ? null : ((CraftBlockData) blockData).toStates(true);
     }
 
     @Override
@@ -1486,7 +1503,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     @Override
     public UseCooldownComponent getUseCooldown() {
-        return (this.hasUseCooldown()) ? new CraftUseCooldownComponent(this.useCooldown) : new CraftUseCooldownComponent(new UseCooldown(0));
+        return (this.hasUseCooldown()) ? new CraftUseCooldownComponent(this.useCooldown) : new CraftUseCooldownComponent(new UseCooldown(1));
     }
 
     @Override
@@ -1536,7 +1553,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     @Override
     public void setEquippable(EquippableComponent equippable) {
-        this.equippable = (equippable == null) ? null : new CraftEquippableComponent((CraftEquippableComponent) this.equippable);
+        this.equippable = (equippable == null) ? null : new CraftEquippableComponent((CraftEquippableComponent) equippable);
     }
 
     @Override
@@ -1675,7 +1692,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         CraftMetaItem.Applicator tag = new CraftMetaItem.Applicator();
         this.applyToItem(tag);
         DataComponentPatch patch = tag.build();
-        net.minecraft.nbt.Tag nbt = DataComponentPatch.CODEC.encodeStart(BukkitMethodHooks.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), patch).getOrThrow();
+        net.minecraft.nbt.Tag nbt = DataComponentPatch.CODEC.encodeStart(MinecraftServer.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), patch).getOrThrow();
         return nbt.toString();
     }
 
@@ -1881,7 +1898,9 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             if (this.lore != null) {
                 clone.lore = new ArrayList<Component>(this.lore);
             }
-            clone.customModelData = this.customModelData;
+            if (this.hasCustomModelData()) {
+                clone.customModelData = new CraftCustomModelDataComponent(customModelData);
+            }
             clone.enchantableValue = this.enchantableValue;
             clone.blockData = this.blockData;
             if (this.enchantments != null) {
@@ -2070,8 +2089,8 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             }
         }
 
-        if (!this.unhandledTags.build().isEmpty()) {
-            net.minecraft.nbt.Tag unhandled = DataComponentPatch.CODEC.encodeStart(BukkitMethodHooks.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), this.unhandledTags.build()).getOrThrow(IllegalStateException::new);
+        if (!this.unhandledTags.isEmpty()) {
+            net.minecraft.nbt.Tag unhandled = DataComponentPatch.CODEC.encodeStart(MinecraftServer.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), this.unhandledTags.build()).getOrThrow(IllegalStateException::new);
             try {
                 ByteArrayOutputStream buf = new ByteArrayOutputStream();
                 NbtIo.writeCompressed((CompoundTag) unhandled, buf);

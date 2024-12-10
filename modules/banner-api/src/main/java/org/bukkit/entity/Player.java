@@ -13,7 +13,6 @@ import org.bukkit.BanEntry;
 import org.bukkit.DyeColor;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
-import org.bukkit.Input;
 import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -393,15 +392,15 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
 
     /**
      * Saves the players current location, health, inventory, motion, and
-     * other information into the username.dat file, in the world/player
-     * folder
+     * other information into the uuid.dat file, in the &lt;main
+     * world&gt;/playerdata folder.
      */
     public void saveData();
 
     /**
      * Loads the players current location, health, inventory, motion, and
-     * other information from the username.dat file, in the world/player
-     * folder.
+     * other information from the uuid.dat file, in the &lt;main
+     * world&gt;/playerdata folder.
      * <p>
      * Note: This will overwrite the players current inventory, health,
      * motion, etc, with the state from the saved dat file.
@@ -491,30 +490,6 @@ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginM
      *     valid respawn point is not present
      */
     public void setRespawnLocation(@Nullable Location location, boolean force);
-
-    /**
-     * Gets the ender pearls currently associated with this entity.
-     * <p>
-     * The returned list will not be directly linked to the entity's current
-     * pearls, and no guarantees are made as to its mutability.
-     *
-     * @return collection of entities corresponding to current pearls.
-     */
-    @NotNull
-    @ApiStatus.Experimental
-    public Collection<EnderPearl> getEnderPearls();
-
-    /**
-     * Gets the current movement input, as last provided by the player.
-     * <br>
-     * <b>Note: that this may not always be consistent with the current movement
-     * of the player.</b>
-     *
-     * @return current input
-     */
-    @NotNull
-    @ApiStatus.Experimental
-    public Input getCurrentInput();
 
     /**
      * Play a note for the player at a location. <br>

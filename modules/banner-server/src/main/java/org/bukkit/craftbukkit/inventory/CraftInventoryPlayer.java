@@ -136,7 +136,7 @@ public class CraftInventoryPlayer extends CraftInventory implements org.bukkit.i
                 this.setHelmet(item);
                 break;
             default:
-                throw new IllegalArgumentException("Could not set slot " + slot + " - not a valid slot for PlayerInventory");
+                throw new IllegalArgumentException("Not implemented. This is a bug");
         }
     }
 
@@ -163,7 +163,7 @@ public class CraftInventoryPlayer extends CraftInventory implements org.bukkit.i
             case HEAD:
                 return this.getHelmet();
             default:
-                throw new IllegalArgumentException("Could not get slot " + slot + " - not a valid slot for PlayerInventory");
+                throw new IllegalArgumentException("Not implemented. This is a bug");
         }
     }
 

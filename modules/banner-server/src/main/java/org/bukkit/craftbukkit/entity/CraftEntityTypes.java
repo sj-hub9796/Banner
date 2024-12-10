@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -76,7 +74,6 @@ import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Cod;
 import org.bukkit.entity.Cow;
 import org.bukkit.entity.Creaking;
-import org.bukkit.entity.CreakingTransient;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Dolphin;
 import org.bukkit.entity.Donkey;
@@ -344,7 +341,6 @@ public final class CraftEntityTypes {
         register(new EntityTypeData<>(EntityType.BREEZE, Breeze.class, CraftBreeze::new, createLiving(net.minecraft.world.entity.EntityType.BREEZE)));
         register(new EntityTypeData<>(EntityType.ARMADILLO, Armadillo.class, CraftArmadillo::new, createLiving(net.minecraft.world.entity.EntityType.ARMADILLO)));
         register(new EntityTypeData<>(EntityType.CREAKING, Creaking.class, CraftCreaking::new, createLiving(net.minecraft.world.entity.EntityType.CREAKING)));
-        register(new EntityTypeData<>(EntityType.CREAKING_TRANSIENT, CreakingTransient.class, CraftCreakingTransient::new, createLiving(net.minecraft.world.entity.EntityType.CREAKING_TRANSIENT)));
 
         Function<SpawnData, net.minecraft.world.entity.boss.enderdragon.EnderDragon> dragonFunction = createLiving(net.minecraft.world.entity.EntityType.ENDER_DRAGON);
         register(new EntityTypeData<>(EntityType.ENDER_DRAGON, EnderDragon.class, CraftEnderDragon::new, spawnData -> {
@@ -484,7 +480,13 @@ public final class CraftEntityTypes {
     }
 
     private static <R extends AbstractMinecart> Function<SpawnData, R> createMinecart(net.minecraft.world.entity.EntityType<R> entityTypes) {
-        return spawnData -> AbstractMinecart.createMinecart(spawnData.minecraftWorld(), spawnData.x(), spawnData.y(), spawnData.z(), entityTypes, EntitySpawnReason.TRIGGERED, ItemStack.EMPTY, null);
+        return spawnData -> {
+            if (spawnData.normalWorld()) {
+                return AbstractMinecart.createMinecart(spawnData.minecraftWorld(), spawnData.x(), spawnData.y(), spawnData.z(), entityTypes, EntitySpawnReason.TRIGGERED, ItemStack.EMPTY, null);
+            } else {
+                return combine(fromEntityType(entityTypes), (spawnData2, entity) -> entity.setInitialPos(spawnData.x(), spawnData.y(), spawnData.z())).apply(spawnData);
+            }
+        };
     }
 
     private static <R extends net.minecraft.world.entity.Entity> Function<SpawnData, R> createAndMove(net.minecraft.world.entity.EntityType<R> entityTypes) {
@@ -523,8 +525,8 @@ public final class CraftEntityTypes {
                 if (nmsBlock.isSolid() || DiodeBlock.isDiode(nmsBlock)) {
                     boolean taken = false;
                     AABB bb = (ItemFrame.class.isAssignableFrom(clazz))
-                            ? BukkitMethodHooks.calculateBoundingBoxStaticItemFrame(pos, CraftBlock.blockFaceToNotch(dir).getOpposite())
-                            : BukkitMethodHooks.calculateBoundingBoxStaticPainting(pos, CraftBlock.blockFaceToNotch(dir).getOpposite(), width, height);
+                            ? net.minecraft.world.entity.decoration.ItemFrame.calculateBoundingBoxStatic(pos, CraftBlock.blockFaceToNotch(dir).getOpposite())
+                            : net.minecraft.world.entity.decoration.Painting.calculateBoundingBoxStatic(pos, CraftBlock.blockFaceToNotch(dir).getOpposite(), width, height);
                     List<net.minecraft.world.entity.Entity> list = spawnData.world().getEntities(null, bb);
                     for (Iterator<net.minecraft.world.entity.Entity> it = list.iterator(); !taken && it.hasNext(); ) {
                         net.minecraft.world.entity.Entity e = it.next();

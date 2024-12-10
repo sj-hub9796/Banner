@@ -1,6 +1,5 @@
 package org.bukkit.craftbukkit.inventory;
 
-import com.mohistmc.banner.bukkit.BukkitConstructorHooks;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -175,7 +174,7 @@ public class CraftContainer extends AbstractContainerMenu {
                 this.delegate = new BlastFurnaceMenu(windowId, bottom, top, new SimpleContainerData(4));
                 break;
             case LECTERN:
-                this.delegate = BukkitConstructorHooks.newLecternMenu(windowId, top, bottom);
+                this.delegate = new LecternMenu(windowId, top, new SimpleContainerData(1), bottom);
                 break;
             case SMOKER:
                 this.delegate = new SmokerMenu(windowId, bottom, top, new SimpleContainerData(4));

@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -30,7 +28,7 @@ public class CraftCrashReport implements Supplier<String> {
                 value.append(' ').append(description.getFullName()).append(legacy ? "*" : "").append(' ').append(description.getMain()).append(' ').append(Arrays.toString(description.getAuthors().toArray())).append(',');
             }
             value.append("}\n   Warnings: ").append(Bukkit.getWarningState().name());
-            value.append("\n   Reload Count: ").append(String.valueOf(BukkitMethodHooks.getServer().bridge$server().reloadCount));
+            value.append("\n   Reload Count: ").append(String.valueOf(BukkitMethodHooks.getServer().server.reloadCount));
             value.append("\n   Threads: {");
             for (Map.Entry<Thread, ? extends Object[]> entry : Thread.getAllStackTraces().entrySet()) {
                 value.append(' ').append(entry.getKey().getState().name()).append(' ').append(entry.getKey().getName()).append(": ").append(Arrays.toString(entry.getValue())).append(',');

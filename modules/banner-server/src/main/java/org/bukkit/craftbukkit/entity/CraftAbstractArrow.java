@@ -61,7 +61,7 @@ public class CraftAbstractArrow extends AbstractProjectile implements AbstractAr
 
     @Override
     public ProjectileSource getShooter() {
-        return this.getHandle().bridge$projectileSource();
+        return this.getHandle().projectileSource;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class CraftAbstractArrow extends AbstractProjectile implements AbstractAr
         } else {
             this.getHandle().setOwner(null);
         }
-        this.getHandle().banner$setProjectileSource(shooter);
+        this.getHandle().projectileSource = shooter;
     }
 
     @Override

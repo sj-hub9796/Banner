@@ -4,8 +4,6 @@ import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-
-import com.mohistmc.banner.bukkit.BannerLecternInventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MerchantContainer;
@@ -256,19 +254,6 @@ public class CraftInventory implements Inventory {
         return this.inventory.isEmpty();
     }
 
-    public int firstPartial(Material material) {
-        Preconditions.checkArgument(material != null, "Material cannot be null");
-        material = CraftLegacy.fromLegacy(material);
-        ItemStack[] inventory = this.getStorageContents();
-        for (int i = 0; i < inventory.length; i++) {
-            ItemStack item = inventory[i];
-            if (item != null && item.getType() == material && item.getAmount() < item.getMaxStackSize()) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     private int firstPartial(ItemStack item) {
         ItemStack[] inventory = this.getStorageContents();
         ItemStack filteredItem = CraftItemStack.asCraftCopy(item);
@@ -277,7 +262,7 @@ public class CraftInventory implements Inventory {
         }
         for (int i = 0; i < inventory.length; i++) {
             ItemStack cItem = inventory[i];
-            if (cItem != null && cItem.getAmount() < cItem.getMaxStackSize() && cItem.isSimilar(filteredItem)) {
+            if (cItem != null && cItem.getAmount() < getMaxItemStack(cItem) && cItem.isSimilar(filteredItem)) {
                 return i;
             }
         }
@@ -313,11 +298,12 @@ public class CraftInventory implements Inventory {
                         break;
                     } else {
                         // More than a single stack!
-                        if (item.getAmount() > this.getMaxItemStack()) {
+                        int maxAmount = getMaxItemStack(item);
+                        if (item.getAmount() > maxAmount) {
                             CraftItemStack stack = CraftItemStack.asCraftCopy(item);
-                            stack.setAmount(this.getMaxItemStack());
+                            stack.setAmount(maxAmount);
                             this.setItem(firstFree, stack);
-                            item.setAmount(item.getAmount() - this.getMaxItemStack());
+                            item.setAmount(item.getAmount() - maxAmount);
                         } else {
                             // Just store it
                             this.setItem(firstFree, item);
@@ -330,7 +316,7 @@ public class CraftInventory implements Inventory {
 
                     int amount = item.getAmount();
                     int partialAmount = partialItem.getAmount();
-                    int maxAmount = partialItem.getMaxStackSize();
+                    int maxAmount = getMaxItemStack(partialItem);
 
                     // Check if it fully fits
                     if (amount + partialAmount <= maxAmount) {
@@ -396,8 +382,8 @@ public class CraftInventory implements Inventory {
         return leftover;
     }
 
-    private int getMaxItemStack() {
-        return this.getInventory().getMaxStackSize();
+    private int getMaxItemStack(ItemStack itemstack) {
+        return Math.min(itemstack.getMaxStackSize(), getInventory().getMaxStackSize());
     }
 
     @Override
@@ -495,7 +481,7 @@ public class CraftInventory implements Inventory {
             return InventoryType.SHULKER_BOX;
         } else if (this.inventory instanceof BarrelBlockEntity) {
             return InventoryType.BARREL;
-        } else if (this.inventory instanceof BannerLecternInventory) {
+        } else if (this.inventory instanceof LecternBlockEntity.LecternInventory) {
             return InventoryType.LECTERN;
         } else if (this.inventory instanceof ChiseledBookShelfBlockEntity) {
             return InventoryType.CHISELED_BOOKSHELF;

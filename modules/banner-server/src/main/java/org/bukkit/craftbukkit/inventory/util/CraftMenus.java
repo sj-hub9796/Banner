@@ -35,13 +35,11 @@ import org.bukkit.inventory.view.LoomView;
 import org.bukkit.inventory.view.MerchantView;
 import org.bukkit.inventory.view.StonecutterView;
 
-// Banner TODO fixme
 public final class CraftMenus {
 
     public record MenuTypeData<V extends InventoryView>(Class<V> viewClass, CraftMenuBuilder menuBuilder) {
     }
 
-    /*
     private static final CraftMenuBuilder STANDARD = (player, menuType) -> menuType.create(player.nextContainerCounter(), player.getInventory());
 
     public static <V extends InventoryView> MenuTypeData<V> getMenuTypeData(CraftMenuType<?> menuType) {
@@ -110,7 +108,7 @@ public final class CraftMenus {
         }
 
         return CraftMenus.asType(new MenuTypeData<>(InventoryView.class, CraftMenus.STANDARD));
-    }*/
+    }
 
     private static <V extends InventoryView> MenuTypeData<V> asType(MenuTypeData<?> data) {
         return (MenuTypeData<V>) data;

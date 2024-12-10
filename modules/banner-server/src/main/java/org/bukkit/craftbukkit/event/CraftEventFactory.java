@@ -252,11 +252,9 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.view.AnvilView;
-import org.bukkit.inventory.view.MerchantView;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
-// Banner TODO fixme
 public class CraftEventFactory {
 
     // helper methods
@@ -374,7 +372,7 @@ public class CraftEventFactory {
      * Trade Index Change Event
      */
     public static TradeSelectEvent callTradeSelectEvent(ServerPlayer player, int newIndex, MerchantMenu merchant) {
-        TradeSelectEvent tradeSelectEvent = new TradeSelectEvent((MerchantView) merchant.getBukkitView(), newIndex);
+        TradeSelectEvent tradeSelectEvent = new TradeSelectEvent(merchant.getBukkitView(), newIndex);
         Bukkit.getPluginManager().callEvent(tradeSelectEvent);
         return tradeSelectEvent;
     }
@@ -707,7 +705,7 @@ public class CraftEventFactory {
 
         // Spigot start - SPIGOT-7523: Merge after spawn event and only merge if the event was not cancelled (gets checked above)
         if (entity instanceof net.minecraft.world.entity.ExperienceOrb xp) {
-            double radius = world.bridge$spigotConfig().expMerge;
+            double radius = world.spigotConfig.expMerge;
             if (radius > 0) {
                 List<Entity> entities = world.getEntities(entity, entity.getBoundingBox().inflate(radius, radius, radius));
                 for (Entity e : entities) {
@@ -903,11 +901,10 @@ public class CraftEventFactory {
         CraftLivingEntity entity = (CraftLivingEntity) victim.getBukkitEntity();
         CraftDamageSource bukkitDamageSource = new CraftDamageSource(damageSource);
         CraftWorld world = (CraftWorld) entity.getWorld();
-        // Banner TODO fixme
-        EntityDeathEvent event = new EntityDeathEvent(entity, bukkitDamageSource, drops, victim.getExpReward(/*world.getHandle(), */damageSource.getEntity()));
+        EntityDeathEvent event = new EntityDeathEvent(entity, bukkitDamageSource, drops, victim.getExpReward(world.getHandle(), damageSource.getEntity()));
         Bukkit.getServer().getPluginManager().callEvent(event);
 
-        victim.banner$setExpToDrop(event.getDroppedExp());
+        victim.expToDrop = event.getDroppedExp();
 
         for (org.bukkit.inventory.ItemStack stack : event.getDrops()) {
             if (stack == null || stack.getType() == Material.AIR || stack.getAmount() == 0) continue;
@@ -921,17 +918,16 @@ public class CraftEventFactory {
     public static PlayerDeathEvent callPlayerDeathEvent(ServerPlayer victim, DamageSource damageSource, List<org.bukkit.inventory.ItemStack> drops, String deathMessage, boolean keepInventory) {
         CraftPlayer entity = victim.getBukkitEntity();
         CraftDamageSource bukkitDamageSource = new CraftDamageSource(damageSource);
-        // Banner TODO fixme
-        PlayerDeathEvent event = new PlayerDeathEvent(entity, bukkitDamageSource, drops, victim.getExpReward(/*victim.serverLevel(), */damageSource.getEntity()), 0, deathMessage);
+        PlayerDeathEvent event = new PlayerDeathEvent(entity, bukkitDamageSource, drops, victim.getExpReward(victim.serverLevel(), damageSource.getEntity()), 0, deathMessage);
         event.setKeepInventory(keepInventory);
-        event.setKeepLevel(victim.bridge$keepLevel()); // SPIGOT-2222: pre-set keepLevel
+        event.setKeepLevel(victim.keepLevel); // SPIGOT-2222: pre-set keepLevel
         Bukkit.getServer().getPluginManager().callEvent(event);
 
-        victim.banner$setKeepLevel(event.getKeepLevel());
-        victim.banner$setNewLevel(event.getNewLevel());
-        victim.banner$setNewTotalExp(event.getNewTotalExp());
-        victim.banner$setExpToDrop(event.getDroppedExp());
-        victim.banner$setNewExp(event.getNewExp());
+        victim.keepLevel = event.getKeepLevel();
+        victim.newLevel = event.getNewLevel();
+        victim.newTotalExp = event.getNewTotalExp();
+        victim.expToDrop = event.getDroppedExp();
+        victim.newExp = event.getNewExp();
 
         for (org.bukkit.inventory.ItemStack stack : event.getDrops()) {
             if (stack == null || stack.getType() == Material.AIR) continue;
@@ -939,9 +935,9 @@ public class CraftEventFactory {
             if (stack instanceof CraftItemStack craftItemStack && craftItemStack.isForInventoryDrop()) {
                 victim.drop(CraftItemStack.asNMSCopy(stack), true, false, false); // SPIGOT-7800, SPIGOT-7801: Vanilla Behaviour for Player Inventory dropped items
             } else {
-                victim.banner$setForceDrops(true);
+                victim.forceDrops = true;
                 victim.spawnAtLocation(victim.serverLevel(), CraftItemStack.asNMSCopy(stack)); // SPIGOT-7806: Vanilla Behaviour for items not related to Player Inventory dropped items
-                victim.banner$setForceDrops(false);
+                victim.forceDrops = false;
             }
         }
 
@@ -1080,7 +1076,7 @@ public class CraftEventFactory {
         if (!event.isCancelled()) {
             event.getEntity().setLastDamageCause(event);
         } else {
-            damagee.banner$setLastDamageCancelled(true); // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
+            damagee.lastDamageCancelled = true; // SPIGOT-5339, SPIGOT-6252, SPIGOT-6777: Keep track if the event was canceled
         }
 
         return event;
@@ -1667,7 +1663,7 @@ public class CraftEventFactory {
         BlockPhysicsEvent event = new BlockPhysicsEvent(block, block.getBlockData());
         // Suppress during worldgen
         if (world instanceof Level) {
-            ((Level) world).getServer().bridge$server().getPluginManager().callEvent(event);
+            ((Level) world).getServer().server.getPluginManager().callEvent(event);
         }
         return event;
     }
@@ -1788,7 +1784,7 @@ public class CraftEventFactory {
         Entity entity = lootInfo.getOptionalParameter(LootContextParams.THIS_ENTITY);
         List<org.bukkit.inventory.ItemStack> bukkitLoot = loot.stream().map(CraftItemStack::asCraftMirror).collect(Collectors.toCollection(ArrayList::new));
 
-        LootGenerateEvent event = new LootGenerateEvent(world, (entity != null ? entity.getBukkitEntity() : null), inventory.getOwner(), lootTable.bridge$craftLootTable(), CraftLootTable.convertContext(lootInfo), bukkitLoot, plugin);
+        LootGenerateEvent event = new LootGenerateEvent(world, (entity != null ? entity.getBukkitEntity() : null), inventory.getOwner(), lootTable.craftLootTable, CraftLootTable.convertContext(lootInfo), bukkitLoot, plugin);
         Bukkit.getPluginManager().callEvent(event);
         return event;
     }

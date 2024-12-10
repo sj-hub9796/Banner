@@ -13,37 +13,37 @@ public class CraftInput implements Input {
 
     @Override
     public boolean isForward() {
-        return this.handle.forward();
+        return handle.forward();
     }
 
     @Override
     public boolean isBackward() {
-        return this.handle.backward();
+        return handle.backward();
     }
 
     @Override
     public boolean isLeft() {
-        return this.handle.left();
+        return handle.left();
     }
 
     @Override
     public boolean isRight() {
-        return this.handle.right();
+        return handle.right();
     }
 
     @Override
     public boolean isJump() {
-        return this.handle.jump();
+        return handle.jump();
     }
 
     @Override
     public boolean isSneak() {
-        return this.handle.shift();
+        return handle.shift();
     }
 
     @Override
     public boolean isSprint() {
-        return this.handle.sprint();
+        return handle.sprint();
     }
 
     @Override
@@ -61,7 +61,7 @@ public class CraftInput implements Input {
         if (obj == null) {
             return false;
         }
-        if (this.getClass() != obj.getClass()) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
         final CraftInput other = (CraftInput) obj;
@@ -70,6 +70,6 @@ public class CraftInput implements Input {
 
     @Override
     public String toString() {
-        return "CraftInput{" + this.handle + '}';
+        return "CraftInput{" + handle + '}';
     }
 }

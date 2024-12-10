@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.entity;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,24 +29,24 @@ public abstract class CraftMinecart extends CraftVehicle implements Minecart {
 
     @Override
     public double getMaxSpeed() {
-        return this.getHandle().bridge$maxSpeed();
+        return getHandle().getBehavior().getMaxSpeed((ServerLevel) getHandle().level());
     }
 
     @Override
     public void setMaxSpeed(double speed) {
         if (speed >= 0D) {
-            this.getHandle().banner$setMaxSpeed(speed);
+            this.getHandle().maxSpeed = speed;
         }
     }
 
     @Override
     public boolean isSlowWhenEmpty() {
-        return this.getHandle().bridge$slowWhenEmpty();
+        return this.getHandle().slowWhenEmpty;
     }
 
     @Override
     public void setSlowWhenEmpty(boolean slow) {
-        this.getHandle().banner$setSlowWhenEmpty(slow);
+        this.getHandle().slowWhenEmpty = slow;
     }
 
     @Override

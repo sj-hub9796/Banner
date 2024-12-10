@@ -15,7 +15,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -76,22 +75,6 @@ public abstract class MixinItemEntity extends Entity {
         // CraftBukkit start - fire PlayerPickupItemEvent
         int canHold = player.getInventory().canHold(itemStack);
         int remaining = i - canHold;
-
-        // Paper start
-        if (this.pickupDelay <= 0) {
-            PlayerAttemptPickupItemEvent attemptEvent = new PlayerAttemptPickupItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
-            this.level().getCraftServer().getPluginManager().callEvent(attemptEvent);
-
-            flyAtPlayer.set(attemptEvent.getFlyAtPlayer());
-            if (attemptEvent.isCancelled()) {
-                if (flyAtPlayer.get()) {
-                    player.take(this, i);
-                }
-
-                ci.cancel();
-            }
-        }
-        // Paper end
 
         if (this.pickupDelay <= 0 && canHold > 0) {
             itemStack.setCount(canHold);

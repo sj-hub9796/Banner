@@ -61,7 +61,7 @@ public class CraftChunk implements Chunk {
     private static final byte[] EMPTY_LIGHT = new byte[2048];
 
     public CraftChunk(net.minecraft.world.level.chunk.LevelChunk chunk) {
-        this.worldServer = chunk.banner$r();
+        this.worldServer = chunk.level;
         this.x = chunk.getPos().x;
         this.z = chunk.getPos().z;
     }
@@ -218,7 +218,7 @@ public class CraftChunk implements Chunk {
     @Override
     public boolean isSlimeChunk() {
         // 987234911L is deterimined in EntitySlime when seeing if a slime can spawn in a chunk
-        return WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), this.worldServer.bridge$spigotConfig().slimeSeed).nextInt(10) == 0;
+        return WorldgenRandom.seedSlimeChunk(this.getX(), this.getZ(), this.getWorld().getSeed(), this.worldServer.spigotConfig.slimeSeed).nextInt(10) == 0;
     }
 
     @Override
@@ -353,7 +353,7 @@ public class CraftChunk implements Chunk {
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
-        return this.getHandle(ChunkStatus.STRUCTURE_STARTS).bridge$persistentDataContainer();
+        return this.getHandle(ChunkStatus.STRUCTURE_STARTS).persistentDataContainer;
     }
 
     @Override

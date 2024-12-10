@@ -39,7 +39,7 @@
 +                    // CraftBukkit start - Use relative location for far away sounds
 +                    // worldserver.globalLevelEvent(1023, new BlockPosition(this), 0);
 +                    int viewDistance = worldserver.getCraftServer().getViewDistance() * 16;
-+                    for (EntityPlayer player : (List<EntityPlayer>) MinecraftServer.getServer().getPlayerList().players) {
++                    for (EntityPlayer player : (List<EntityPlayer>) BukkitMethodHooks.getServer().getPlayerList().players) {
 +                        double deltaX = this.getX() - player.getX();
 +                        double deltaZ = this.getZ() - player.getZ();
 +                        double distanceSquared = deltaX * deltaX + deltaZ * deltaZ;

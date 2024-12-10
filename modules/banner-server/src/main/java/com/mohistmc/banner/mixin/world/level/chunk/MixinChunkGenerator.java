@@ -7,7 +7,9 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.SectionPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -64,13 +66,13 @@ public abstract class MixinChunkGenerator implements InjectionChunkGenerator {
      * @reason bukkit
      */
     @Overwrite
-    private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState random, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess chunk, ChunkPos chunkPos, SectionPos sectionPos) {
+    private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState random, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess chunk, ChunkPos chunkPos, SectionPos sectionPos, ResourceKey<Level> resourceKey) {
         Structure structure = (Structure)structureSelectionEntry.structure().value();
         int i = fetchReferences(structureManager, chunk, sectionPos, structure);
         HolderSet<Biome> holderSet = structure.biomes();
         Objects.requireNonNull(holderSet);
         Predicate<Holder<Biome>> predicate = holderSet::contains;
-        StructureStart structureStart = structure.generate(registryAccess, ((ChunkGenerator) (Object) this), this.biomeSource, random, structureTemplateManager, seed, chunkPos, i, chunk, predicate);
+        StructureStart structureStart = structure.generate(structureSelectionEntry.structure(), resourceKey, registryAccess, ((ChunkGenerator) (Object) this), this.biomeSource, random, structureTemplateManager, seed, chunkPos, i, chunk, predicate);
         if (structureStart.isValid()) {
             structureManager.setStartForStructure(sectionPos, structure, structureStart, chunk);
             box = structureStart.getBoundingBox();

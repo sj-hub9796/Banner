@@ -8,9 +8,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
-import com.mohistmc.banner.bukkit.BukkitConstructorHooks;
-import com.mohistmc.banner.bukkit.BukkitFieldHooks;
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -383,9 +380,9 @@ public final class CraftServer implements Server {
         this.ignoreVanillaPermissions = this.commandsConfiguration.getBoolean("ignore-vanilla-permissions");
         this.pluginManager.useTimings(this.configuration.getBoolean("settings.plugin-profiling"));
         this.overrideSpawnLimits();
-        console.banner$setAutosavePeriod(this.configuration.getInt("ticks-per.autosave"));
+        console.autosavePeriod = this.configuration.getInt("ticks-per.autosave");
         this.warningState = WarningState.value(this.configuration.getString("settings.deprecated-verbose"));
-        BukkitFieldHooks.pluginTicket().timeout = this.configuration.getInt("chunk-gc.period-in-ticks");
+        TicketType.PLUGIN.timeout = this.configuration.getInt("chunk-gc.period-in-ticks");
         this.minimumAPI = ApiVersion.getOrCreateVersion(this.configuration.getString("settings.minimum-api"));
         this.loadIcon();
         this.loadCompatibilities();
@@ -402,11 +399,11 @@ public final class CraftServer implements Server {
     }
 
     private File getConfigFile() {
-        return (File) this.console.bridge$options().valueOf("bukkit-settings");
+        return (File) this.console.options.valueOf("bukkit-settings");
     }
 
     private File getCommandsConfigFile() {
-        return (File) this.console.bridge$options().valueOf("commands-settings");
+        return (File) this.console.options.valueOf("commands-settings");
     }
 
     private void overrideSpawnLimits() {
@@ -463,7 +460,7 @@ public final class CraftServer implements Server {
     public void loadPlugins() {
         this.pluginManager.registerInterface(JavaPluginLoader.class);
 
-        File pluginFolder = (File) this.console.bridge$options().valueOf("plugins");
+        File pluginFolder = (File) this.console.options.valueOf("plugins");
 
         if (pluginFolder.exists()) {
             Plugin[] plugins = this.pluginManager.loadPlugins(pluginFolder);
@@ -515,7 +512,7 @@ public final class CraftServer implements Server {
     }
 
     private void setVanillaCommands(boolean first) { // Spigot
-        Commands dispatcher = this.console.bridge$getVanillaCommands();
+        Commands dispatcher = this.console.vanillaCommandDispatcher;
 
         // Build a list of all Vanilla commands and create wrappers
         for (CommandNode<CommandSourceStack> cmd : dispatcher.getDispatcher().getRoot().getChildren()) {
@@ -534,7 +531,7 @@ public final class CraftServer implements Server {
 
     public void syncCommands() {
         // Clear existing commands
-        Commands dispatcher = this.console.resources.managers().commands = BukkitConstructorHooks.newCommands();
+        Commands dispatcher = this.console.resources.managers().commands = new Commands();
 
         // Register all commands, vanilla ones will be using the old dispatcher references
         for (Map.Entry<String, Command> entry : this.commandMap.getKnownCommands().entrySet()) {
@@ -815,7 +812,7 @@ public final class CraftServer implements Server {
 
     @Override
     public File getUpdateFolderFile() {
-        return new File((File) this.console.bridge$options().valueOf("plugins"), this.configuration.getString("settings.update-folder", "update"));
+        return new File((File) this.console.options.valueOf("plugins"), this.configuration.getString("settings.update-folder", "update"));
     }
 
     @Override
@@ -942,6 +939,7 @@ public final class CraftServer implements Server {
         this.configuration = YamlConfiguration.loadConfiguration(this.getConfigFile());
         this.commandsConfiguration = YamlConfiguration.loadConfiguration(this.getCommandsConfigFile());
 
+        this.console.settings = new DedicatedServerSettings(this.console.options);
         DedicatedServerProperties config = this.console.settings.getProperties();
 
         this.console.setPvpAllowed(config.pvp);
@@ -949,10 +947,10 @@ public final class CraftServer implements Server {
         this.console.setMotd(config.motd);
         this.overrideSpawnLimits();
         this.warningState = WarningState.value(this.configuration.getString("settings.deprecated-verbose"));
-        BukkitFieldHooks.pluginTicket().timeout = this.configuration.getInt("chunk-gc.period-in-ticks");
+        TicketType.PLUGIN.timeout = this.configuration.getInt("chunk-gc.period-in-ticks");
         this.minimumAPI = ApiVersion.getOrCreateVersion(this.configuration.getString("settings.minimum-api"));
         this.printSaveWarning = false;
-        this.console.banner$setAutosavePeriod(this.configuration.getInt("ticks-per.autosave"));
+        this.console.autosavePeriod = this.configuration.getInt("ticks-per.autosave");
         this.loadIcon();
         this.loadCompatibilities();
         CraftMagicNumbers.INSTANCE.getCommodore().updateReroute(activeCompatibilities::contains);
@@ -968,22 +966,22 @@ public final class CraftServer implements Server {
             this.logger.log(Level.WARNING, "Failed to load banned-players.json, " + ex.getMessage());
         }
 
-        org.spigotmc.SpigotConfig.init((File) this.console.bridge$options().valueOf("spigot-settings")); // Spigot
+        org.spigotmc.SpigotConfig.init((File) this.console.options.valueOf("spigot-settings")); // Spigot
         for (ServerLevel world : this.console.getAllLevels()) {
-            world.bridge$serverLevelDataCB().setDifficulty(config.difficulty);
+            world.serverLevelData.setDifficulty(config.difficulty);
             world.setSpawnSettings(config.spawnMonsters);
 
             for (SpawnCategory spawnCategory : SpawnCategory.values()) {
                 if (CraftSpawnCategory.isValidForLimits(spawnCategory)) {
                     long ticksPerCategorySpawn = this.getTicksPerSpawns(spawnCategory);
                     if (ticksPerCategorySpawn < 0) {
-                        world.bridge$ticksPerSpawnCategory().put(spawnCategory, CraftSpawnCategory.getDefaultTicksPerSpawn(spawnCategory));
+                        world.ticksPerSpawnCategory.put(spawnCategory, CraftSpawnCategory.getDefaultTicksPerSpawn(spawnCategory));
                     } else {
-                        world.bridge$ticksPerSpawnCategory().put(spawnCategory, ticksPerCategorySpawn);
+                        world.ticksPerSpawnCategory.put(spawnCategory, ticksPerCategorySpawn);
                     }
                 }
             }
-            world.bridge$spigotConfig().init(); // Spigot
+            world.spigotConfig.init(); // Spigot
         }
 
         this.pluginManager.clearPlugins();
@@ -1021,7 +1019,7 @@ public final class CraftServer implements Server {
 
     @Override
     public void reloadData() {
-        BukkitMethodHooks.reload(this.console);
+        ReloadCommand.reload(this.console);
     }
 
     private void loadIcon() {
@@ -1194,7 +1192,7 @@ public final class CraftServer implements Server {
         boolean hardcore = creator.hardcore();
 
         PrimaryLevelData worlddata;
-        WorldLoader.DataLoadContext worldloader_a = this.console.bridge$worldLoader();
+        WorldLoader.DataLoadContext worldloader_a = this.console.worldLoader;
         RegistryAccess.Frozen iregistrycustom_dimension = worldloader_a.datapackDimensions();
         net.minecraft.core.Registry<LevelStem> iregistry = iregistrycustom_dimension.lookupOrThrow(Registries.LEVEL_STEM);
         if (dynamic != null) {
@@ -1219,12 +1217,12 @@ public final class CraftServer implements Server {
             iregistrycustom_dimension = worlddimensions_b.dimensionsRegistryAccess();
         }
         iregistry = iregistrycustom_dimension.lookupOrThrow(Registries.LEVEL_STEM);
-        worlddata.banner$setCustomDimensions(iregistry);
+        worlddata.customDimensions = iregistry;
         worlddata.checkName(name);
         worlddata.setModdedInfo(this.console.getServerModName(), this.console.getModdedStatus().shouldReportAsModified());
 
-        if (this.console.bridge$options().has("forceUpgrade")) {
-            net.minecraft.server.Main.forceUpgrade(worldSession, DataFixers.getDataFixer(), this.console.bridge$options().has("eraseCache"), () -> true, iregistrycustom_dimension, this.console.bridge$options().has("recreateRegionFiles"));
+        if (this.console.options.has("forceUpgrade")) {
+            net.minecraft.server.Main.forceUpgrade(worldSession, DataFixers.getDataFixer(), this.console.options.has("eraseCache"), () -> true, iregistrycustom_dimension, this.console.options.has("recreateRegionFiles"));
         }
 
         long j = BiomeManager.obfuscateSeed(creator.seed());
@@ -1243,20 +1241,17 @@ public final class CraftServer implements Server {
         } else if (name.equals(levelName + "_the_end")) {
             worldKey = net.minecraft.world.level.Level.END;
         } else {
-            worldKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace(name.toLowerCase(java.util.Locale.ENGLISH)));
+            worldKey = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace(name.toLowerCase(Locale.ROOT)));
         }
 
         // If set to not keep spawn in memory (changed from default) then adjust rule accordingly
         if (!creator.keepSpawnInMemory()) {
             worlddata.getGameRules().getRule(GameRules.RULE_SPAWN_CHUNK_RADIUS).set(0, null);
         }
-        ServerLevel internal = new ServerLevel(console, console.executor, worldSession, worlddata, worldKey, worlddimension, getServer().progressListenerFactory.create(11),
-                worlddata.isDebugWorld(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true, console.overworld().getRandomSequences());
+        ServerLevel internal = (ServerLevel) new ServerLevel(this.console, this.console.executor, worldSession, worlddata, worldKey, worlddimension, this.getServer().progressListenerFactory.create(worlddata.getGameRules().getInt(GameRules.RULE_SPAWN_CHUNK_RADIUS)),
+                worlddata.isDebugWorld(), j, creator.environment() == Environment.NORMAL ? list : ImmutableList.of(), true, this.console.overworld().getRandomSequences(), creator.environment(), generator, biomeProvider);
 
-        name = name.contains("DIM") ? name : name.toLowerCase(java.util.Locale.ENGLISH);
-        internal.banner$setGenerator(generator);
-        internal.banner$setBiomeProvider(biomeProvider);
-        if (!(this.worlds.containsKey(name.toLowerCase(java.util.Locale.ENGLISH)))) {
+        if (!(this.worlds.containsKey(name.toLowerCase(Locale.ROOT)))) {
             return null;
         }
 
@@ -1311,7 +1306,7 @@ public final class CraftServer implements Server {
 
             handle.getChunkSource().close(save);
             handle.entityManager.close(save); // SPIGOT-6722: close entityManager
-            handle.bridge$convertable().close();
+            handle.convertable.close();
         } catch (Exception ex) {
             this.getLogger().log(Level.SEVERE, null, ex);
         }
@@ -1362,7 +1357,7 @@ public final class CraftServer implements Server {
     }
 
     public ConsoleReader getReader() {
-        return this.console.bridge$reader();
+        return this.console.reader;
     }
 
     @Override
@@ -1761,7 +1756,7 @@ public final class CraftServer implements Server {
         if (worldmap == null) {
             return null;
         }
-        return worldmap.bridge$mapView();
+        return worldmap.mapView;
     }
 
     @Override
@@ -1772,7 +1767,7 @@ public final class CraftServer implements Server {
         // creates a new map at world spawn with the scale of 3, with out tracking position and unlimited tracking
         BlockPos spawn = minecraftWorld.getLevelData().getSpawnPos();
         MapId newId = MapItem.createNewSavedData(minecraftWorld, spawn.getX(), spawn.getZ(), 3, false, false, minecraftWorld.dimension());
-        return minecraftWorld.getMapData(newId).bridge$mapView();
+        return minecraftWorld.getMapData(newId).mapView;
     }
 
     @Override
@@ -2011,7 +2006,7 @@ public final class CraftServer implements Server {
 
     @Override
     public ConsoleCommandSender getConsoleSender() {
-        return this.console.bridge$console();
+        return this.console.console;
     }
 
     public EntityMetadataStore getEntityMetadata() {
@@ -2277,7 +2272,7 @@ public final class CraftServer implements Server {
     }
 
     public void checkSaveState() {
-        if (this.playerCommandState || this.printSaveWarning || this.console.bridge$autosavePeriod() <= 0) {
+        if (this.playerCommandState || this.printSaveWarning || this.console.autosavePeriod <= 0) {
             return;
         }
         this.printSaveWarning = true;
@@ -2324,6 +2319,16 @@ public final class CraftServer implements Server {
     @Override
     public int getIdleTimeout() {
         return this.console.getPlayerIdleTimeout();
+    }
+
+    @Override
+    public int getPauseWhenEmptyTime() {
+        return this.getProperties().pauseWhenEmptySeconds;
+    }
+
+    @Override
+    public void setPauseWhenEmptyTime(int seconds) {
+        this.getProperties().pauseWhenEmptySeconds = seconds;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.entity;
 
 import java.util.stream.Collectors;
-
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.AbstractBoat;
 import org.bukkit.TreeSpecies;
@@ -9,7 +8,7 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 
-public class CraftBoat extends CraftVehicle implements Boat {
+public abstract class CraftBoat extends CraftVehicle implements Boat {
 
     public CraftBoat(CraftServer server, AbstractBoat entity) {
         super(server, entity);
@@ -26,52 +25,57 @@ public class CraftBoat extends CraftVehicle implements Boat {
     }
 
     @Override
+    public Type getBoatType() {
+        return CraftBoat.boatTypeFromNms(this.getHandle().getType());
+    }
+
+    @Override
     public void setBoatType(Type type) {
         throw new UnsupportedOperationException("Not supported - you must spawn a new entity to change boat type.");
     }
 
     @Override
     public double getMaxSpeed() {
-        return this.getHandle().bridge$maxSpeed();
+        return this.getHandle().maxSpeed;
     }
 
     @Override
     public void setMaxSpeed(double speed) {
         if (speed >= 0D) {
-            this.getHandle().banner$setMaxSpeed(speed);
+            this.getHandle().maxSpeed = speed;
         }
     }
 
     @Override
     public double getOccupiedDeceleration() {
-        return this.getHandle().bridge$occupiedDeceleration();
+        return this.getHandle().occupiedDeceleration;
     }
 
     @Override
     public void setOccupiedDeceleration(double speed) {
         if (speed >= 0D) {
-            this.getHandle().banner$setOccupiedDeceleration(speed);
+            this.getHandle().occupiedDeceleration = speed;
         }
     }
 
     @Override
     public double getUnoccupiedDeceleration() {
-        return this.getHandle().bridge$unoccupiedDeceleration();
+        return this.getHandle().unoccupiedDeceleration;
     }
 
     @Override
     public void setUnoccupiedDeceleration(double speed) {
-        this.getHandle().banner$setUnoccupiedDeceleration(speed);
+        this.getHandle().unoccupiedDeceleration = speed;
     }
 
     @Override
     public boolean getWorkOnLand() {
-        return this.getHandle().bridge$landBoats();
+        return this.getHandle().landBoats;
     }
 
     @Override
     public void setWorkOnLand(boolean workOnLand) {
-        this.getHandle().banner$setLandBoats(workOnLand);
+        this.getHandle().landBoats = workOnLand;
     }
 
     @Override
@@ -163,10 +167,5 @@ public class CraftBoat extends CraftVehicle implements Boat {
         }
 
         return TreeSpecies.GENERIC;
-    }
-
-    @Deprecated
-    public Type getBoatType() {
-        return CraftBoat.boatTypeFromNms(this.getHandle().getType());
     }
 }

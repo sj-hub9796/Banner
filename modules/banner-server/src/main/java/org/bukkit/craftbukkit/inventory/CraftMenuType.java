@@ -18,17 +18,16 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.MenuType;
 
-// Banner TODO fixme
 public class CraftMenuType<V extends InventoryView> implements MenuType.Typed<V>, Handleable<net.minecraft.world.inventory.MenuType<?>> {
 
     private final NamespacedKey key;
     private final net.minecraft.world.inventory.MenuType<?> handle;
-    private Supplier<CraftMenus.MenuTypeData<V>> typeData;
+    private final Supplier<CraftMenus.MenuTypeData<V>> typeData;
 
     public CraftMenuType(NamespacedKey key, net.minecraft.world.inventory.MenuType<?> handle) {
         this.key = key;
         this.handle = handle;
-        //this.typeData = Suppliers.memoize(() -> CraftMenus.getMenuTypeData(this));
+        this.typeData = Suppliers.memoize(() -> CraftMenus.getMenuTypeData(this));
     }
 
     @Override
@@ -47,7 +46,7 @@ public class CraftMenuType<V extends InventoryView> implements MenuType.Typed<V>
 
         final AbstractContainerMenu container = this.typeData.get().menuBuilder().build(serverPlayer, this.handle);
         container.setTitle(CraftChatMessage.fromString(title)[0]);
-        container.banner$setCheckReachable(false);
+        container.checkReachable = false;
         return (V) container.getBukkitView();
     }
 
