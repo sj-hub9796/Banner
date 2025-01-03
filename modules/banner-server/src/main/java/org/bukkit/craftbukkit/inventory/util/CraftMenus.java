@@ -34,7 +34,6 @@ import org.bukkit.inventory.view.MerchantView;
 import org.bukkit.inventory.view.StonecutterView;
 
 
-import static org.bukkit.craftbukkit.inventory.util.CraftMenuBuilder.*;
 import static org.bukkit.craftbukkit.inventory.util.CraftMenuBuilder.tileEntity;
 import static org.bukkit.craftbukkit.inventory.util.CraftMenuBuilder.worldAccess;
 

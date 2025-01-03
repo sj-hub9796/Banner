@@ -4,7 +4,9 @@ import com.mohistmc.banner.injection.world.item.InjectionSuspiciousStewItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.SuspiciousStewEffects;
+import org.spongepowered.asm.mixin.Mixin;
 
+@Mixin(net.minecraft.world.item.SuspiciousStewItem.class)
 public class MixinSuspiciousStewItem implements InjectionSuspiciousStewItem {
 
     // CraftBukkit start

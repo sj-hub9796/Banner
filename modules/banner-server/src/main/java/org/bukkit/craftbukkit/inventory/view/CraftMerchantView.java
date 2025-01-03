@@ -3,7 +3,6 @@ package org.bukkit.craftbukkit.inventory.view;
 import net.minecraft.world.inventory.MerchantMenu;
 import org.bukkit.craftbukkit.inventory.CraftInventoryView;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.view.MerchantView;
