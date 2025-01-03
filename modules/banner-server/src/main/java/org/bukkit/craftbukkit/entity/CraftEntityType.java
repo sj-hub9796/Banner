@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.entity;
 
 import com.google.common.base.Preconditions;
+import com.mohistmc.banner.api.ServerAPI;
 import java.util.Locale;
 import net.minecraft.core.registries.Registries;
 import org.bukkit.NamespacedKey;
@@ -18,10 +19,7 @@ public class CraftEntityType {
 
         net.minecraft.core.Registry<net.minecraft.world.entity.EntityType<?>> registry = CraftRegistry.getMinecraftRegistry(Registries.ENTITY_TYPE);
         EntityType bukkit = Registry.ENTITY_TYPE.get(CraftNamespacedKey.fromMinecraft(registry.getResourceKey(minecraft).orElseThrow().location()));
-
-        Preconditions.checkArgument(bukkit != null);
-
-        return bukkit;
+        return (bukkit != null) ? bukkit : ServerAPI.entity_minecraftToBukkit.get(minecraft);
     }
 
     public static net.minecraft.world.entity.EntityType<?> bukkitToMinecraft(EntityType bukkit) {

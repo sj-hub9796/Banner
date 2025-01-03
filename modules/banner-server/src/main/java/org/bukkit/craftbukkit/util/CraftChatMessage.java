@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.util;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.gson.JsonParseException;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -10,8 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.ClickEvent.Action;

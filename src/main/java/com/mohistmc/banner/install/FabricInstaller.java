@@ -3,7 +3,6 @@ package com.mohistmc.banner.install;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import com.mohistmc.banner.BannerMain;
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;

@@ -1,9 +1,8 @@
 package org.bukkit.craftbukkit.block;
 
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.world.LockCode;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;

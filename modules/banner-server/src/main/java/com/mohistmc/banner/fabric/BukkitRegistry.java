@@ -8,6 +8,11 @@ import com.mohistmc.banner.api.ServerAPI;
 import com.mohistmc.banner.bukkit.MaterialHelper;
 import com.mohistmc.banner.util.I18n;
 import com.mohistmc.dynamicenum.MohistDynamEnum;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleType;
@@ -54,14 +59,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionType;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 @SuppressWarnings({"ConstantConditions", "deprecation"})
 public class BukkitRegistry {
@@ -346,6 +343,7 @@ public class BukkitRegistry {
                 EntityType.ID_MAP.put((short) typeId, bukkitType);
                 ServerAPI.entityTypeMap.put(entity, entityType);
                 BannerMod.LOGGER.debug("Registered {} as entity {}", entityType, bukkitType);
+                ServerAPI.entity_minecraftToBukkit.put(entity, bukkitType);
             } else {
                 ServerAPI.entityTypeMap.put(entity, normalizeName(resourceLocation.getPath()));
             }

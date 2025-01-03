@@ -5,29 +5,29 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import com.mohistmc.banner.bukkit.entity.BannerModAbstractVillager;
+import com.mohistmc.banner.bukkit.entity.BannerModAnimals;
+import com.mohistmc.banner.bukkit.entity.BannerModChestedHorse;
+import com.mohistmc.banner.bukkit.entity.BannerModEntity;
 import com.mohistmc.banner.bukkit.entity.BannerModGolem;
+import com.mohistmc.banner.bukkit.entity.BannerModHorse;
 import com.mohistmc.banner.bukkit.entity.BannerModLivingEntity;
 import com.mohistmc.banner.bukkit.entity.BannerModMinecart;
 import com.mohistmc.banner.bukkit.entity.BannerModMinecartContainer;
 import com.mohistmc.banner.bukkit.entity.BannerModMob;
-import com.mohistmc.banner.bukkit.entity.BannerModVehicle;
 import com.mohistmc.banner.bukkit.entity.BannerModMonster;
 import com.mohistmc.banner.bukkit.entity.BannerModProjectile;
 import com.mohistmc.banner.bukkit.entity.BannerModRaider;
 import com.mohistmc.banner.bukkit.entity.BannerModSkeleton;
-import com.mohistmc.banner.bukkit.entity.BannerModChestedHorse;
-import com.mohistmc.banner.bukkit.entity.BannerModAnimals;
-import com.mohistmc.banner.bukkit.entity.BannerModEntity;
-import com.mohistmc.banner.bukkit.entity.BannerModHorse;
 import com.mohistmc.banner.bukkit.entity.BannerModTameableAnimal;
 import com.mohistmc.banner.bukkit.entity.BannerModThrowableProjectile;
+import com.mohistmc.banner.bukkit.entity.BannerModVehicle;
 import com.mohistmc.banner.bukkit.entity.BannerModVillager;
 import com.mohistmc.banner.bukkit.entity.BannerModWindCharge;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -92,8 +92,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
-
-import net.md_5.bungee.api.chat.BaseComponent; // Spigot
 
 public abstract class CraftEntity implements org.bukkit.entity.Entity {
     private static PermissibleBase perm;

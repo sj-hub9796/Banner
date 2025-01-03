@@ -1,13 +1,12 @@
 package org.bukkit.craftbukkit;
 
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
-
-import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;

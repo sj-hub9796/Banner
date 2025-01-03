@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import java.util.function.Consumer;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AnvilMenu;
-import net.minecraft.world.inventory.CraftingContainer;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.inventory.view.CraftAnvilView;
 import org.bukkit.entity.HumanEntity;

@@ -1,7 +1,6 @@
 package com.mohistmc.banner.injection.network.connection;
 
 import com.mojang.authlib.properties.Property;
-
 import java.net.SocketAddress;
 import java.util.UUID;
 

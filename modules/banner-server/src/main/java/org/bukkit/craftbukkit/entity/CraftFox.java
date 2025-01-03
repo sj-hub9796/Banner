@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Fox;
-import org.bukkit.entity.Fox.Type;
 
 public class CraftFox extends CraftAnimals implements Fox {
 

@@ -4,17 +4,16 @@ import com.google.common.net.InetAddresses;
 import com.mohistmc.banner.config.BannerConfig;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.ProfilePublicKey;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.net.InetAddress;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.ProfilePublicKey;
 
 // Codes from paper, GPLv3/MIT
 // https://github.com/PaperMC/Paper/blob/master/patches/server/0832-Add-Velocity-IP-Forwarding-Support.patch

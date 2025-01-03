@@ -1,8 +1,7 @@
 package org.bukkit.craftbukkit.block;
 
-import java.util.Set;
-
 import com.mohistmc.banner.bukkit.BukkitMethodHooks;
+import java.util.Set;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;

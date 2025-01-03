@@ -3,6 +3,9 @@ package com.mohistmc.banner.boot;
 import com.google.gson.internal.bind.TypeAdapters;
 import com.google.gson.reflect.TypeToken;
 import com.mohistmc.banner.asm.Unsafe;
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.function.Consumer;
 import net.fabricmc.loader.impl.FabricLoaderImpl;
 import net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider;
 import net.fabricmc.loader.impl.game.patch.GameTransformer;
@@ -19,10 +22,6 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
-
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public class FabricBootstrap implements Consumer<FabricLauncher> {
 

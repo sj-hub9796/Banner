@@ -1,6 +1,5 @@
 package com.mohistmc.banner.install;
 
-import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.function.Supplier;
+import javax.net.ssl.SSLException;
 
 public record FileDownloader(String url, String target, String hash) implements Supplier<Path> {
 

@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.item.crafting;
 
 import com.google.gson.JsonObject;
 import com.mohistmc.banner.injection.world.item.crafting.InjectionRecipeManager;
+import java.util.Map;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -10,8 +11,6 @@ import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.Map;
 
 // Banner TODO fix patch
 @Mixin(RecipeManager.class)

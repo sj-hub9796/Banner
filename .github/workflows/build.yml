@@ -7,7 +7,7 @@ on : [push, pull_request]
 
 env:
   MINECRAFT_VERSION: 1.21.1
-  VERSION: 1.21.1-snapshot
+  VERSION: 1.21.1
   MODRINTH_TOKEN: ${{ secrets.PUBLISH_MODRINTH_TOKEN }}
   RELEASE_NAME: banner-1.21.1
 

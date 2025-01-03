@@ -11,7 +11,7 @@ public class BannerLauncher {
     private static final int MIN_CLASS_VERSION = 65;
     private static final int MIN_JAVA_VERSION = 21;
 
-    private static final int MAX_CLASS_VERSION = 66;
+    private static final int MAX_CLASS_VERSION = 67;
     private static final int MAX_JAVA_VERSION = 22;
 
     public static void main(String[] args) throws Throwable {

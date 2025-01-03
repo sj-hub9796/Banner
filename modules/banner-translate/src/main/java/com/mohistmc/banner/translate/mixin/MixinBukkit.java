@@ -1,6 +1,8 @@
 package com.mohistmc.banner.translate.mixin;
 
 import com.mohistmc.banner.BannerMCStart;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -10,9 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Logger;
 
 @Mixin(value = Bukkit.class, remap = false)
 public abstract class MixinBukkit {

@@ -1,10 +1,6 @@
 package com.mohistmc.banner.bukkit.remapping;
 
 import com.google.common.io.ByteStreams;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.loader.impl.transformer.FabricTransformer;
-import org.objectweb.asm.ClassReader;
-
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,6 +11,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 import java.util.Hashtable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.impl.transformer.FabricTransformer;
+import org.objectweb.asm.ClassReader;
 
 /**
  * RemapSourceHandler

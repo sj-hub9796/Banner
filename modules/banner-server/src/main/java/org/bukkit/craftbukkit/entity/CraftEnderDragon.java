@@ -11,7 +11,6 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.boss.CraftDragonBattle;
 import org.bukkit.entity.ComplexEntityPart;
 import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.EnderDragon.Phase;
 
 public class CraftEnderDragon extends CraftMob implements EnderDragon, CraftEnemy {
 

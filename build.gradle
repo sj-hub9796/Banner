@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.7-SNAPSHOT'
+    id 'fabric-loom' version '1.9-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -22,6 +22,10 @@ allprojects {
         maven {
             name = 'mohist'
             url = 'https://maven.mohistmc.com/'
+        }
+        maven {
+            name = 'mohist lib'
+            url = 'https://maven.mohistmc.com/libraries'
         }
         maven {
             name = 'izzel'
@@ -62,6 +66,7 @@ allprojects {
         implementation('com.mohistmc:tools:0.5.1')
         implementation('com.mohistmc:dynamicenum:0.3.1')
         // jansi support
+        implementation("org.jline:jline-reader:3.21.0")
         implementation("org.jline:jline-terminal:3.21.0")
         implementation("org.jline:jline-terminal-jansi:3.21.0")
         implementation("net.minecrell:terminalconsoleappender:1.4.0")

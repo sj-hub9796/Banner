@@ -2,11 +2,10 @@ package org.bukkit.craftbukkit.scheduler;
 
 import java.util.function.Consumer;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.SpigotTimings;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
-
-import org.bukkit.craftbukkit.SpigotTimings; // Spigot
-import org.spigotmc.CustomTimingsHandler; // Spigot
+import org.spigotmc.CustomTimingsHandler;
 
 public class CraftTask implements BukkitTask, Runnable { // Spigot
 

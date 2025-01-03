@@ -2,13 +2,9 @@ archivesBaseName = project.archives_base_name + "-bukkit-manager"
 version = getSubprojectVersion(project)
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
-    compileOnly(fileTree("lib/banner-1.21.1-dev.jar"))
+    compileOnly(rootProject.project("banner-api"))
+    compileOnly(rootProject.project("banner-server"))
 }
-
-moduleDependencies(project, [
-        "banner-server"
-])
 
 processResources {
     duplicatesStrategy = DuplicatesStrategy.WARN

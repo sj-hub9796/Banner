@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.stats;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import java.util.Collection;
+import java.util.List;
 import net.minecraft.network.protocol.game.ClientboundRecipePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,9 +14,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Collection;
-import java.util.List;
 
 @Mixin(ServerRecipeBook.class)
 public class MixinServerRecipeBook {
