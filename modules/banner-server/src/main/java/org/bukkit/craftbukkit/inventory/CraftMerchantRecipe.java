@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.inventory;
 
 import com.google.common.base.Preconditions;
+import com.mohistmc.banner.bukkit.BukkitConstructorHooks;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.component.DataComponentMap;
@@ -29,7 +30,7 @@ public class CraftMerchantRecipe extends MerchantRecipe {
 
     public CraftMerchantRecipe(ItemStack result, int uses, int maxUses, boolean experienceReward, int experience, float priceMultiplier, int demand, int specialPrice) {
         super(result, uses, maxUses, experienceReward, experience, priceMultiplier, demand, specialPrice);
-        this.handle = new net.minecraft.world.item.trading.MerchantOffer(
+        this.handle = BukkitConstructorHooks.newMerchantOffer(
                 new ItemCost(Items.AIR),
                 Optional.empty(),
                 CraftItemStack.asNMSCopy(result),

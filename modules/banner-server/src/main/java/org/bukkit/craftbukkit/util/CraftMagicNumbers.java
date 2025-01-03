@@ -7,6 +7,7 @@ import com.google.common.io.Files;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Dynamic;
@@ -246,7 +247,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 
         try {
-            nmsStack.applyComponents(new ItemParser(Commands.createValidationContext(MinecraftServer.getDefaultRegistryAccess())).parse(new StringReader(arguments)).components());
+            nmsStack.applyComponents(new ItemParser(Commands.createValidationContext(BukkitMethodHooks.getDefaultRegistryAccess())).parse(new StringReader(arguments)).components());
         } catch (CommandSyntaxException ex) {
             Logger.getLogger(CraftMagicNumbers.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -299,7 +300,7 @@ public final class CraftMagicNumbers implements UnsafeValues {
     @Override
     public void checkSupported(PluginDescriptionFile pdf) throws InvalidPluginException {
         ApiVersion toCheck = ApiVersion.getOrCreateVersion(pdf.getAPIVersion());
-        ApiVersion minimumVersion = BukkitMethodHooks.getServer().server.minimumAPI;
+        ApiVersion minimumVersion = BukkitMethodHooks.getServer().bridge$server().minimumAPI;
 
         if (toCheck.isNewerThan(ApiVersion.CURRENT)) {
             // Newer than supported

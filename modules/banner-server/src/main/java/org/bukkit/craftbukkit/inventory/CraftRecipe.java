@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.inventory;
 
 import com.google.common.base.Preconditions;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public interface CraftRecipe extends Recipe {
         } else if (bukkit instanceof RecipeChoice.MaterialChoice) {
             stack = Ingredient.of(((RecipeChoice.MaterialChoice) bukkit).getChoices().stream().map((mat) -> CraftItemType.bukkitToMinecraft(mat)));
         } else if (bukkit instanceof RecipeChoice.ExactChoice) {
-            stack = Ingredient.ofStacks(((RecipeChoice.ExactChoice) bukkit).getChoices().stream().map((mat) -> CraftItemStack.asNMSCopy(mat)).toList());
+            stack = BukkitMethodHooks.ofStacks(((RecipeChoice.ExactChoice) bukkit).getChoices().stream().map((mat) -> CraftItemStack.asNMSCopy(mat)).toList());
         } else {
             throw new IllegalArgumentException("Unknown recipe stack instance " + bukkit);
         }
@@ -53,9 +54,9 @@ public interface CraftRecipe extends Recipe {
             return null;
         }
 
-        if (list.isExact()) {
-            List<org.bukkit.inventory.ItemStack> choices = new ArrayList<>(list.itemStacks().size());
-            for (net.minecraft.world.item.ItemStack i : list.itemStacks()) {
+        if (list.bridge$exact()) {
+            List<org.bukkit.inventory.ItemStack> choices = new ArrayList<>(list.bridge$itemStacks().size());
+            for (net.minecraft.world.item.ItemStack i : list.bridge$itemStacks()) {
                 choices.add(CraftItemStack.asBukkitCopy(i));
             }
 

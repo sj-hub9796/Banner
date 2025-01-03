@@ -1,6 +1,6 @@
 package org.bukkit.craftbukkit.inventory;
 
-import net.minecraft.server.MinecraftServer;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.RecipeChoice;

@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.map;
 
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public final class CraftMapView implements MapView {
 
     @Override
     public int getId() {
-        return this.worldMap.id.id();
+        return this.worldMap.bridge$mapView().getId();
     }
 
     @Override
@@ -58,8 +59,8 @@ public final class CraftMapView implements MapView {
             return world.getWorld();
         }
 
-        if (this.worldMap.uniqueId != null) {
-            return Bukkit.getServer().getWorld(this.worldMap.uniqueId);
+        if (this.worldMap.bridge$uniqueId() != null) {
+            return Bukkit.getServer().getWorld(this.worldMap.bridge$uniqueId());
         }
         return null;
     }
@@ -67,7 +68,7 @@ public final class CraftMapView implements MapView {
     @Override
     public void setWorld(World world) {
         this.worldMap.dimension = ((CraftWorld) world).getHandle().dimension();
-        this.worldMap.uniqueId = world.getUID();
+        this.worldMap.banner$setUniqueId(world.getUID());
     }
 
     @Override

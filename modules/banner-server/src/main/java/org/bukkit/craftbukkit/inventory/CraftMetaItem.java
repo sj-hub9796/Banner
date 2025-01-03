@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
+import com.mohistmc.banner.bukkit.BukkitMethodHooks;
 import com.mojang.serialization.DynamicOps;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -738,7 +739,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
             ByteArrayInputStream buf = new ByteArrayInputStream(Base64.getDecoder().decode(unhandled));
             try {
                 CompoundTag unhandledTag = NbtIo.readCompressed(buf, NbtAccounter.unlimitedHeap());
-                DataComponentPatch unhandledPatch = DataComponentPatch.CODEC.parse(MinecraftServer.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), unhandledTag).result().get();
+                DataComponentPatch unhandledPatch = DataComponentPatch.CODEC.parse(BukkitMethodHooks.getDefaultRegistryAccess().createSerializationContext(NbtOps.INSTANCE), unhandledTag).result().get();
                 this.unhandledTags.copy(unhandledPatch);
 
                 for (Entry<DataComponentType<?>, Optional<?>> entry : unhandledPatch.entrySet()) {
