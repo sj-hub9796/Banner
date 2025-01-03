@@ -24,6 +24,6 @@ libraries/org/apache/logging/log4j/log4j-iostreams/2.20.0/log4j-iostreams-2.20.0
 libraries/net/minecrell/terminalconsoleappender/1.4.0/terminalconsoleappender-1.4.0.jar|6508e35ad178825278fbd3d1ff82d2cc|26102
 libraries/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar|5cc2c478d73e8454b4c369cee66c5bc7|23931
 libraries/com/mysql/mysql-connector-j/8.4.0/mysql-connector-j-8.4.0.jar|2607d710106276083d26e6a1505948d7|2533399
-libraries/net/md-5/bungeecord-chat/1.16-R0.4/bungeecord-chat-1.16-R0.4.jar|bf6464395a0951675c3bca47d3e1a13a|148961
+libraries/net/md-5/bungeecord-chat/1.20-R0.2/bungeecord-chat-1.20-R0.2.jar|ed9538000dab1eb802b575479985475d|157153
 libraries/net/md-5/SpecialSource/1.11.2/SpecialSource-1.11.2.jar|adcca168c7f61188d6bf90c809d6eef1|89094
 libraries/jline/jline/2.14.6/jline-2.14.6.jar|480423551649bc6980b43f09e4717272|268780
