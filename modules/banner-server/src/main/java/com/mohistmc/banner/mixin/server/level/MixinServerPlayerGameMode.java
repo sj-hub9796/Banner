@@ -54,7 +54,6 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -373,11 +372,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     public BlockPos interactPosition;
     public InteractionHand interactHand;
     public ItemStack interactItemStack;
-
-    @ModifyVariable(method = { "useItemOn" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;copy()Lnet/minecraft/world/item/ItemStack;"), ordinal = 1)
-    private boolean stopBlockUse(final boolean orig) {
-        return false || orig;
-    }
 
     /**
      * @author wdog5
