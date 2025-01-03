@@ -901,14 +901,15 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
     }
 
     void applyEnchantments(Map<Enchantment, Integer> enchantments, CraftMetaItem.Applicator tag, ItemMetaKeyType<ItemEnchantments> key, ItemFlag itemFlag) {
-        if (enchantments == null) {
+        if (enchantments == null && !hasItemFlag(itemFlag)) {
             return;
         }
 
         ItemEnchantments.Mutable list = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
-
-        for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
-            list.set(CraftEnchantment.bukkitToMinecraftHolder(entry.getKey()), entry.getValue());
+        if (enchantments != null) {
+            for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+                list.set(CraftEnchantment.bukkitToMinecraftHolder(entry.getKey()), entry.getValue());
+            }
         }
 
         list.showInTooltip = !this.hasItemFlag(itemFlag);
@@ -956,7 +957,7 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
 
     @Overridden
     boolean isEmpty() {
-        return !(this.hasDisplayName() || this.hasItemName() || this.hasLocalizedName() || this.hasEnchants() || (this.lore != null) || this.hasCustomModelData() || this.hasBlockData() || this.hasRepairCost() || !this.unhandledTags.build().isEmpty() || !this.removedTags.isEmpty() || !this.persistentDataContainer.isEmpty() || this.hideFlag != 0 || this.isHideTooltip() || this.isUnbreakable() || this.hasEnchantmentGlintOverride() || this.isFireResistant() || this.hasMaxStackSize() || this.hasRarity() || this.hasFood() || this.hasTool() || this.hasDamage() || this.hasMaxDamage() || this.hasAttributeModifiers() || this.customTag != null);
+        return !(this.hasDisplayName() || this.hasItemName() || this.hasLocalizedName() || this.hasEnchants() || (this.lore != null) || this.hasCustomModelData() || this.hasBlockData() || this.hasRepairCost() || !this.unhandledTags.build().isEmpty() || !this.removedTags.isEmpty() || !this.persistentDataContainer.isEmpty() || this.hideFlag != 0 || this.isHideTooltip() || this.isUnbreakable() || this.hasEnchantmentGlintOverride() || this.isFireResistant() || this.hasMaxStackSize() || this.hasRarity() || this.hasFood() || this.hasTool() || hasJukeboxPlayable() || this.hasDamage() || this.hasMaxDamage() || this.hasAttributeModifiers() || this.customTag != null);
     }
 
     @Override

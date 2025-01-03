@@ -12,6 +12,8 @@ import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.arclight.mixin.Eject;
 import java.io.File;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
@@ -57,6 +59,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.server.players.IpBanList;
 import net.minecraft.server.players.IpBanListEntry;
 import net.minecraft.server.players.PlayerList;
@@ -84,6 +87,7 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.command.ColouredConsoleSender;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftPlayer.TransferCookieConnection;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.craftbukkit.util.CraftLocation;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -99,6 +103,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -257,6 +262,16 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         return quitMsg;
     }
 
+    @Unique
+    private AtomicReference<ServerPlayer> entity = new AtomicReference<>(null);
+    @Unique
+    public AtomicReference<ServerLoginPacketListenerImpl> handler = new AtomicReference<>(null);
+
+    @Override
+    public void banner$putHandler(ServerLoginPacketListenerImpl handler) {
+        this.handler.set(handler);
+    }
+
     /**
      * @author Mgazul
      * @reason bukkit
@@ -264,9 +279,13 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Overwrite
     public Component canPlayerLogin(SocketAddress socketaddress, GameProfile gameProfile) {
         ServerPlayer serverPlayer = getPlayerForLogin(gameProfile, ClientInformation.createDefault());
+        entity.set(serverPlayer);
         org.bukkit.entity.Player player = serverPlayer.getBukkitEntity();
-        String hostname = ((java.net.InetSocketAddress) socketaddress).getHostName() + ":" + ((java.net.InetSocketAddress) socketaddress).getPort();
-        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((java.net.InetSocketAddress) socketaddress).getAddress());
+        ServerLoginPacketListenerImpl handleR = handler.getAndSet(null);
+        serverPlayer.bridge$transferCookieConnection((TransferCookieConnection) handler);
+        String hostname = handleR == null ? "" : handleR.connection.bridge$hostname();
+        InetAddress realAddress = handleR == null ? ((InetSocketAddress) socketaddress).getAddress() : ((InetSocketAddress) handleR.connection.channel.remoteAddress()).getAddress();
+        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((InetSocketAddress) socketaddress).getAddress(), realAddress);
 
         if (getBans().isBanned(gameProfile) && !getBans().get(gameProfile).hasExpired()) {
             UserBanListEntry userbanlistentry = this.bans.get(gameProfile);
@@ -453,7 +472,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.sendAllPlayerInfo(playerIn);
         playerIn.onUpdateAbilities();
         playerIn.triggerDimensionChangeTriggers(((CraftWorld) fromWorld).getHandle());
-        if (fromWorld != playerIn.serverLevel()) {
+        if (fromWorld != playerIn.serverLevel().getWorld()) {
             PlayerChangedWorldEvent event = new PlayerChangedWorldEvent(playerIn.getBukkitEntity(), fromWorld);
             Bukkit.getPluginManager().callEvent(event);
         }

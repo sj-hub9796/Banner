@@ -6,7 +6,6 @@ import com.mohistmc.banner.injection.world.item.InjectionItemStack;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -21,8 +20,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BedItem;
 import net.minecraft.world.item.BlockItem;
@@ -34,7 +31,6 @@ import net.minecraft.world.item.SignItem;
 import net.minecraft.world.item.SolidBucketItem;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -62,7 +58,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -106,31 +101,6 @@ public abstract class MixinItemStack implements InjectionItemStack {
         this.components.restorePatch(empty);
     }
 
-    /**
-     * @author wdog5
-     * @reason functionality replaced
-     * TODO inline this with injects
-     */
-    @Overwrite
-    public void hurtAndBreak(int i, LivingEntity livingEntity, EquipmentSlot equipmentSlot) {
-        Level var5 = livingEntity.level();
-        if (var5 instanceof ServerLevel serverLevel) {
-            ServerPlayer var10003;
-            if (livingEntity instanceof ServerPlayer serverPlayer) {
-                var10003 = serverPlayer;
-            } else {
-                var10003 = null;
-            }
-
-            this.hurtAndBreak(i, serverLevel, var10003, (item) -> {
-                if (this.count == 1 && livingEntity instanceof Player) {
-                    CraftEventFactory.callPlayerItemBreakEvent(((Player) livingEntity), (ItemStack) (Object) this);
-                }
-                livingEntity.onEquippedItemBroken(item, equipmentSlot);
-            });
-        }
-
-    }
 
     @SuppressWarnings("all")
     @Override
@@ -177,7 +147,12 @@ public abstract class MixinItemStack implements InjectionItemStack {
                 int j = this.getDamageValue() + i;
                 this.setDamageValue(j);
                 if (j >= this.getMaxDamage()) {
-                    Item item = this.getItem();
+
+                    // CraftBukkit start - Check for item breaking
+                    if (this.count == 1) {
+                        org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerItemBreakEvent(serverPlayer, (ItemStack) (Object) this);
+                    }
+                    // CraftBukkit end
                     this.shrink(1);
                     consumer.accept(item);
                 }

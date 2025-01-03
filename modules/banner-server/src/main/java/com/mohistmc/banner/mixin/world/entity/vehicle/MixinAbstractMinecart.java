@@ -281,6 +281,16 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
         }
     }
 
+    // CraftBukkit start
+    @Override
+    public Vec3 getKnownMovement() {
+        double d0 = this.getMaxSpeed();
+        Vec3 vec3d = super.getKnownMovement();
+
+        return new Vec3(Mth.clamp(vec3d.x, -d0, d0), vec3d.y, Mth.clamp(vec3d.z, -d0, d0));
+    }
+    // CraftBukkit end
+
     @Override
     public Vector getFlyingVelocityMod() {
         return new Vector(flyingX, flyingY, flyingZ);

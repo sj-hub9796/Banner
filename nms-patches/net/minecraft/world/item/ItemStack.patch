@@ -307,7 +307,7 @@
  
              this.hurtAndBreak(i, worldserver, entityplayer, (item) -> {
 +                // CraftBukkit start - Check for item breaking
-+                if (this.count == 1 && entityliving instanceof EntityHuman) {
++                if (this.count == 1 && entityplayer != null) {
 +                    org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerItemBreakEvent((EntityHuman) entityliving, this);
 +                }
 +                // CraftBukkit end

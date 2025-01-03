@@ -162,6 +162,16 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     private float pluginRainPositionPrevious;
     public CraftPlayer.TransferCookieConnection transferCookieConnection;
 
+    @Override
+    public void bridge$transferCookieConnection(CraftPlayer.TransferCookieConnection transferCookieConnection) {
+        this.transferCookieConnection = transferCookieConnection;
+    }
+
+    @Override
+    public CraftPlayer.TransferCookieConnection bridge$transferCookieConnection() {
+        return this.transferCookieConnection;
+    }
+
     public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
         super(level, blockPos, f, gameProfile);
     }

@@ -169,7 +169,7 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
         if (bukkitEntity != null) {
             return bukkitEntity;
         }
-        CraftInventory inventory = new CraftInventoryAnvil(
+        CraftInventoryAnvil inventory = new CraftInventoryAnvil(
                 access.getLocation(), this.inputSlots, this.resultSlots, ((AnvilMenu) (Object) this));
         bukkitEntity = new CraftAnvilView(this.player.getBukkitEntity(), inventory, ((AnvilMenu) (Object) this));
         return bukkitEntity;

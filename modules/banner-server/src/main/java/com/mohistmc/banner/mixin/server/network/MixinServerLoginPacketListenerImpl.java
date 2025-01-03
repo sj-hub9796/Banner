@@ -18,6 +18,7 @@ import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
 import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.util.Waitable;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
@@ -33,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerLoginPacketListenerImpl.class)
-public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginPacketListener, TickablePacketListener, InjectionServerLoginPacketListenerImpl {
+public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginPacketListener, TickablePacketListener, InjectionServerLoginPacketListenerImpl, CraftPlayer.TransferCookieConnection {
 
     @Shadow public abstract void disconnect(Component component);
     @Shadow @Final private MinecraftServer server;
@@ -56,6 +57,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
 
     @Inject(method = "verifyLoginAndFinishConnectionSetup", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;canPlayerLogin(Ljava/net/SocketAddress;Lcom/mojang/authlib/GameProfile;)Lnet/minecraft/network/chat/Component;", shift = Shift.AFTER))
     private void banner$canLogin(GameProfile gameProfile, CallbackInfo ci, @Local PlayerList playerList) {
+        playerList.banner$putHandler((ServerLoginPacketListenerImpl) (Object) this);
         if (this.player == null) {
             this.player = playerList.getPlayerForLogin(gameProfile, ClientInformation.createDefault());
         }

@@ -9,6 +9,7 @@ import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures.Totem;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
+import com.mohistmc.banner.injection.world.item.InjectionSuspiciousStewItem;
 import io.izzel.arclight.mixin.Eject;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -163,7 +164,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Shadow public abstract void heal(float healAmount);
     @Shadow public abstract ItemStack getItemInHand(InteractionHand hand);
 
-    @Shadow public abstract boolean onClimbable();
+    @Shadow protected ItemStack useItem;
 
     @Shadow public abstract InteractionHand getUsedItemHand();
 
@@ -928,13 +929,16 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Eject(method = "completeUsingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack banner$itemConsume(ItemStack itemStack, Level worldIn, LivingEntity
             entityLiving, CallbackInfo ci) {
-        if (((LivingEntity)(Object) this) instanceof ServerPlayer) {
+        if (((LivingEntity)(Object) this) instanceof ServerPlayer entityPlayer) {
             final org.bukkit.inventory.ItemStack craftItem = CraftItemStack.asBukkitCopy(itemStack);
             final PlayerItemConsumeEvent event = new PlayerItemConsumeEvent((org.bukkit.entity.Player)this.getBukkitEntity(), craftItem, CraftEquipmentSlot.getHand(this.getUsedItemHand()));
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
-                ((ServerPlayer) (Object) this).getBukkitEntity().updateInventory();
-                ((ServerPlayer) (Object) this).getBukkitEntity().updateScaledHealth();
+                if (this.useItem.getItem() instanceof net.minecraft.world.item.SuspiciousStewItem itemSuspiciousStew) {
+                    ((InjectionSuspiciousStewItem)itemSuspiciousStew).cancelUsingItem(entityPlayer, this.useItem);
+                }
+                entityPlayer.getBukkitEntity().updateInventory();
+                entityPlayer.getBukkitEntity().updateScaledHealth();
                 ci.cancel();
                 return null;
             } else if (!craftItem.equals(event.getItem())) {

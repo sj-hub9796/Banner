@@ -1,6 +1,7 @@
 package com.mohistmc.banner.injection.server.network;
 
 import net.minecraft.network.ConnectionProtocol;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -40,6 +41,10 @@ public interface InjectionServerCommonPacketListenerImpl {
     }
 
     default void sendPacket(Packet<?> packet) {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    default void kickPlayer(Component reason) {
         throw new IllegalStateException("Not implemented");
     }
 

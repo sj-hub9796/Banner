@@ -40,7 +40,7 @@ public abstract class MixinAbstractVillager extends AgeableMob implements Invent
 
     @Override
     public CraftMerchant getCraftMerchant() {
-        return (craftMerchant == null) ? craftMerchant = new CraftMerchant((net.minecraft.world.entity.npc.AbstractVillager) (Object) this) : craftMerchant;
+        return (org.bukkit.craftbukkit.entity.CraftAbstractVillager) getBukkitEntity();
     }
 
     @Redirect(method = "addOffersFromItemListings", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/trading/MerchantOffers;add(Ljava/lang/Object;)Z"))

@@ -39,13 +39,6 @@ public abstract class MixinAbstractHurtingProjectile extends Projectile implemen
     }
 
     /*
-    @Inject(method = "tick", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/projectile/AbstractHurtingProjectile;onHit(Lnet/minecraft/world/phys/HitResult;)V"))
-    private void banner$projectileHit(CallbackInfo ci, Entity entity, HitResult rayTraceResult) {
-        if (this.isRemoved()) {
-            CraftEventFactory.callProjectileHitEvent((AbstractHurtingProjectile) (Object) this, rayTraceResult);
-        }
-    }
-
     @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getLookAngle()Lnet/minecraft/world/phys/Vec3;"))
     private void banner$nonLivingAttack(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (CraftEventFactory.handleNonLivingEntityDamageEvent((AbstractHurtingProjectile) (Object) this, source, amount, false)) {
