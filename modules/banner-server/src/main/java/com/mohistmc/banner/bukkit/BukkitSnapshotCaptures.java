@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.WorldLoader;
@@ -394,4 +397,17 @@ public class BukkitSnapshotCaptures {
             return primary;
         }
     }
+
+    public static class Totem {
+        public static AtomicBoolean fakeShrink = new AtomicBoolean(false);
+        @Getter
+        @Setter
+        private static org.bukkit.inventory.EquipmentSlot hand = null;
+
+        public static void clear() {
+            fakeShrink.set(false);
+            hand = null;
+        }
+    }
+
 }

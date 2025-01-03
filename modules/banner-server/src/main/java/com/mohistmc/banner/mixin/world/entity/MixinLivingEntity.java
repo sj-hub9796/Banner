@@ -3,8 +3,10 @@ package com.mohistmc.banner.mixin.world.entity;
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures.Totem;
 import com.mohistmc.banner.bukkit.ProcessableEffect;
 import com.mohistmc.banner.injection.world.entity.InjectionLivingEntity;
 import io.izzel.arclight.mixin.Eject;
@@ -15,6 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -53,6 +57,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
@@ -83,13 +88,14 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(LivingEntity.class)
+@Mixin(value = LivingEntity.class, priority = 199)
 public abstract class MixinLivingEntity extends Entity implements Attackable, InjectionLivingEntity {
 
     @Shadow @Final public static EntityDataAccessor<Float> DATA_HEALTH_ID;
@@ -110,7 +116,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Shadow protected abstract void onEffectRemoved(MobEffectInstance effectInstance);
 
-    @Shadow public boolean effectsDirty;
+    @Shadow public abstract boolean checkTotemDeathProtection(DamageSource damageSource);
 
     @Shadow protected abstract void updateInvisibilityStatus();
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_EFFECT_AMBIENCE_ID;
@@ -220,6 +226,10 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Shadow public abstract boolean hasEffect(Holder<MobEffect> holder);
 
     @Shadow public abstract int getExperienceReward(ServerLevel serverLevel, @Nullable Entity entity);
+
+    @Shadow protected abstract boolean trapdoorUsableAsLadder(BlockPos blockPos, BlockState blockState);
+
+    @Shadow public abstract void forceAddEffect(MobEffectInstance mobEffectInstance, @Nullable Entity entity);
 
     public MixinLivingEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -516,7 +526,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             float f1 = 0.0F;
             // ShieldBlockEvent implemented in damageEntity0
 
-            if (false && amount > 0.0F && this.isDamageSourceBlocked(source)) {
+            if (amount > 0.0F && this.isDamageSourceBlocked(source)) {
                 this.hurtCurrentlyUsedShield(amount);
                 f1 = amount;
                 amount = 0.0F;
@@ -532,6 +542,11 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
             if (source.is(DamageTypeTags.IS_FREEZING) && this.getType().is(EntityTypeTags.FREEZE_HURTS_EXTRA_TYPES)) {
                 f *= 5.0F;
+            }
+
+            if (source.is(DamageTypeTags.DAMAGES_HELMET) && !this.getItemBySlot(EquipmentSlot.HEAD).isEmpty()) {
+                this.hurtHelmet(source, f);
+                f *= 0.75F;
             }
 
             this.walkAnimation.setSpeed(1.5F);
@@ -558,13 +573,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
                 this.hurtTime = this.hurtDuration;
             }
 
-            if ((Object) this instanceof Animal) {
-                ((Animal) (Object) this).resetLove();
-                if ((Object) this instanceof TamableAnimal) {
-                    ((TamableAnimal) (Object) this).setOrderedToSit(false);
-                }
-            }
-
             Entity entity1 = source.getEntity();
             if (entity1 != null) {
                 if (entity1 instanceof LivingEntity && !source.is(DamageTypeTags.NO_ANGER)) {
@@ -574,10 +582,10 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
                 if (entity1 instanceof net.minecraft.world.entity.player.Player) {
                     this.lastHurtByPlayerTime = 100;
                     this.lastHurtByPlayer = (net.minecraft.world.entity.player.Player) entity1;
-                } else if (entity1 instanceof TamableAnimal wolfentity) {
-                    if (wolfentity.isTame()) {
+                } else if (entity1 instanceof Wolf wolf) {
+                    if (wolf.isTame()) {
                         this.lastHurtByPlayerTime = 100;
-                        LivingEntity livingentity = wolfentity.getOwner();
+                        LivingEntity livingentity = wolf.getOwner();
                         if (livingentity instanceof net.minecraft.world.entity.player.Player) {
                             this.lastHurtByPlayer = (net.minecraft.world.entity.player.Player) livingentity;
                         } else {
@@ -879,54 +887,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     public boolean removeAllEffects(EntityPotionEffectEvent.Cause cause) {
         pushEffectCause(cause);
         return this.removeAllEffects();
-    }
-
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    private boolean checkTotemDeathProtection(DamageSource damageSourceIn) {
-        if (damageSourceIn.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-            return false;
-        } else {
-            net.minecraft.world.item.ItemStack itemstack = null;
-
-            net.minecraft.world.item.ItemStack itemstack1 = ItemStack.EMPTY;
-            org.bukkit.inventory.EquipmentSlot bukkitHand = null;
-            for (InteractionHand hand : InteractionHand.values()) {
-                itemstack1 = this.getItemInHand(hand);
-                if (itemstack1.is(Items.TOTEM_OF_UNDYING)) {
-                    itemstack = itemstack1.copy();
-                    bukkitHand = CraftEquipmentSlot.getHand(hand);
-                    // itemstack1.shrink(1);
-                    break;
-                }
-            }
-
-            EntityResurrectEvent event = new EntityResurrectEvent((org.bukkit.entity.LivingEntity) this.getBukkitEntity(), bukkitHand);
-            event.setCancelled(itemstack == null);
-            Bukkit.getPluginManager().callEvent(event);
-
-            if (!event.isCancelled()) {
-                if (!itemstack1.isEmpty()) {
-                    itemstack1.shrink(1);
-                }
-                if (itemstack != null && (Object) this instanceof ServerPlayer serverplayerentity) {
-                    serverplayerentity.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
-                    CriteriaTriggers.USED_TOTEM.trigger(serverplayerentity, itemstack);
-                }
-
-                this.setHealth(1.0F);
-                this.removeAllEffects(EntityPotionEffectEvent.Cause.TOTEM);
-                this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 900, 1), EntityPotionEffectEvent.Cause.TOTEM);
-                pushEffectCause(EntityPotionEffectEvent.Cause.TOTEM);
-                this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 100, 1), EntityPotionEffectEvent.Cause.TOTEM);
-                this.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 1), EntityPotionEffectEvent.Cause.TOTEM);
-                this.level().broadcastEntityEvent((Entity) (Object) this, (byte) 35);
-            }
-            return !event.isCancelled();
-        }
     }
 
     @Inject(method = "createWitherRose", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))

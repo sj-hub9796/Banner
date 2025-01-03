@@ -23,4 +23,8 @@ public interface InjectionItemStack {
     default void restorePatch(DataComponentPatch empty) {
         throw new IllegalStateException("Not implemented");
     }
+
+    default void banner$fakeShrink(int count) {
+        throw new IllegalStateException("Not implemented");
+    }
 }

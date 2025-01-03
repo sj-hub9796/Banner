@@ -54,6 +54,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -251,7 +252,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             } else if (packetplayinblockdig_enumplayerdigtype == ServerboundPlayerActionPacket.Action.ABORT_DESTROY_BLOCK) {
                 this.isDestroyingBlock = false;
                 if (!Objects.equals(this.destroyPos, blockposition)) {
-                    LOGGER.debug("Mismatch in destroy block pos: {} {}", this.destroyPos, blockposition); // CraftBukkit - SPIGOT-5457 sent by client when interact event cancelled
+                    LOGGER.warn("Mismatch in destroy block pos: {} {}", this.destroyPos, blockposition);
                     this.level.destroyBlockProgress(this.player.getId(), this.destroyPos, -1);
                     this.debugLogging(blockposition, true, j, "aborted mismatched destroying");
                 }
@@ -373,8 +374,13 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     public InteractionHand interactHand;
     public ItemStack interactItemStack;
 
+    @ModifyVariable(method = { "useItemOn" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;copy()Lnet/minecraft/world/item/ItemStack;"), ordinal = 1)
+    private boolean stopBlockUse(final boolean orig) {
+        return false || orig;
+    }
+
     /**
-     * @author wdog4
+     * @author wdog5
      * @reason
      */
     @Overwrite
@@ -398,7 +404,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         interactResult = event.useItemInHand() == Event.Result.DENY;
         interactPosition = blockPos.immutable();
         interactHand = hand;
-        interactItemStack = stack.copy();
+        interactItemStack = stack;
 
         if (event.useInteractedBlock() == Event.Result.DENY) {
             // If we denied a door from opening, we need to send a correcting update to the client, as it already opened the door.

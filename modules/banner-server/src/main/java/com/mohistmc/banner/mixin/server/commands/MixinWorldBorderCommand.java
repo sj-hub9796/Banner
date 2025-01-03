@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -15,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(WorldBorderCommand.class)
 public class MixinWorldBorderCommand {
 
-    private static AtomicReference<CommandSourceStack> banner$source = new AtomicReference<>();
+    @Unique
+    private static final AtomicReference<CommandSourceStack> banner$source = new AtomicReference<>();
 
     @Inject(method = "setDamageBuffer", at = @At("HEAD"))
     private static void banner$setSource(CommandSourceStack source, float distance, CallbackInfoReturnable<Integer> cir) {

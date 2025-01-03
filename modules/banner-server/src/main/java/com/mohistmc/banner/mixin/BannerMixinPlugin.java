@@ -67,6 +67,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
         if (mixinClassName.equals("com.mohistmc.banner.mixin.core.world.item.MixinChorusFruitItem")) {
             return !FabricLoader.getInstance().isModLoaded("openpartiesandclaims");
         }
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.server.commands.MixinWorldBorderCommand")) {
+            return !FabricLoader.getInstance().isModLoaded("multiworldborders");
+        }
         return true;
     }
 

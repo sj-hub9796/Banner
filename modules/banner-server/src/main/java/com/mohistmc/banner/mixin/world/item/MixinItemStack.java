@@ -1,10 +1,12 @@
 package com.mohistmc.banner.mixin.world.item;
 
 import com.mohistmc.banner.bukkit.BukkitFieldHooks;
+import com.mohistmc.banner.bukkit.BukkitSnapshotCaptures;
 import com.mohistmc.banner.injection.world.item.InjectionItemStack;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
@@ -60,6 +62,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack implements InjectionItemStack {
@@ -355,6 +361,18 @@ public abstract class MixinItemStack implements InjectionItemStack {
             }
 
             return interactionResult;
+        }
+    }
+
+    @Override
+    public void banner$fakeShrink(int count) {
+        shrink(count);
+    }
+
+    @Inject(method = "shrink", cancellable = true, at = @At("HEAD"))
+    private void banner$onArrowChange(int count, CallbackInfo ci) {
+        if (BukkitSnapshotCaptures.Totem.fakeShrink.getAndSet(false)) {
+            ci.cancel();
         }
     }
 
