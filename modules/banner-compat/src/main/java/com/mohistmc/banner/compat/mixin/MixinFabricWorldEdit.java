@@ -5,13 +5,11 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Pseudo
-@Mixin(targets = "com.sk89q.worldedit.fabric.FabricWorldEdit")
+@Mixin(value = com.sk89q.worldedit.fabric.FabricWorldEdit.class, remap = false)
 public abstract class MixinFabricWorldEdit {
 
     @Shadow protected abstract void setupRegistries(MinecraftServer server);

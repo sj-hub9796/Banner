@@ -362,6 +362,7 @@
     "world.item.MixinSnowballItem",
     "world.item.MixinSpawnEggItem",
     "world.item.MixinStandingAndWallBlockItem",
+    "world.item.MixinSuspiciousStewItem",
     "world.item.MixinTridentItem",
     "world.item.crafting.MixinBlastingRecipe",
     "world.item.crafting.MixinCampfireCookingRecipe",

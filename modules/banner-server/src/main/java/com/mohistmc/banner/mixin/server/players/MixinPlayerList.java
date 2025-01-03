@@ -282,7 +282,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         entity.set(serverPlayer);
         org.bukkit.entity.Player player = serverPlayer.getBukkitEntity();
         ServerLoginPacketListenerImpl handleR = handler.getAndSet(null);
-        serverPlayer.bridge$transferCookieConnection((TransferCookieConnection) handler);
+        serverPlayer.bridge$transferCookieConnection((TransferCookieConnection) handleR);
         String hostname = handleR == null ? "" : handleR.connection.bridge$hostname();
         InetAddress realAddress = handleR == null ? ((InetSocketAddress) socketaddress).getAddress() : ((InetSocketAddress) handleR.connection.channel.remoteAddress()).getAddress();
         PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((InetSocketAddress) socketaddress).getAddress(), realAddress);
