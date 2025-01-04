@@ -12,12 +12,12 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(TheEndGatewayBlockEntity.class)
 public abstract class MixinTheEndGatewayBlockEntity extends TheEndPortalBlockEntity {
 
-    @Shadow
-    private static void triggerCooldown(Level level, BlockPos pos, BlockState state, TheEndGatewayBlockEntity blockEntity) {
-    }
-
     protected MixinTheEndGatewayBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
+    }
+
+    @Shadow
+    private static void triggerCooldown(Level level, BlockPos pos, BlockState state, TheEndGatewayBlockEntity blockEntity) {
     }
 
 

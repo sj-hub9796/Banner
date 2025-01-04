@@ -26,15 +26,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinDistanceManager implements InjectionDistanceManager {
 
 
+    @Shadow @Final public Long2ObjectOpenHashMap<SortedArraySet<Ticket<?>>> tickets;
     // @formatter:off
     @Shadow @Final private DistanceManager.ChunkTicketTracker ticketTracker;
-    @Shadow protected abstract SortedArraySet<Ticket<?>> getTickets(long p_229848_1_);
+    @Shadow
+    private long ticketTickCounter;
+
     @Shadow private static int getTicketLevelAt(SortedArraySet<Ticket<?>> p_229844_0_) { return 0; }
-    @Shadow @Final public Long2ObjectOpenHashMap<SortedArraySet<Ticket<?>>> tickets;
-    @Shadow abstract TickingTracker tickingTracker();
+
+    @Shadow protected abstract SortedArraySet<Ticket<?>> getTickets(long p_229848_1_);
     // @formatter:on
 
-    @Shadow private long ticketTickCounter;
+    @Shadow abstract TickingTracker tickingTracker();
 
     @Inject(method = "removePlayer", cancellable = true, at = @At(value = "INVOKE", remap = false, target = "Lit/unimi/dsi/fastutil/objects/ObjectSet;remove(Ljava/lang/Object;)Z"))
     private void banner$remove(SectionPos p_140829_, ServerPlayer p_140830_, CallbackInfo ci, @Local ObjectSet<?> set) {
@@ -77,10 +80,7 @@ public abstract class MixinDistanceManager implements InjectionDistanceManager {
     @Override
     public boolean removeTicket(long chunkPosIn, Ticket<?> ticketIn) {
         SortedArraySet<Ticket<?>> ticketSet = this.getTickets(chunkPosIn);
-        boolean removed = false;
-        if (ticketSet.remove(ticketIn)) {
-            removed = true;
-        }
+        boolean removed = ticketSet.remove(ticketIn);
         if (ticketSet.isEmpty()) {
             this.tickets.remove(chunkPosIn);
         }

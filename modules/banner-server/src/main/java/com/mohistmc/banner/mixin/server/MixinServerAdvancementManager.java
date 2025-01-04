@@ -30,16 +30,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerAdvancementManager.class)
 public abstract class MixinServerAdvancementManager {
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
 
     @Shadow
     public Map<ResourceLocation, AdvancementHolder> advancements;
 
-    @Shadow private AdvancementTree tree;
+    @Shadow
+    private AdvancementTree tree;
+    @Shadow
+    @Final
+    private HolderLookup.Provider registries;
 
-    @Shadow protected abstract void validate(ResourceLocation resourceLocation, Advancement advancement);
-
-    @Shadow @Final private HolderLookup.Provider registries;
+    @Shadow
+    protected abstract void validate(ResourceLocation resourceLocation, Advancement advancement);
 
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At(value = "FIELD", shift = At.Shift.AFTER, opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/server/ServerAdvancementManager;advancements:Ljava/util/Map;"))
     private void banner$buildMutable(Map<ResourceLocation, JsonElement> map, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo ci) {
@@ -64,7 +69,7 @@ public abstract class MixinServerAdvancementManager {
             }
             // Spigot end
             try {
-                Advancement advancement = (Advancement)Advancement.CODEC.parse(registryOps, jsonElement).getOrThrow(JsonParseException::new);
+                Advancement advancement = Advancement.CODEC.parse(registryOps, jsonElement).getOrThrow(JsonParseException::new);
                 this.validate(resourceLocation, advancement);
                 builder.put(resourceLocation, new AdvancementHolder(resourceLocation, advancement));
             } catch (Exception var6) {

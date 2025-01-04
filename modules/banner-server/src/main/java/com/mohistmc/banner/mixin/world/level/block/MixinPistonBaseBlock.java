@@ -53,7 +53,7 @@ public abstract class MixinPistonBaseBlock extends DirectionalBlock {
     @Inject(method = "moveBlocks", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/level/block/piston/PistonStructureResolver;getToDestroy()Ljava/util/List;"))
     public void banner$pistonAction(Level worldIn, BlockPos pos, Direction directionIn, boolean extending, CallbackInfoReturnable<Boolean> cir,
-                                      BlockPos blockPos, PistonStructureResolver helper) {
+                                    BlockPos blockPos, PistonStructureResolver helper) {
         final Block craftBlock = CraftBlock.at(worldIn, pos);
 
         final List<BlockPos> moved = helper.getToPush();

@@ -36,7 +36,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net.minecraft.server.network.ServerGamePacketListenerImpl$1")
 public abstract class MixinServerGamePacketListenerImpl_Handler {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     ServerGamePacketListenerImpl field_28963;
 
     @Unique
@@ -71,7 +72,7 @@ public abstract class MixinServerGamePacketListenerImpl_Handler {
 
         if (event.isCancelled() || player.getInventory().getSelected() == null || player.getInventory().getSelected().getItem() != origItem) {
             // Refresh the current entity metadata
-             entity.getEntityData().refresh(player);
+            entity.getEntityData().refresh(player);
             if (entity instanceof Allay) {
                 player.connection.send(new ClientboundSetEquipmentPacket(entity.getId(), Arrays.stream(net.minecraft.world.entity.EquipmentSlot.values()).map((slot) -> Pair.of(slot, ((LivingEntity) entity).getItemBySlot(slot).copy())).collect(Collectors.toList())));
                 player.containerMenu.sendAllDataToRemote();

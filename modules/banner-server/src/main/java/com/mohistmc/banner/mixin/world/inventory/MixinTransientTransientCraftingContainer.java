@@ -24,13 +24,16 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(TransientCraftingContainer.class)
 public abstract class MixinTransientTransientCraftingContainer implements Container, InjectionTransientCraftingContainer {
 
-    @Shadow @Final private NonNullList<ItemStack> items;
-
-    @Shadow @Final public AbstractContainerMenu menu;
+    @Shadow
+    @Final
+    public AbstractContainerMenu menu;
     // CraftBukkit start - add fields
     public List<HumanEntity> transaction = new java.util.ArrayList<>();
-    private RecipeHolder<?> currentRecipe;
     public Container resultInventory;
+    @Shadow
+    @Final
+    private NonNullList<ItemStack> items;
+    private RecipeHolder<?> currentRecipe;
     private Player owner;
     private int maxStack = MAX_STACK;
 
@@ -83,6 +86,12 @@ public abstract class MixinTransientTransientCraftingContainer implements Contai
     }
 
     @Override
+    public void setMaxStackSize(int size) {
+        maxStack = size;
+        resultInventory.setMaxStackSize(size);
+    }
+
+    @Override
     public List<HumanEntity> getViewers() {
         return transaction;
     }
@@ -93,23 +102,17 @@ public abstract class MixinTransientTransientCraftingContainer implements Contai
     }
 
     @Override
+    public void setCurrentRecipe(RecipeHolder<?> recipe) {
+        this.currentRecipe = recipe;
+    }
+
+    @Override
     public Location getLocation() {
         return menu instanceof CraftingMenu ? ((CraftingMenu) menu).access.getLocation() : owner.getBukkitEntity().getLocation();
     }
 
     @Override
-    public void setMaxStackSize(int size) {
-        maxStack = size;
-        resultInventory.setMaxStackSize(size);
-    }
-
-    @Override
     public void bridge$setResultInventory(Container resultInventory) {
         this.resultInventory = resultInventory;
-    }
-
-    @Override
-    public void setCurrentRecipe(RecipeHolder<?> recipe) {
-        this.currentRecipe = recipe;
     }
 }

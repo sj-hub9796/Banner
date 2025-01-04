@@ -39,14 +39,6 @@ public class MixinComposterBlock {
     public static BlockState empty(@Nullable Entity p_270236_, BlockState p_270873_, LevelAccessor p_270963_, BlockPos p_270211_) { return null; }
     // @formatter:on
 
-    @SuppressWarnings({"InvalidMemberReference", "UnresolvedMixinReference", "MixinAnnotationTarget", "InvalidInjectorMethodSignature"})
-    @Redirect(method = "getContainer", at = @At(value = "NEW", target = "()Lnet/minecraft/world/level/block/ComposterBlock$EmptyContainer;"))
-    public ComposterBlock.EmptyContainer banner$newEmpty(BlockState blockState, LevelAccessor world, BlockPos blockPos) {
-        ComposterBlock.EmptyContainer inventory = new ComposterBlock.EmptyContainer();
-        inventory.setOwner(new CraftBlockInventoryHolder(world, blockPos, inventory));
-        return inventory;
-    }
-
     /**
      * @author wdog5
      * @reason
@@ -96,5 +88,13 @@ public class MixinComposterBlock {
             }
             return blockstate;
         }
+    }
+
+    @SuppressWarnings({"InvalidMemberReference", "UnresolvedMixinReference", "MixinAnnotationTarget", "InvalidInjectorMethodSignature"})
+    @Redirect(method = "getContainer", at = @At(value = "NEW", target = "()Lnet/minecraft/world/level/block/ComposterBlock$EmptyContainer;"))
+    public ComposterBlock.EmptyContainer banner$newEmpty(BlockState blockState, LevelAccessor world, BlockPos blockPos) {
+        ComposterBlock.EmptyContainer inventory = new ComposterBlock.EmptyContainer();
+        inventory.setOwner(new CraftBlockInventoryHolder(world, blockPos, inventory));
+        return inventory;
     }
 }

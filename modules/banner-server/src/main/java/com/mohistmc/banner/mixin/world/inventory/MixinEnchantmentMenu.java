@@ -21,18 +21,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 // Banner TODO fix patches
 @Mixin(EnchantmentMenu.class)
-public abstract class MixinEnchantmentMenu extends AbstractContainerMenu{
+public abstract class MixinEnchantmentMenu extends AbstractContainerMenu {
 
+    @Shadow @Final public int[] costs;
+    @Shadow @Final public int[] enchantClue;
+    @Shadow @Final public int[] levelClue;
     // @formatter:off
     @Shadow @Final private Container enchantSlots;
     @Shadow @Final private ContainerLevelAccess access;
     @Shadow @Final private RandomSource random;
     @Shadow @Final private DataSlot enchantmentSeed;
-    @Shadow @Final public int[] costs;
-    @Shadow @Final public int[] enchantClue;
-    @Shadow @Final public int[] levelClue;
     // @formatter:on
-
     private CraftEnchantmentView bukkitEntity = null;
     private org.bukkit.entity.Player player;
 

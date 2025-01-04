@@ -25,7 +25,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractFurnaceMenu.class)
 public abstract class MixinAbstractFurnaceMenu extends RecipeBookMenu<SingleRecipeInput, AbstractCookingRecipe> {
 
-    @Shadow @Final private Container container;
+    @Shadow
+    @Final
+    private Container container;
     private CraftFurnaceView bukkitEntity = null;
     private Inventory player;
 
@@ -34,12 +36,12 @@ public abstract class MixinAbstractFurnaceMenu extends RecipeBookMenu<SingleReci
     }
 
     @Inject(method = "<init>(Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/inventory/RecipeBookType;ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/Container;Lnet/minecraft/world/inventory/ContainerData;)V",
-    at = @At("RETURN"))
+            at = @At("RETURN"))
     private void banner$init(MenuType<?> menuType, RecipeType<?> recipeType, RecipeBookType recipeBookType, int i, Inventory inventory, Container container, ContainerData containerData, CallbackInfo ci) {
         this.player = inventory;
     }
 
-    @Inject(method = "stillValid", at= @At("HEAD"), cancellable = true)
+    @Inject(method = "stillValid", at = @At("HEAD"), cancellable = true)
     private void banner$unreachable(Player player, CallbackInfoReturnable<Boolean> cir) {
         if (!this.bridge$checkReachable()) {
             cir.setReturnValue(true);
@@ -53,7 +55,7 @@ public abstract class MixinAbstractFurnaceMenu extends RecipeBookMenu<SingleReci
         }
 
         CraftInventoryFurnace inventory = new CraftInventoryFurnace((AbstractFurnaceBlockEntity) this.container);
-        bukkitEntity = new CraftFurnaceView (this.player.player.getBukkitEntity(), inventory, (AbstractFurnaceMenu) (Object) this);
+        bukkitEntity = new CraftFurnaceView(this.player.player.getBukkitEntity(), inventory, (AbstractFurnaceMenu) (Object) this);
         return bukkitEntity;
     }
 }

@@ -23,19 +23,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerAdvancements.class)
 public abstract class MixinPlayerAdvancements {
 
-    @Shadow private ServerPlayer player;
-
-    @Shadow @Final private Path playerSavePath;
-
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    private ServerPlayer player;
+    @Shadow
+    @Final
+    private Path playerSavePath;
+    private final AtomicReference<Map.Entry<ResourceLocation, AdvancementProgress>> banner$entry = new AtomicReference<>();
 
     @Inject(method = "award",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerAdvancements;getOrStartProgress(Lnet/minecraft/advancements/AdvancementHolder;)Lnet/minecraft/advancements/AdvancementProgress;"))
     public void banner$callEvent(AdvancementHolder advancementHolder, String string, CallbackInfoReturnable<Boolean> cir) {
         Bukkit.getPluginManager().callEvent(new org.bukkit.event.player.PlayerAdvancementDoneEvent(this.player.getBukkitEntity(), advancementHolder.bridge$bukkit()));
     }
-
-    private AtomicReference<Map.Entry<ResourceLocation, AdvancementProgress>> banner$entry = new AtomicReference<>();
 
     @Inject(method = "method_48027",
             at = @At(value = "HEAD"), cancellable = true)

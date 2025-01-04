@@ -17,7 +17,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ServerScoreboard.class)
 public class MixinServerScoreboard {
 
-    @Shadow @Final private MinecraftServer server;
+    @Shadow
+    @Final
+    private MinecraftServer server;
 
     @Redirect(method = "startTrackingObjective", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;getPlayers()Ljava/util/List;"))
     private List<ServerPlayer> banner$filterAdd(PlayerList playerList) {
@@ -44,8 +46,8 @@ public class MixinServerScoreboard {
 
     // CraftBukkit start - Send to players
     private void broadcastAll(Packet packet) {
-        for (ServerPlayer entityplayer : (List<ServerPlayer>) this.server.getPlayerList().players) {
-            if (entityplayer.getBukkitEntity().getScoreboard().getHandle() == ((Scoreboard) (Object) this)) {
+        for (ServerPlayer entityplayer : this.server.getPlayerList().players) {
+            if (entityplayer.getBukkitEntity().getScoreboard().getHandle() == (Object) this) {
                 entityplayer.connection.send(packet);
             }
         }

@@ -19,9 +19,12 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(targets = "net.minecraft.world.entity.monster.Silverfish$SilverfishWakeUpFriendsGoal")
 public abstract class MixinSilverfish_WakeUpFriendsGoal extends Goal {
 
-    @Shadow private int lookForFriends;
+    @Shadow
+    private int lookForFriends;
 
-    @Shadow @Final private Silverfish silverfish;
+    @Shadow
+    @Final
+    private Silverfish silverfish;
 
     /**
      * @author wdog5
@@ -35,9 +38,9 @@ public abstract class MixinSilverfish_WakeUpFriendsGoal extends Goal {
             RandomSource randomSource = this.silverfish.getRandom();
             BlockPos blockPos = this.silverfish.blockPosition();
 
-            for(int i = 0; i <= 5 && i >= -5; i = (i <= 0 ? 1 : 0) - i) {
-                for(int j = 0; j <= 10 && j >= -10; j = (j <= 0 ? 1 : 0) - j) {
-                    for(int k = 0; k <= 10 && k >= -10; k = (k <= 0 ? 1 : 0) - k) {
+            for (int i = 0; i <= 5 && i >= -5; i = (i <= 0 ? 1 : 0) - i) {
+                for (int j = 0; j <= 10 && j >= -10; j = (j <= 0 ? 1 : 0) - j) {
+                    for (int k = 0; k <= 10 && k >= -10; k = (k <= 0 ? 1 : 0) - k) {
                         BlockPos blockPos2 = blockPos.offset(j, i, k);
                         BlockState blockState = level.getBlockState(blockPos2);
                         Block block = blockState.getBlock();
@@ -49,7 +52,7 @@ public abstract class MixinSilverfish_WakeUpFriendsGoal extends Goal {
                             if (level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
                                 level.destroyBlock(blockPos2, true, this.silverfish);
                             } else {
-                                level.setBlock(blockPos2, ((InfestedBlock)block).hostStateByInfested(level.getBlockState(blockPos2)), 3);
+                                level.setBlock(blockPos2, ((InfestedBlock) block).hostStateByInfested(level.getBlockState(blockPos2)), 3);
                             }
 
                             if (randomSource.nextBoolean()) {

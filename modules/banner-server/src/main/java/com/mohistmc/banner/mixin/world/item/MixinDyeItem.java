@@ -20,7 +20,9 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(DyeItem.class)
 public class MixinDyeItem {
 
-    @Shadow @Final private DyeColor dyeColor;
+    @Shadow
+    @Final
+    private DyeColor dyeColor;
 
     @Decorate(method = "interactLivingEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Sheep;setColor(Lnet/minecraft/world/item/DyeColor;)V"))
     private void banner$sheepDyeWool(net.minecraft.world.entity.animal.Sheep sheepEntity, DyeColor color, ItemStack stack, Player playerIn, LivingEntity target, InteractionHand hand) throws Throwable {

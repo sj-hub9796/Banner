@@ -29,41 +29,6 @@ public abstract class MixinZombieVillager extends Zombie {
         super(entityType, level);
     }
 
-    @Inject(method = "startConverting", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;removeEffect(Lnet/minecraft/core/Holder;)Z"))
-    private void banner$convert1(UUID conversionStarterIn, int conversionTimeIn, CallbackInfo ci) {
-        this.banner$setPersist(true);
-        pushEffectCause(EntityPotionEffectEvent.Cause.CONVERSION);
-    }
-
-    @Inject(method = "startConverting", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
-    private void banner$convert2(UUID conversionStarterIn, int conversionTimeIn, CallbackInfo ci) {
-        pushEffectCause(EntityPotionEffectEvent.Cause.CONVERSION);
-    }
-
-    @Eject(method = "finishConversion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
-    private <T extends Mob> T banner$cure(net.minecraft.world.entity.monster.ZombieVillager zombieVillagerEntity, EntityType<T> entityType, boolean flag, CallbackInfo ci) {
-        T t = this.convertTo(entityType, flag, EntityTransformEvent.TransformReason.CURED, CreatureSpawnEvent.SpawnReason.CURED);
-        if (t == null) {
-            ((ZombieVillager) this.getBukkitEntity()).setConversionTime(-1);
-            ci.cancel();
-        } else {
-             t.pushEffectCause(EntityPotionEffectEvent.Cause.CONVERSION);
-        }
-        return t;
-    }
-
-    // Banner TODO fixme
-    /*
-    @Inject(method = "finishConversion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;spawnAtLocation(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/item/ItemEntity;"))
-    private void banner$dropPre(ServerLevel world, CallbackInfo ci) {
-        this.banner$setForceDrops(true);
-    }
-
-    @Inject(method = "finishConversion", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/monster/ZombieVillager;spawnAtLocation(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/item/ItemEntity;"))
-    private void banner$dropPost(ServerLevel world, CallbackInfo ci) {
-        this.banner$setForceDrops(false);
-    }*/
-
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
     private static net.minecraft.world.entity.monster.ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
         villager.level().pushAddEntityReason(spawnReason);
@@ -80,5 +45,40 @@ public abstract class MixinZombieVillager extends Zombie {
             }
         }
         return zombieVillager;
+    }
+
+    @Inject(method = "startConverting", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;removeEffect(Lnet/minecraft/core/Holder;)Z"))
+    private void banner$convert1(UUID conversionStarterIn, int conversionTimeIn, CallbackInfo ci) {
+        this.banner$setPersist(true);
+        pushEffectCause(EntityPotionEffectEvent.Cause.CONVERSION);
+    }
+
+    @Inject(method = "startConverting", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z"))
+    private void banner$convert2(UUID conversionStarterIn, int conversionTimeIn, CallbackInfo ci) {
+        pushEffectCause(EntityPotionEffectEvent.Cause.CONVERSION);
+    }
+
+    // Banner TODO fixme
+    /*
+    @Inject(method = "finishConversion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;spawnAtLocation(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/item/ItemEntity;"))
+    private void banner$dropPre(ServerLevel world, CallbackInfo ci) {
+        this.banner$setForceDrops(true);
+    }
+
+    @Inject(method = "finishConversion", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/monster/ZombieVillager;spawnAtLocation(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/entity/item/ItemEntity;"))
+    private void banner$dropPost(ServerLevel world, CallbackInfo ci) {
+        this.banner$setForceDrops(false);
+    }*/
+
+    @Eject(method = "finishConversion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/ZombieVillager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
+    private <T extends Mob> T banner$cure(net.minecraft.world.entity.monster.ZombieVillager zombieVillagerEntity, EntityType<T> entityType, boolean flag, CallbackInfo ci) {
+        T t = this.convertTo(entityType, flag, EntityTransformEvent.TransformReason.CURED, CreatureSpawnEvent.SpawnReason.CURED);
+        if (t == null) {
+            ((ZombieVillager) this.getBukkitEntity()).setConversionTime(-1);
+            ci.cancel();
+        } else {
+            t.pushEffectCause(EntityPotionEffectEvent.Cause.CONVERSION);
+        }
+        return t;
     }
 }

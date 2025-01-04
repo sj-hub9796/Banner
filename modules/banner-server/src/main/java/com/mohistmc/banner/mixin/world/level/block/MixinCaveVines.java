@@ -29,7 +29,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(CaveVines.class)
 public interface MixinCaveVines {
 
-    @Shadow @Final BooleanProperty BERRIES = BlockStateProperties.BERRIES;
+    @Shadow
+    @Final
+    BooleanProperty BERRIES = BlockStateProperties.BERRIES;
 
     /**
      * @author wdog5
@@ -37,9 +39,9 @@ public interface MixinCaveVines {
      */
     @Overwrite
     static InteractionResult use(@Nullable Entity entity, BlockState blockState, Level level, BlockPos blockPos) {
-        if ((Boolean)blockState.getValue(BERRIES)) {
+        if (blockState.getValue(BERRIES)) {
             // CraftBukkit start
-            if (!CraftEventFactory.callEntityChangeBlockEvent(entity, blockPos, (BlockState) blockState.setValue(CaveVines.BERRIES, false))) {
+            if (!CraftEventFactory.callEntityChangeBlockEvent(entity, blockPos, blockState.setValue(CaveVines.BERRIES, false))) {
                 return InteractionResult.SUCCESS;
             }
 
@@ -56,8 +58,8 @@ public interface MixinCaveVines {
             }
             // CraftBukkit end
             float f = Mth.randomBetween(level.random, 0.8F, 1.2F);
-            level.playSound((Player)null, blockPos, SoundEvents.CAVE_VINES_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, f);
-            BlockState blockState2 = (BlockState)blockState.setValue(BERRIES, false);
+            level.playSound(null, blockPos, SoundEvents.CAVE_VINES_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, f);
+            BlockState blockState2 = blockState.setValue(BERRIES, false);
             level.setBlock(blockPos, blockState2, 2);
             level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(entity, blockState2));
             return InteractionResult.sidedSuccess(level.isClientSide);

@@ -26,16 +26,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(net.minecraft.world.entity.npc.AbstractVillager.class)
 public abstract class MixinAbstractVillager extends AgeableMob implements InventoryCarrier, Npc, Merchant {
 
+    private CraftMerchant craftMerchant;
+    @Shadow
+    @Final
+    private SimpleContainer inventory;
     protected MixinAbstractVillager(EntityType<? extends AgeableMob> entityType, Level level) {
         super(entityType, level);
     }
 
-    private CraftMerchant craftMerchant;
-    @Shadow @Final private SimpleContainer inventory;
-
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(EntityType<? extends net.minecraft.world.entity.npc.AbstractVillager> type, Level worldIn, CallbackInfo ci) {
-         this.inventory.setOwner((InventoryHolder) this.getBukkitEntity());
+        this.inventory.setOwner((InventoryHolder) this.getBukkitEntity());
     }
 
     @Override
@@ -46,7 +47,7 @@ public abstract class MixinAbstractVillager extends AgeableMob implements Invent
     @Redirect(method = "addOffersFromItemListings", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/trading/MerchantOffers;add(Ljava/lang/Object;)Z"))
     private boolean banner$gainOffer(MerchantOffers merchantOffers, Object e) {
         MerchantOffer offer = (MerchantOffer) e;
-        VillagerAcquireTradeEvent event = new VillagerAcquireTradeEvent((AbstractVillager) getBukkitEntity(),  offer.asBukkit());
+        VillagerAcquireTradeEvent event = new VillagerAcquireTradeEvent((AbstractVillager) getBukkitEntity(), offer.asBukkit());
         if (this.bridge$valid()) {
             Bukkit.getPluginManager().callEvent(event);
         }

@@ -15,17 +15,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(WorldBorder.class)
 public abstract class MixinWorldBorder implements InjectionWorldBorder {
 
-    @Shadow @Final private List<BorderChangeListener> listeners;
-
-    @Shadow public abstract double getCenterX();
-
-    @Shadow public abstract double getCenterZ();
-
-    @Shadow public abstract double getSize();
-
-    @Shadow public abstract void lerpSizeBetween(double oldSize, double newSize, long time);
-
     public net.minecraft.world.level.Level world; // CraftBukkit
+    @Shadow
+    @Final
+    private List<BorderChangeListener> listeners;
+
+    @Shadow
+    public abstract double getCenterX();
+
+    @Shadow
+    public abstract double getCenterZ();
+
+    @Shadow
+    public abstract double getSize();
+
+    @Shadow
+    public abstract void lerpSizeBetween(double oldSize, double newSize, long time);
 
     @Override
     public Level bridge$world() {

@@ -62,17 +62,19 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
     @Shadow
     @Final
+    private static Logger LOGGER;
+    private final AtomicReference<BlockBreakEvent> banner$event = new AtomicReference<>();
+    // CraftBukkit start - whole method
+    public boolean interactResult = false;
+    public boolean firedInteract = false;
+    public BlockPos interactPosition;
+    public InteractionHand interactHand;
+    public ItemStack interactItemStack;
+    @Shadow
+    @Final
     protected ServerPlayer player;
-
     @Shadow
     protected ServerLevel level;
-
-    @Shadow
-    public abstract boolean isCreative();
-
-    @Shadow
-    protected abstract void debugLogging(BlockPos blockPos, boolean bl, int i, String string);
-
     @Shadow
     private GameType gameModeForPlayer;
     @Shadow
@@ -93,16 +95,20 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     private int delayedTickStart;
 
     @Shadow
-    @Final
-    private static Logger LOGGER;
+    public abstract boolean isCreative();
 
-    @Shadow public abstract boolean destroyBlock(BlockPos pos);
+    @Shadow
+    protected abstract void debugLogging(BlockPos blockPos, boolean bl, int i, String string);
 
-    @Shadow public abstract void destroyAndAck(BlockPos pos, int i, String string);
+    @Shadow
+    public abstract boolean destroyBlock(BlockPos pos);
+
+    @Shadow
+    public abstract void destroyAndAck(BlockPos pos, int i, String string);
 
     @Inject(method = "changeGameModeForPlayer", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;setGameModeForPlayer(Lnet/minecraft/world/level/GameType;Lnet/minecraft/world/level/GameType;)V"))
     private void banner$gameModeEvent(GameType gameType, CallbackInfoReturnable<Boolean> cir) {
-        PlayerGameModeChangeEvent event = new PlayerGameModeChangeEvent(((ServerPlayer) player).getBukkitEntity(), GameMode.getByValue(gameType.getId()));
+        PlayerGameModeChangeEvent event = new PlayerGameModeChangeEvent(player.getBukkitEntity(), GameMode.getByValue(gameType.getId()));
         Bukkit.getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             cir.setReturnValue(false);
@@ -265,8 +271,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
         }
     }
 
-    private final AtomicReference<BlockBreakEvent> banner$event = new AtomicReference<>();
-
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
     private void banner$fireBreakEvent(BlockPos blockposition, CallbackInfoReturnable<Boolean> cir) {
         BlockState iblockdata = this.level.getBlockState(blockposition);
@@ -350,7 +354,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
 
     @Redirect(method = "destroyBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/Item;canAttackBlock(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean banner$addFalse(Item instance, BlockState state, Level level, BlockPos pos, Player player) {
-        return true && this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
+        return this.player.getMainHandItem().getItem().canAttackBlock(state, this.level, pos, this.player);
     }
 
     @Inject(method = "destroyBlock", at = @At("RETURN"))
@@ -363,15 +367,9 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
                     target = "Lnet/minecraft/server/level/ServerLevel;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"), cancellable = true)
     private void banner$resetState(BlockPos pos, CallbackInfoReturnable<Boolean> cir, @Local LocalRef<BlockState> blockState) {
         blockState.set(this.level.getBlockState(pos)); // CraftBukkit - update state from plugins
-        if (blockState.get().isAir()) cir.setReturnValue(false); // CraftBukkit - A plugin set block to air without cancelling
+        if (blockState.get().isAir())
+            cir.setReturnValue(false); // CraftBukkit - A plugin set block to air without cancelling
     }
-
-    // CraftBukkit start - whole method
-    public boolean interactResult = false;
-    public boolean firedInteract = false;
-    public BlockPos interactPosition;
-    public InteractionHand interactHand;
-    public ItemStack interactItemStack;
 
     /**
      * @author wdog5

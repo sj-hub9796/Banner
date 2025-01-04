@@ -34,17 +34,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinFireBlock implements InjectionFireBlock {
 
 
+    @Shadow
+    @Final
+    private Object2IntMap<Block> burnOdds;
+    // @formatter:on
+    private final AtomicReference<BlockPos> sourceposition = new AtomicReference<>();
+
     // @formatter:off
     @Shadow
     protected abstract BlockState getStateForPlacement(BlockGetter blockReader, BlockPos pos);
-    // @formatter:on
-
-    @Shadow @Final private Object2IntMap<Block> burnOdds;
-    private AtomicReference<BlockPos> sourceposition = new AtomicReference<>();
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     public boolean banner$fireSpread(ServerLevel world, BlockPos mutablePos, BlockState newState, int flags,
-                                       BlockState state, ServerLevel worldIn, BlockPos pos) {
+                                     BlockState state, ServerLevel worldIn, BlockPos pos) {
         if (world.getBlockState(mutablePos).getBlock() != Blocks.FIRE) {
             if (!CraftEventFactory.callBlockIgniteEvent(world, mutablePos, pos).isCancelled()) {
                 return CraftEventFactory.handleBlockSpreadEvent(world, pos, mutablePos, newState, flags);

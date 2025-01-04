@@ -42,7 +42,7 @@ public abstract class MixinSmallFireball extends Fireball {
             Bukkit.getPluginManager().callEvent(event);
 
             if (!event.isCancelled()) {
-                 entity.banner$setSecondsOnFire((int) event.getDuration(), false);
+                entity.banner$setSecondsOnFire((int) event.getDuration(), false);
             }
         }
     }

@@ -29,15 +29,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PortalForcer.class)
 public abstract class MixinPortalForcer implements InjectionPortalForcer {
 
-    // @formatter:off
-    @Shadow public abstract Optional<BlockUtil.FoundRectangle> createPortal(BlockPos pos, Direction.Axis axis);
     @Shadow @Final protected ServerLevel level;
+    private final AtomicReference<Integer> banner$searchRadius = new AtomicReference<>();
     // @formatter:on
-
-    private AtomicReference<Integer> banner$searchRadius = new AtomicReference<>();
     private transient BlockStateListPopulator banner$populator;
     private transient Entity banner$entity;
     private transient int banner$createRadius = -1;
+
+    // @formatter:off
+    @Shadow public abstract Optional<BlockUtil.FoundRectangle> createPortal(BlockPos pos, Direction.Axis axis);
 
     // Banner TODO fix patches
     @Override
@@ -76,7 +76,7 @@ public abstract class MixinPortalForcer implements InjectionPortalForcer {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Inject(method = "createPortal", cancellable = true, at = @At("RETURN"))
     private void banner$portalCreate(BlockPos pos, Direction.Axis axis, CallbackInfoReturnable<Optional<BlockUtil.FoundRectangle>> cir) {
-        CraftWorld craftWorld =  this.level.getWorld();
+        CraftWorld craftWorld = this.level.getWorld();
         List<org.bukkit.block.BlockState> blockStates;
         if (this.banner$populator == null) {
             blockStates = new ArrayList<>();

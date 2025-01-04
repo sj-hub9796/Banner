@@ -33,7 +33,7 @@ public abstract class MixinBlockItem {
     private void banner$putCBState(BlockPlaceContext blockPlaceContext,
                                    CallbackInfoReturnable<InteractionResult> cir,
                                    @Local(ordinal = 1) BlockPlaceContext blockPlaceContext2,
-                                   @Share("cbState")LocalRef<org.bukkit.block.BlockState> stateLocalRef) {
+                                   @Share("cbState") LocalRef<org.bukkit.block.BlockState> stateLocalRef) {
         // CraftBukkit start - special case for handling block placement with water lilies and snow buckets
         org.bukkit.block.BlockState blockstate = null;
         if (((BlockItem) (Object) this) instanceof PlaceOnWaterBlockItem || ((BlockItem) (Object) this) instanceof SolidBucketItem) {
@@ -53,7 +53,7 @@ public abstract class MixinBlockItem {
                                    @Local BlockPos blockPos,
                                    @Local Level level,
                                    @Local Player player,
-                                   @Share("cbState")LocalRef<org.bukkit.block.BlockState> stateLocalRer) {
+                                   @Share("cbState") LocalRef<org.bukkit.block.BlockState> stateLocalRer) {
         // CraftBukkit start
         if (stateLocalRer.get() != null) {
             org.bukkit.event.block.BlockPlaceEvent placeEvent =
@@ -70,7 +70,8 @@ public abstract class MixinBlockItem {
     }
 
     @Redirect(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"))
-    private void banner$cancelPlaySound(Level instance, Player player, BlockPos blockPos, SoundEvent soundEvent, SoundSource soundSource, float f, float g) { }
+    private void banner$cancelPlaySound(Level instance, Player player, BlockPos blockPos, SoundEvent soundEvent, SoundSource soundSource, float f, float g) {
+    }
 
     @Inject(method = "canPlace", at = @At("HEAD"))
     private void banner$storeValue(BlockPlaceContext blockPlaceContext,

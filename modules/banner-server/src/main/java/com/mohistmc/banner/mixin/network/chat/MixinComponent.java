@@ -16,16 +16,20 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Component.class)
 public interface MixinComponent extends Iterable<Component>, InjectionComponent {
 
+    private static MutableComponent a(String key, Object... args) {
+        return MutableComponent.create(new TranslatableContents(key, null, args));
+    }
+    // @formatter:on
+
     // @formatter:off
     @Shadow List<Component> getSiblings();
-    // @formatter:on
 
     default Stream<Component> stream() {
         class Func implements Function<Component, Stream<? extends Component>> {
 
             @Override
             public Stream<? extends Component> apply(Component component) {
-                return ((InjectionComponent) component).bridge$stream();
+                return component.bridge$stream();
             }
         }
         return Streams.concat(Stream.of((Component) this), this.getSiblings().stream().flatMap(new Func()));
@@ -39,9 +43,5 @@ public interface MixinComponent extends Iterable<Component>, InjectionComponent 
     @Override
     default Stream<Component> bridge$stream() {
         return stream();
-    }
-
-    private static MutableComponent a(String key, Object... args) {
-        return MutableComponent.create(new TranslatableContents(key, (String)null, args));
     }
 }

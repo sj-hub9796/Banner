@@ -40,8 +40,8 @@ public abstract class MixinAreaEffectCloud extends Entity implements TraceableEn
     @SuppressWarnings("unchecked")
     @Decorate(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getEntitiesOfClass(Ljava/lang/Class;Lnet/minecraft/world/phys/AABB;)Ljava/util/List;"))
     private List<LivingEntity> banner$effectApply(Level instance, Class<LivingEntity> cl, AABB aabb,
-                                                    @Local(ordinal = 0) float radius,
-                                                    @Local(ordinal = -1) List<MobEffectInstance> effects) throws Throwable {
+                                                  @Local(ordinal = 0) float radius,
+                                                  @Local(ordinal = -1) List<MobEffectInstance> effects) throws Throwable {
         var entities = (List<LivingEntity>) DecorationOps.callsite().invoke(instance, cl, aabb);
         var affected = entities.stream().filter(it -> !this.victims.containsKey(it) && it.isAffectedByPotions())
                 .filter(it -> effects.stream().anyMatch(it::canBeAffected))

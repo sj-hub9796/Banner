@@ -14,12 +14,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BannerBlockEntity.class)
 public class MixinBannerBlockEntity {
 
-    @Shadow private BannerPatternLayers patterns;
+    @Shadow
+    private BannerPatternLayers patterns;
 
     @Inject(method = "applyImplicitComponents", at = @At(value = "FIELD",
             target = "Lnet/minecraft/world/level/block/entity/BannerBlockEntity;name:Lnet/minecraft/network/chat/Component;"))
     private void banner$checkPattern(BlockEntity.DataComponentInput dataComponentInput, CallbackInfo ci) {
-        this.setPatterns((BannerPatternLayers) dataComponentInput.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)); // CraftBukkit - apply limits
+        this.setPatterns(dataComponentInput.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)); // CraftBukkit - apply limits
     }
 
     public void setPatterns(BannerPatternLayers bannerpatternlayers) {

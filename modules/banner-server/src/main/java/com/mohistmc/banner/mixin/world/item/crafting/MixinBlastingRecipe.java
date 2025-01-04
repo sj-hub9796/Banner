@@ -27,7 +27,7 @@ public abstract class MixinBlastingRecipe extends AbstractCookingRecipe {
         }
         CraftItemStack result = CraftItemStack.asCraftMirror(this.result);
 
-        CraftBlastingRecipe recipe =  new CraftBlastingRecipe(id, result, CraftRecipe.toBukkit(this.ingredient), this.experience, this.cookingTime);
+        CraftBlastingRecipe recipe = new CraftBlastingRecipe(id, result, CraftRecipe.toBukkit(this.ingredient), this.experience, this.cookingTime);
         recipe.setGroup(this.group);
         recipe.setCategory(CraftRecipe.getCategory(this.category()));
         return recipe;

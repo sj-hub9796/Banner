@@ -21,7 +21,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GameEventDispatcher.class)
 public class MixinGameEventDispatcher {
 
-    @Shadow @Final private ServerLevel level;
+    @Shadow
+    @Final
+    private ServerLevel level;
 
     @Inject(method = "post", cancellable = true, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/core/SectionPos;blockToSectionCoord(I)I", ordinal = 0))

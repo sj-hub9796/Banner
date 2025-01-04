@@ -25,15 +25,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MapItemSavedData.HoldingPlayer.class)
 public abstract class MixinMapItemSavedData_HoldingPlayer {
 
-    @Shadow @Final private MapItemSavedData field_132;
-    @Shadow @Final public Player player;
+    @Shadow
+    @Final
+    public Player player;
+    @Shadow
+    @Final
+    private MapItemSavedData field_132;
     @Unique
-    private byte[] banner$colors = field_132.colors;
+    private final byte[] banner$colors = field_132.colors;
     @Unique
-    private java.util.Collection<MapDecoration> icons = new java.util.ArrayList<>();
+    private final java.util.Collection<MapDecoration> icons = new java.util.ArrayList<>();
 
-    private AtomicReference<RenderData> banner$render = new AtomicReference<>();
-    private AtomicReference<Player> banner$player = new AtomicReference<>();
+    private final AtomicReference<RenderData> banner$render = new AtomicReference<>();
+    private final AtomicReference<Player> banner$player = new AtomicReference<>();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$initRender(MapItemSavedData mapItemSavedData, Player player, CallbackInfo ci) {

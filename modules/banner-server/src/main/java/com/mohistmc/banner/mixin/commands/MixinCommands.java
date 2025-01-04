@@ -30,13 +30,19 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Commands.class)
 public abstract class MixinCommands implements InjectionCommands {
 
-    @Mutable @Shadow @Final private CommandDispatcher<CommandSourceStack> dispatcher;
+    @Mutable
+    @Shadow
+    @Final
+    private CommandDispatcher<CommandSourceStack> dispatcher;
 
-    @Shadow protected abstract void fillUsableCommands(CommandNode<CommandSourceStack> rootCommandSource, CommandNode<SharedSuggestionProvider> rootSuggestion, CommandSourceStack source, Map<CommandNode<CommandSourceStack>, CommandNode<SharedSuggestionProvider>> commandNodeToSuggestionNode);
+    @Shadow
+    protected abstract void fillUsableCommands(CommandNode<CommandSourceStack> rootCommandSource, CommandNode<SharedSuggestionProvider> rootSuggestion, CommandSourceStack source, Map<CommandNode<CommandSourceStack>, CommandNode<SharedSuggestionProvider>> commandNodeToSuggestionNode);
 
-    @Shadow public abstract void performCommand(ParseResults<CommandSourceStack> parseResults, String string);
+    @Shadow
+    public abstract void performCommand(ParseResults<CommandSourceStack> parseResults, String string);
 
-    @Shadow public abstract void performPrefixedCommand(CommandSourceStack commandSourceStack, String string);
+    @Shadow
+    public abstract void performPrefixedCommand(CommandSourceStack commandSourceStack, String string);
 
     @CreateConstructor
     public void banner$constructor() {
@@ -101,7 +107,7 @@ public abstract class MixinCommands implements InjectionCommands {
 
         RootCommandNode<CommandSourceStack> vanilla = player.getServer().bridge$getVanillaCommands().getDispatcher().getRoot();
         map.put(vanilla, vanillaRoot);
-        this.fillUsableCommands(vanilla, vanillaRoot, player.createCommandSourceStack(), (Map) map);
+        this.fillUsableCommands(vanilla, vanillaRoot, player.createCommandSourceStack(), map);
 
         RootCommandNode<SharedSuggestionProvider> rootCommandNode = new RootCommandNode();
         map.put(this.dispatcher.getRoot(), rootCommandNode);

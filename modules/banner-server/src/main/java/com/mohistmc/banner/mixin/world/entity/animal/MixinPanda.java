@@ -17,11 +17,13 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Panda.class)
 public abstract class MixinPanda extends Animal {
 
+    @Shadow
+    @Final
+    static Predicate<ItemEntity> PANDA_ITEMS;
+
     protected MixinPanda(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
     }
-
-    @Shadow @Final static Predicate<ItemEntity> PANDA_ITEMS;
 
     /**
      * @author wdog5

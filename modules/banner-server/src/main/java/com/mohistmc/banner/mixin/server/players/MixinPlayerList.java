@@ -115,48 +115,84 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerList.class)
 public abstract class MixinPlayerList implements InjectionPlayerList {
 
+    @Shadow
+    @Final
+    private static SimpleDateFormat BAN_DATE_FORMAT;
     @Mutable
-    @Shadow @Final public List<ServerPlayer> players;
-    @Shadow @Final private Map<UUID, ServerPlayer> playersByUUID;
-
-    @Shadow public abstract void broadcastSystemMessage(Component message, boolean bypassHiddenChat);
-
-    @Shadow @Nullable public abstract ServerPlayer getPlayer(UUID playerUUID);
-
-    @Shadow @Final private MinecraftServer server;
-
-    @Shadow public abstract UserBanList getBans();
-
-    @Shadow @Final private UserBanList bans;
-    @Shadow @Final private static SimpleDateFormat BAN_DATE_FORMAT;
-
-    @Shadow public abstract boolean isWhiteListed(GameProfile profile);
-
-    @Shadow public abstract IpBanList getIpBans();
-
-    @Shadow @Final private IpBanList ipBans;
+    @Shadow
+    @Final
+    public List<ServerPlayer> players;
     @Shadow
     public int maxPlayers;
-
-    @Shadow public abstract boolean canBypassPlayerLimit(GameProfile profile);
-    @Shadow public abstract void sendAllPlayerInfo(ServerPlayer player);
-
-    @Shadow @Final public PlayerDataStorage playerIo;
-    @Shadow protected abstract void save(ServerPlayer player);
-
-    @Shadow @Final private Map<UUID, ServerStatsCounter> stats;
-
-    @Shadow public abstract ServerPlayer getPlayerForLogin(GameProfile gameProfile, ClientInformation clientInformation);
-
-    @Shadow public abstract ServerPlayer respawn(ServerPlayer serverPlayer, boolean bl, Entity.RemovalReason removalReason);
-
-    @Shadow public abstract void sendActivePlayerEffects(ServerPlayer serverPlayer);
-
-    @Shadow public abstract void sendLevelInfo(ServerPlayer serverPlayer, ServerLevel serverLevel);
-
-    @Shadow public abstract void sendPlayerPermissionLevel(ServerPlayer serverPlayer);
-
+    @Shadow
+    @Final
+    public PlayerDataStorage playerIo;
+    public String quitMsg;
+    @Unique
+    public AtomicReference<ServerLoginPacketListenerImpl> handler = new AtomicReference<>(null);
+    public ServerLevel banner$worldserver = null;
+    public AtomicBoolean avoidSuffocation = new AtomicBoolean(true);
+    @Shadow
+    @Final
+    private Map<UUID, ServerPlayer> playersByUUID;
+    @Shadow
+    @Final
+    private MinecraftServer server;
+    @Shadow
+    @Final
+    private UserBanList bans;
+    @Shadow
+    @Final
+    private IpBanList ipBans;
+    @Shadow
+    @Final
+    private Map<UUID, ServerStatsCounter> stats;
     private CraftServer cserver;
+    @Unique
+    private final AtomicReference<ServerPlayer> entity = new AtomicReference<>(null);
+    private Location banner$loc = null;
+    private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
+    private final AtomicReference<ServerPlayer> banner$worldBorderPlayer = new AtomicReference<>();
+
+    @Shadow
+    public abstract void broadcastSystemMessage(Component message, boolean bypassHiddenChat);
+
+    @Shadow
+    @Nullable
+    public abstract ServerPlayer getPlayer(UUID playerUUID);
+
+    @Shadow
+    public abstract UserBanList getBans();
+
+    @Shadow
+    public abstract boolean isWhiteListed(GameProfile profile);
+
+    @Shadow
+    public abstract IpBanList getIpBans();
+
+    @Shadow
+    public abstract boolean canBypassPlayerLimit(GameProfile profile);
+
+    @Shadow
+    public abstract void sendAllPlayerInfo(ServerPlayer player);
+
+    @Shadow
+    protected abstract void save(ServerPlayer player);
+
+    @Shadow
+    public abstract ServerPlayer getPlayerForLogin(GameProfile gameProfile, ClientInformation clientInformation);
+
+    @Shadow
+    public abstract ServerPlayer respawn(ServerPlayer serverPlayer, boolean bl, Entity.RemovalReason removalReason);
+
+    @Shadow
+    public abstract void sendActivePlayerEffects(ServerPlayer serverPlayer);
+
+    @Shadow
+    public abstract void sendLevelInfo(ServerPlayer serverPlayer, ServerLevel serverLevel);
+
+    @Shadow
+    public abstract void sendPlayerPermissionLevel(ServerPlayer serverPlayer);
 
     @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/server/players/PlayerList;bans:Lnet/minecraft/server/players/UserBanList;"))
     public void banner$init(MinecraftServer minecraftServer, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, PlayerDataStorage playerDataStorage, int i, CallbackInfo ci) {
@@ -175,7 +211,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         if (optional.isPresent()) {
             CompoundTag nbttagcompound = (CompoundTag) optional.get();
             if (nbttagcompound.contains("bukkit")) {
-                CompoundTag bukkit =  nbttagcompound.getCompound("bukkit");
+                CompoundTag bukkit = nbttagcompound.getCompound("bukkit");
                 string = bukkit.contains("lastKnownName", 8) ? bukkit.getString("lastKnownName") : string;
             }
         }
@@ -183,7 +219,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
 
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;getLevel(Lnet/minecraft/resources/ResourceKey;)Lnet/minecraft/server/level/ServerLevel;"))
     private ServerLevel banner$spawnLocationEvent(MinecraftServer minecraftServer, ResourceKey<Level> dimension, Connection netManager, ServerPlayer playerIn) {
-        CraftPlayer player =  playerIn.getBukkitEntity();
+        CraftPlayer player = playerIn.getBukkitEntity();
         PlayerSpawnLocationEvent event = new PlayerSpawnLocationEvent(player, player.getLocation());
         cserver.getPluginManager().callEvent(event);
         Location loc = event.getSpawnLocation();
@@ -241,12 +277,10 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         }
     }
 
-    public String quitMsg;
-
     @Inject(method = "remove", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;save(Lnet/minecraft/server/level/ServerPlayer;)V"))
     private void banner$playerQuitPre(ServerPlayer playerIn, CallbackInfo ci) {
         if (playerIn.inventoryMenu != playerIn.containerMenu) {
-             playerIn.getBukkitEntity().closeInventory();
+            playerIn.getBukkitEntity().closeInventory();
         }
         var quitMessage = BukkitSnapshotCaptures.getQuitMessage();
         quitMsg = quitMessage;
@@ -261,11 +295,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     public String bridge$quiltMsg() {
         return quitMsg;
     }
-
-    @Unique
-    private AtomicReference<ServerPlayer> entity = new AtomicReference<>(null);
-    @Unique
-    public AtomicReference<ServerLoginPacketListenerImpl> handler = new AtomicReference<>(null);
 
     @Override
     public void banner$putHandler(ServerLoginPacketListenerImpl handler) {
@@ -324,11 +353,6 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         // Banner end
         return null;
     }
-
-    private Location banner$loc = null;
-    private transient PlayerRespawnEvent.RespawnReason banner$respawnReason;
-    public ServerLevel banner$worldserver = null;
-    public AtomicBoolean avoidSuffocation = new AtomicBoolean(true);
 
     @Inject(method = "respawn", at = @At("HEAD"))
     private void banner$stopRiding(ServerPlayer serverPlayer, boolean bl, Entity.RemovalReason removalReason, CallbackInfoReturnable<ServerPlayer> cir) {
@@ -409,7 +433,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
         this.players.remove(playerIn);
         playerIn.serverLevel().removePlayerImmediately(playerIn, removalReason);
         //playerIn.revive();
-        World fromWorld =  playerIn.getBukkitEntity().getWorld();
+        World fromWorld = playerIn.getBukkitEntity().getWorld();
         playerIn.wonGame = false;
         /*
         playerIn.copyFrom(playerIn, flag);
@@ -424,7 +448,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             //playerIn.pushRespawnReason(respawnReason);
             dimensiontransition = playerIn.findRespawnPositionAndUseSpawnBlock(flag, DimensionTransition.DO_NOTHING);
             if (!flag) {
-                 playerIn.reset(); // SPIGOT-4785
+                playerIn.reset(); // SPIGOT-4785
             }
         } else {
             dimensiontransition = new DimensionTransition(((CraftWorld) location.getWorld()).getHandle(), CraftLocation.toVec3D(location), Vec3.ZERO, location.getYaw(), location.getPitch(), DimensionTransition.DO_NOTHING);
@@ -466,7 +490,7 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             BlockState iblockdata = serverWorld.getBlockState(blockposition);
 
             if (iblockdata.is(Blocks.RESPAWN_ANCHOR)) {
-                playerIn.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), 1.0F, 1.0F, serverWorld.getRandom().nextLong()));
+                playerIn.connection.send(new ClientboundSoundPacket(SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.BLOCKS, blockposition.getX(), blockposition.getY(), blockposition.getZ(), 1.0F, 1.0F, serverWorld.getRandom().nextLong()));
             }
         }
         this.sendAllPlayerInfo(playerIn);
@@ -593,9 +617,9 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
     @Overwrite
     public PlayerAdvancements getPlayerAdvancements(ServerPlayer player) {
         UUID uUID = player.getUUID();
-        PlayerAdvancements playerAdvancements = (PlayerAdvancements)player.getAdvancements();// CraftBukkit
+        PlayerAdvancements playerAdvancements = player.getAdvancements();// CraftBukkit
         if (playerAdvancements == null) {
-            Path path = this.server.getWorldPath(LevelResource.PLAYER_ADVANCEMENTS_DIR).resolve("" + uUID + ".json");
+            Path path = this.server.getWorldPath(LevelResource.PLAYER_ADVANCEMENTS_DIR).resolve(uUID + ".json");
             playerAdvancements = new PlayerAdvancements(this.server.getFixerUpper(), ((PlayerList) (Object) this), this.server.getAdvancements(), path, player);
             // this.advancements.put(uUID, playerAdvancements);
         }
@@ -638,42 +662,45 @@ public abstract class MixinPlayerList implements InjectionPlayerList {
             }
 
             @Override
-            public void onBorderSetDamagePerBlock(WorldBorder worldborder, double d0) {}
+            public void onBorderSetDamagePerBlock(WorldBorder worldborder, double d0) {
+            }
 
             @Override
-            public void onBorderSetDamageSafeZOne(WorldBorder worldborder, double d0) {}
+            public void onBorderSetDamageSafeZOne(WorldBorder worldborder, double d0) {
+            }
         });
     }
 
     @Redirect(method = "sendLevelInfo",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
                     ordinal = 3))
-    private void banner$cancelSendPacket0(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
+    private void banner$cancelSendPacket0(ServerGamePacketListenerImpl instance, Packet<?> packet) {
+    }
 
     @Redirect(method = "sendLevelInfo",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
                     ordinal = 4))
-    private void banner$cancelSendPacket1(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
+    private void banner$cancelSendPacket1(ServerGamePacketListenerImpl instance, Packet<?> packet) {
+    }
 
     @Redirect(method = "sendLevelInfo",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
                     ordinal = 5))
-    private void banner$cancelSendPacket2(ServerGamePacketListenerImpl instance, Packet<?> packet) { }
+    private void banner$cancelSendPacket2(ServerGamePacketListenerImpl instance, Packet<?> packet) {
+    }
 
     @Inject(method = "sendLevelInfo",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-            ordinal = 3))
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+                    ordinal = 3))
     private void banner$setWeatherType(ServerPlayer player, ServerLevel level, CallbackInfo ci) {
         // CraftBukkit start - handle player weather
         player.setPlayerWeather(org.bukkit.WeatherType.DOWNFALL, false);
         player.updateWeather(-level.rainLevel, level.rainLevel, -level.thunderLevel, level.thunderLevel);
     }
-
-    private AtomicReference<ServerPlayer> banner$worldBorderPlayer = new AtomicReference<>();
 
     @Inject(method = "sendLevelInfo", at = @At("HEAD"))
     private void banner$getWorldBorderPlayer(ServerPlayer player, ServerLevel level, CallbackInfo ci) {

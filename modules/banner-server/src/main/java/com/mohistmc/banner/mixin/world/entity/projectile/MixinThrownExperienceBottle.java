@@ -36,7 +36,7 @@ public abstract class MixinThrownExperienceBottle extends ThrowableItemProjectil
                 this.level().levelEvent(2002, this.blockPosition(), PotionContents.getColor(Potions.WATER));
             }
             ExperienceOrb.award((ServerLevel) this.level(), this.position(), i);
-           // this.putRemoveCause(EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause // Banner TODO
+            // this.putRemoveCause(EntityRemoveEvent.Cause.HIT); // CraftBukkit - add Bukkit remove cause // Banner TODO
             this.discard();
         }
     }

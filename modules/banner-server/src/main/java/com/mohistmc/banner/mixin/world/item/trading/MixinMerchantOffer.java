@@ -18,10 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MerchantOffer.class)
 public abstract class MixinMerchantOffer implements InjectionMerchantOffer {
 
-    @Shadow public abstract ItemStack getCostA();
-
-    @Shadow public ItemCost baseCostA;
+    @Shadow
+    public ItemCost baseCostA;
     private CraftMerchantRecipe bukkitHandle;
+
+    @Shadow
+    public abstract ItemStack getCostA();
 
     @ShadowConstructor
     public void banner$constructor(ItemCost itemCost, Optional<ItemCost> optional, ItemStack itemStack, int i, int j, int k, float f, int l) {

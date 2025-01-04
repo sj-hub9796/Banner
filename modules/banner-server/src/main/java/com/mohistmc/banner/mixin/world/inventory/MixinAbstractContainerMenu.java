@@ -38,69 +38,86 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(AbstractContainerMenu.class)
 public abstract class MixinAbstractContainerMenu implements InjectionAbstractContainerMenu {
 
-    @Shadow private ItemStack remoteCarried;
+    @Shadow
+    public NonNullList<Slot> slots;
+    @Shadow
+    @Final
+    public int containerId;
+    public boolean checkReachable = true;
+    @Shadow
+    private ItemStack remoteCarried;
+    @Shadow
+    @Nullable
+    private ContainerSynchronizer synchronizer;
+    @Shadow
+    private int quickcraftStatus;
+    @Shadow
+    private int quickcraftType;
+    @Shadow
+    @Final
+    private Set<Slot> quickcraftSlots;
+    private InventoryView bukkitView;
+    @Shadow
+    private ItemStack carried;
+    private Component title;
 
-    @Shadow public abstract ItemStack getCarried();
-
-    @Shadow @Nullable private ContainerSynchronizer synchronizer;
-    @Shadow private int quickcraftStatus;
-
-    @Shadow public static int getQuickcraftHeader(int clickedButton) {
+    @Shadow
+    public static int getQuickcraftHeader(int clickedButton) {
         return clickedButton;
     }
-
-    @Shadow protected abstract void resetQuickCraft();
 
     @Shadow
     public static int getQuickcraftType(int eventButton) {
         return 0;
     }
 
-    @Shadow private int quickcraftType;
-
     @Shadow
     public static boolean isValidQuickcraftType(int dragMode, Player player) {
         return false;
     }
-
-    @Shadow @Final private Set<Slot> quickcraftSlots;
-    @Shadow public NonNullList<Slot> slots;
-    private InventoryView bukkitView;
 
     @Shadow
     public static boolean canItemQuickReplace(@Nullable Slot slot, ItemStack stack, boolean stackSizeMatters) {
         return false;
     }
 
-    @Shadow public abstract void setCarried(ItemStack stack);
-
-    @Shadow public abstract void sendAllDataToRemote();
-
-    @Shadow public abstract ItemStack quickMoveStack(Player player, int index);
-
-    @Shadow @Final public int containerId;
-
-    @Shadow public abstract int incrementStateId();
-
-    @Shadow public abstract Slot getSlot(int slotId);
-
-    @Shadow public abstract boolean canTakeItemForPickAll(ItemStack stack, Slot slot);
-
-    @Shadow public abstract boolean canDragTo(Slot slot);
-
-    @Shadow protected abstract SlotAccess createCarriedSlotAccess();
-
-    @Shadow protected abstract boolean tryItemClickBehaviourOverride(Player player, ClickAction action, Slot slot, ItemStack clickedItem, ItemStack carriedItem);
-
-    @Shadow private ItemStack carried;
-
     @Shadow
     public static int getQuickCraftPlaceCount(Set<Slot> set, int i, ItemStack itemStack) {
         return 0;
     }
 
-    public boolean checkReachable = true;
-    private Component title;
+    @Shadow
+    public abstract ItemStack getCarried();
+
+    @Shadow
+    public abstract void setCarried(ItemStack stack);
+
+    @Shadow
+    protected abstract void resetQuickCraft();
+
+    @Shadow
+    public abstract void sendAllDataToRemote();
+
+    @Shadow
+    public abstract ItemStack quickMoveStack(Player player, int index);
+
+    @Shadow
+    public abstract int incrementStateId();
+
+    @Shadow
+    public abstract Slot getSlot(int slotId);
+
+    @Shadow
+    public abstract boolean canTakeItemForPickAll(ItemStack stack, Slot slot);
+
+    @Shadow
+    public abstract boolean canDragTo(Slot slot);
+
+    @Shadow
+    protected abstract SlotAccess createCarriedSlotAccess();
+
+    @Shadow
+    protected abstract boolean tryItemClickBehaviourOverride(Player player, ClickAction action, Slot slot, ItemStack clickedItem, ItemStack carriedItem);
 
     @Override
     public void transferTo(AbstractContainerMenu other, CraftHumanEntity player) {
@@ -165,7 +182,7 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                 }
             } else if (this.quickcraftStatus == 2) {
                 if (!this.quickcraftSlots.isEmpty()) {
-                    if (false && this.quickcraftSlots.size() == 1) { // CraftBukkit - treat everything as a drag since we are unable to easily call InventoryClickEvent instead
+                    if (false) { // CraftBukkit - treat everything as a drag since we are unable to easily call InventoryClickEvent instead
                         int k = this.quickcraftSlots.iterator().next().index;
                         this.resetQuickCraft();
                         this.doClick(k, this.quickcraftType, ClickType.PICKUP, player);
@@ -265,7 +282,6 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
                 }
 
                 for (ItemStack itemstack = this.quickMoveStack(player, i); !itemstack.isEmpty() && ItemStack.isSameItem(slot.getItem(), itemstack); itemstack = this.quickMoveStack(player, i)) {
-                    ;
                 }
             } else {
                 if (i < 0) {
@@ -437,6 +453,11 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
         return bukkitView;
     }
 
+    @Override
+    public void setBukkitView(InventoryView view) {
+        this.bukkitView = view;
+    }
+
     @Inject(method = "getCarried", at = @At("HEAD"))
     private void banner$checkCarried(CallbackInfoReturnable<ItemStack> cir) {
         // CraftBukkit start
@@ -444,10 +465,5 @@ public abstract class MixinAbstractContainerMenu implements InjectionAbstractCon
             this.setCarried(ItemStack.EMPTY);
         }
         // CraftBukkit end
-    }
-
-    @Override
-    public void setBukkitView(InventoryView view) {
-        this.bukkitView = view;
     }
 }

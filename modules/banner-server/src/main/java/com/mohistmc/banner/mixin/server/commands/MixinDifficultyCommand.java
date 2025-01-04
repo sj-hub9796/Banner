@@ -32,7 +32,7 @@ public class MixinDifficultyCommand {
 
     @Redirect(method = "setDifficulty",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/MinecraftServer;setDifficulty(Lnet/minecraft/world/Difficulty;Z)V"))
+                    target = "Lnet/minecraft/server/MinecraftServer;setDifficulty(Lnet/minecraft/world/Difficulty;Z)V"))
     private static void banner$resetDifficulty(MinecraftServer instance, Difficulty difficulty, boolean forced) {
         banner$serverLevel.getAndSet(null).bridge$serverLevelDataCB().setDifficulty(difficulty);
     }

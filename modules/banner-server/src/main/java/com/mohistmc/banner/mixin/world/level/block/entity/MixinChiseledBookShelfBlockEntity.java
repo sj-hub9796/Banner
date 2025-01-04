@@ -29,16 +29,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ChiseledBookShelfBlockEntity.class)
 public abstract class MixinChiseledBookShelfBlockEntity extends BlockEntity implements Container {
 
-    @Shadow @Final private NonNullList<ItemStack> items;
-
-    @Shadow protected abstract void updateState(int i);
+    public List<HumanEntity> transaction = new ArrayList<>();
+    @Shadow
+    @Final
+    private NonNullList<ItemStack> items;
+    private int maxStack = 1;
 
     public MixinChiseledBookShelfBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
 
-    public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = 1;
+    @Shadow
+    protected abstract void updateState(int i);
 
     @Override
     public List<ItemStack> getContents() {
@@ -65,13 +67,13 @@ public abstract class MixinChiseledBookShelfBlockEntity extends BlockEntity impl
     }
 
     @Override
-    public void setMaxStackSize(int size) {
-        maxStack = size;
+    public int getMaxStackSize() {
+        return maxStack;
     }
 
     @Override
-    public int getMaxStackSize() {
-        return maxStack;
+    public void setMaxStackSize(int size) {
+        maxStack = size;
     }
 
     @Override
@@ -95,7 +97,7 @@ public abstract class MixinChiseledBookShelfBlockEntity extends BlockEntity impl
 
     @Inject(method = "removeItem",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity;updateState(I)V"))
+                    target = "Lnet/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity;updateState(I)V"))
     private void banner$checkWorld(int i, int j, CallbackInfoReturnable<ItemStack> cir) {
         if (level == null) {
             cir.cancel(); // CraftBukkit - SPIGOT-7381: check for null world

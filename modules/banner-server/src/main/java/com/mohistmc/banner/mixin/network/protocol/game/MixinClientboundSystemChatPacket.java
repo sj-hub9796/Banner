@@ -12,6 +12,8 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(ClientboundSystemChatPacket.class)
 public class MixinClientboundSystemChatPacket {
 
+    private String a;
+
     @ShadowConstructor
     public void banner$constructor(Component content, boolean overlay) {
         throw new RuntimeException();
@@ -21,8 +23,6 @@ public class MixinClientboundSystemChatPacket {
     public void banner$constructor(BaseComponent[] content, boolean overlay) {
         banner$constructor(CraftChatMessage.fromJSON(ComponentSerializer.toString(content)), overlay);
     }
-
-    private String a;
 
     public String content0() {
         return a;

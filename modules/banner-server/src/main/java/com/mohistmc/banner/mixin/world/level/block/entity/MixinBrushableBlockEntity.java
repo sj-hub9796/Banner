@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import java.util.Arrays;
+import java.util.Collections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -44,7 +45,7 @@ public abstract class MixinBrushableBlockEntity extends BlockEntity {
                                   double i, ItemEntity itemEntity) {
         // CraftBukkit start
         org.bukkit.block.Block bblock = CraftBlock.at(this.level, this.worldPosition);
-        CraftEventFactory.handleBlockDropItemEvent(bblock, bblock.getState(), (ServerPlayer) player, Arrays.asList(itemEntity));
+        CraftEventFactory.handleBlockDropItemEvent(bblock, bblock.getState(), (ServerPlayer) player, Collections.singletonList(itemEntity));
         // CraftBukkit end
     }
 

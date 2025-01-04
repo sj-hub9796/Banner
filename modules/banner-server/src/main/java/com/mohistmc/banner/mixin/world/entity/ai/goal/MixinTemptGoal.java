@@ -18,9 +18,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(TemptGoal.class)
 public class MixinTemptGoal {
 
-    @Shadow @Nullable protected Player player;
+    @Shadow
+    @Nullable
+    protected Player player;
 
-    @Shadow @Final protected PathfinderMob mob;
+    @Shadow
+    @Final
+    protected PathfinderMob mob;
 
     @Inject(method = "canUse", at = @At("TAIL"), cancellable = true)
     private void banner$targetEvent(CallbackInfoReturnable<Boolean> cir) {

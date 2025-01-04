@@ -24,17 +24,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinPrimedTnt extends Entity implements TraceableEntity, InjectionPrimedTnt {
 
 
+    public float yield;
+    public boolean isIncendiary;
     public MixinPrimedTnt(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
+    // @formatter:on
 
     // @formatter:off
     @Shadow public abstract int getFuse();
-    @Shadow public abstract void setFuse(int p_32086_);
-    // @formatter:on
 
-    public float yield;
-    public boolean isIncendiary;
+    @Shadow public abstract void setFuse(int p_32086_);
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
     private void banner$init(EntityType<? extends PrimedTnt> type, Level worldIn, CallbackInfo ci) {

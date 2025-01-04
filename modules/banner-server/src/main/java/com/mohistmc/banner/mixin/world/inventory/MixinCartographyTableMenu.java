@@ -23,8 +23,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CartographyTableMenu.class)
 public abstract class MixinCartographyTableMenu extends AbstractContainerMenu {
 
-    @Shadow @Final public Container container;
-    @Shadow @Final private ResultContainer resultContainer;
+    @Shadow
+    @Final
+    public Container container;
+    @Shadow
+    @Final
+    private ResultContainer resultContainer;
     // CraftBukkit start
     private CraftInventoryView bukkitEntity = null;
     private Player player;

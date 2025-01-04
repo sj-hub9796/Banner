@@ -19,11 +19,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Ocelot.class)
 public abstract class MixinOcelot extends Animal {
 
+    private final AtomicReference<Player> banner$player = new AtomicReference<>();
+
     protected MixinOcelot(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
     }
-
-    private AtomicReference<Player> banner$player = new AtomicReference<>();
 
     @Inject(method = "mobInteract", at = @At(("HEAD")))
     private void banner$setPlayer(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {

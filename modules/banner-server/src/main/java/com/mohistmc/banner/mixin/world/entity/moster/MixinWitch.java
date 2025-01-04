@@ -24,6 +24,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(Witch.class)
 public abstract class MixinWitch extends Raider {
 
+    private final AtomicReference<ItemStack> paperPotion = new AtomicReference<>();
+
     protected MixinWitch(EntityType<? extends Raider> entityType, Level level) {
         super(entityType, level);
     }
@@ -45,11 +47,9 @@ public abstract class MixinWitch extends Raider {
         // Paper end
     }
 
-    private AtomicReference<ItemStack> paperPotion = new AtomicReference<>();
-
     @Inject(method = "performRangedAttack",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/projectile/ThrownPotion;<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)V"),
+                    target = "Lnet/minecraft/world/entity/projectile/ThrownPotion;<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)V"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     private void banner$callWitchPotionEvent(LivingEntity livingEntity, float f, CallbackInfo ci, Vec3 vec3, double d, double e, double g, double h, Holder holder) {
         // Paper start

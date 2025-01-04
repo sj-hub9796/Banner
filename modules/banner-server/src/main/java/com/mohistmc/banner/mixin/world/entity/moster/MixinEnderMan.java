@@ -26,17 +26,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EnderMan.class)
 public abstract class MixinEnderMan extends Monster {
 
-    // @formatter:off
-    @Shadow private int targetChangeTime;
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_CREEPY;
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_STARED_AT;
     @Shadow @Final private static AttributeModifier SPEED_MODIFIER_ATTACKING;
-
-    @Shadow abstract boolean isLookingAtMe(Player player);
+    // @formatter:off
+    @Shadow private int targetChangeTime;
 
     protected MixinEnderMan(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow abstract boolean isLookingAtMe(Player player);
     // @formatter:on
 
     public void bridge$updateTarget(LivingEntity livingEntity) {
@@ -74,7 +74,7 @@ public abstract class MixinEnderMan extends Monster {
     }
 
     private boolean isLookingAtMe_check(Player player) {
-        ItemStack itemStack = (ItemStack) player.getInventory().armor.get(3);
+        ItemStack itemStack = player.getInventory().armor.get(3);
         if (itemStack.is(Blocks.CARVED_PUMPKIN.asItem())) {
             return false;
         } else {
@@ -83,7 +83,7 @@ public abstract class MixinEnderMan extends Monster {
             double d = vec32.length();
             vec32 = vec32.normalize();
             double e = vec3.dot(vec32);
-            return e > 1.0 - 0.025 / d ? player.hasLineOfSight(this) : false;
+            return e > 1.0 - 0.025 / d && player.hasLineOfSight(this);
         }
     }
 

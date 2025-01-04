@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinAssignProfessionFromJobSite {
 
     @Redirect(method = "method_46891", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;setVillagerData(Lnet/minecraft/world/entity/npc/VillagerData;)V"))
-    private static void banner$cancelJob(Villager instance, VillagerData villagerData) {}
+    private static void banner$cancelJob(Villager instance, VillagerData villagerData) {
+    }
 
     @Inject(method = "method_46891", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/npc/Villager;setVillagerData(Lnet/minecraft/world/entity/npc/VillagerData;)V"), cancellable = true)

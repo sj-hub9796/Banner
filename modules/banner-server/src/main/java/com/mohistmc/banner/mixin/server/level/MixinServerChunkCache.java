@@ -26,13 +26,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ServerChunkCache.class)
 public abstract class MixinServerChunkCache implements InjectionServerChunkCache {
 
-    // @formatter:off
-    @Shadow public abstract void save(boolean flush);
-    @Shadow @Final ThreadedLevelLightEngine lightEngine;
     @Shadow @Final public ChunkMap chunkMap;
+    @Shadow @Final ThreadedLevelLightEngine lightEngine;
     @Shadow @Final
     ServerLevel level;
     @Shadow @Final private DistanceManager distanceManager;
+
+    // @formatter:off
+    @Shadow public abstract void save(boolean flush);
+
     @Shadow protected abstract void clearCache();
     @Shadow @Nullable protected abstract ChunkHolder getVisibleChunkIfPresent(long chunkPosIn);
 

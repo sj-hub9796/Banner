@@ -27,7 +27,7 @@ public abstract class MixinMerchantContainer implements Container {
     @Shadow @Final private Merchant merchant;
     // @formatter:on
 
-    private List<HumanEntity> transactions = new ArrayList<>();
+    private final List<HumanEntity> transactions = new ArrayList<>();
     private int maxStack = MAX_STACK;
 
     @Override
@@ -53,11 +53,12 @@ public abstract class MixinMerchantContainer implements Container {
 
     @Override
     public InventoryHolder getOwner() {
-        return this.merchant instanceof AbstractVillager ? ((CraftAbstractVillager)  ((AbstractVillager) this.merchant).getBukkitEntity()) : null;
+        return this.merchant instanceof AbstractVillager ? ((CraftAbstractVillager) ((AbstractVillager) this.merchant).getBukkitEntity()) : null;
     }
 
     @Override
-    public void setOwner(InventoryHolder owner) { }
+    public void setOwner(InventoryHolder owner) {
+    }
 
     @Override
     public int getMaxStackSize() {
@@ -76,7 +77,9 @@ public abstract class MixinMerchantContainer implements Container {
     }
 
     @Override
-    public RecipeHolder<?> getCurrentRecipe() { return null; }
+    public RecipeHolder<?> getCurrentRecipe() {
+        return null;
+    }
 
     @Override
     public void setCurrentRecipe(RecipeHolder<?> recipe) {

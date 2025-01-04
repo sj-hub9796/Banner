@@ -29,21 +29,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(PersistentEntitySectionManager.class)
-public abstract class MixinPersistentEntitySectionManager<T extends EntityAccess> implements AutoCloseable,InjectionPersistentEntitySectionManager {
+public abstract class MixinPersistentEntitySectionManager<T extends EntityAccess> implements AutoCloseable, InjectionPersistentEntitySectionManager {
 
-    @Shadow @Final
+    @Shadow
+    @Final
+    public EntityPersistentStorage<T> permanentStorage;
+    @Shadow
+    @Final
     EntitySectionStorage<T> sectionStorage;
-
-    @Shadow @Final private Long2ObjectMap<PersistentEntitySectionManager.ChunkLoadStatus> chunkLoadStatuses;
-
-    @Shadow @Final public EntityPersistentStorage<T> permanentStorage;
-
-    @Shadow public abstract void close() throws IOException;
-
-    @Shadow protected abstract void requestChunkLoad(long chunkPosValue);
-
+    @Shadow
+    @Final
+    private Long2ObjectMap<PersistentEntitySectionManager.ChunkLoadStatus> chunkLoadStatuses;
     @Unique
     private boolean banner$fireEvent = false;
+
+    @Shadow
+    public abstract void close() throws IOException;
+
+    @Shadow
+    protected abstract void requestChunkLoad(long chunkPosValue);
 
     @Override
     public void close(boolean save) throws IOException {
@@ -61,11 +65,11 @@ public abstract class MixinPersistentEntitySectionManager<T extends EntityAccess
      */
     @Overwrite
     private boolean storeChunkSections(long l, Consumer<T> consumer) {
-        PersistentEntitySectionManager.ChunkLoadStatus chunkLoadStatus = (PersistentEntitySectionManager.ChunkLoadStatus)this.chunkLoadStatuses.get(l);
+        PersistentEntitySectionManager.ChunkLoadStatus chunkLoadStatus = this.chunkLoadStatuses.get(l);
         if (chunkLoadStatus == PersistentEntitySectionManager.ChunkLoadStatus.PENDING) {
             return false;
         } else {
-            List<T> list = (List)this.sectionStorage.getExistingSectionsInChunk(l).flatMap((entitySection) -> {
+            List<T> list = this.sectionStorage.getExistingSectionsInChunk(l).flatMap((entitySection) -> {
                 return entitySection.getEntities().filter(EntityAccess::shouldBeSaved);
             }).collect(Collectors.toList());
             if (list.isEmpty()) {

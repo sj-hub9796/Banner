@@ -12,11 +12,12 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ThrowableItemProjectile.class)
 public abstract class MixinThrowableItemProjectile extends ThrowableProjectile implements InjectionThrowableItemProjectile {
 
-    @Shadow protected abstract Item getDefaultItem();
-
     protected MixinThrowableItemProjectile(EntityType<? extends ThrowableProjectile> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow
+    protected abstract Item getDefaultItem();
 
     @Override
     public Item getDefaultItemPublic() {

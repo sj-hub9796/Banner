@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CombatTracker.class)
 public class MixinCombatTracker implements InjectionCombatTracker {
 
-    @Shadow @Final private List<CombatEntry> entries;
+    @Shadow
+    @Final
+    private List<CombatEntry> entries;
 
     private Component banner$emptyComnent;
 

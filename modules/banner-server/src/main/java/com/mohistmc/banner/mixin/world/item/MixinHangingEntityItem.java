@@ -34,7 +34,7 @@ public class MixinHangingEntityItem {
         org.bukkit.block.BlockFace blockFace = CraftBlock.notchToBlockFace(direction);
         org.bukkit.inventory.EquipmentSlot hand = CraftEquipmentSlot.getHand(context.getHand());
 
-        HangingPlaceEvent event = new HangingPlaceEvent((org.bukkit.entity.Hanging) ((HangingEntity) hangingEntity).getBukkitEntity(), who, blockClicked, blockFace, hand, CraftItemStack.asBukkitCopy(itemStack));
+        HangingPlaceEvent event = new HangingPlaceEvent((org.bukkit.entity.Hanging) hangingEntity.getBukkitEntity(), who, blockClicked, blockFace, hand, CraftItemStack.asBukkitCopy(itemStack));
         world.getCraftServer().getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {

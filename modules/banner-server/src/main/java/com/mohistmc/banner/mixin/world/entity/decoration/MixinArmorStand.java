@@ -33,10 +33,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ArmorStand.class)
 public abstract class MixinArmorStand extends LivingEntity implements InjectionArmorStand {
 
-    @Shadow @Final private NonNullList<ItemStack> handItems;
-    @Shadow @Final private NonNullList<ItemStack> armorItems;
-    @Shadow private boolean invisible;
     public boolean canMove = true; // Paper
+    @Shadow
+    @Final
+    private NonNullList<ItemStack> handItems;
+    @Shadow
+    @Final
+    private NonNullList<ItemStack> armorItems;
+    @Shadow
+    private boolean invisible;
 
     protected MixinArmorStand(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -57,10 +62,10 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
         this.verifyEquippedItem(stack);
         switch (slot.getType()) {
             case HAND:
-                this.onEquipItem(slot, (ItemStack)this.handItems.set(slot.getIndex(), stack), stack, silent);
+                this.onEquipItem(slot, this.handItems.set(slot.getIndex(), stack), stack, silent);
                 break;
             case HUMANOID_ARMOR:
-                this.onEquipItem(slot, (ItemStack)this.armorItems.set(slot.getIndex(), stack), stack, silent);
+                this.onEquipItem(slot, this.armorItems.set(slot.getIndex(), stack), stack, silent);
         }
     }
 
@@ -88,7 +93,7 @@ public abstract class MixinArmorStand extends LivingEntity implements InjectionA
     public void banner$damageDropOut(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (CraftEventFactory.handleNonLivingEntityDamageEvent((net.minecraft.world.entity.decoration.ArmorStand) (Object) this, source, amount)) {
             cir.setReturnValue(false);
-        }else {
+        } else {
             banner$callEntityDeath();
         }
     }

@@ -40,6 +40,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(DedicatedServer.class)
 public abstract class MixinDedicatedServer extends MinecraftServer {
 
+    public AtomicReference<RconConsoleSource> rconConsoleSource = new AtomicReference<>(null);
+
     public MixinDedicatedServer(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory) {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
     }
@@ -113,10 +115,8 @@ public abstract class MixinDedicatedServer extends MinecraftServer {
         }
     }
 
-    public AtomicReference<RconConsoleSource> rconConsoleSource = new AtomicReference<>(null);
-
     @Override
-    public void banner$setRconConsoleSource(RconConsoleSource source)  {
+    public void banner$setRconConsoleSource(RconConsoleSource source) {
         rconConsoleSource.set(source);
     }
 

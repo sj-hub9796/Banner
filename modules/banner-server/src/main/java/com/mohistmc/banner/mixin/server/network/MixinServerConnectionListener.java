@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ServerConnectionListener.class)
 public class MixinServerConnectionListener implements InjectionServerConnectionListener {
 
-    @Shadow @Final private List<ChannelFuture> channels;
+    @Shadow
+    @Final
+    private List<ChannelFuture> channels;
 
     @Redirect(method = "startTcpServerListener", at = @At(value = "INVOKE",
             target = "Lio/netty/bootstrap/ServerBootstrap;bind()Lio/netty/channel/ChannelFuture;",

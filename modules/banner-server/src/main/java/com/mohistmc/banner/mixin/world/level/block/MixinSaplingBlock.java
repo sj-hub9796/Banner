@@ -25,10 +25,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SaplingBlock.class)
 public class MixinSaplingBlock {
 
-    @Shadow @Final protected TreeGrower treeGrower;
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
     private static TreeType treeType; // CraftBukkit
-
+    @Shadow
+    @Final
+    protected TreeGrower treeGrower;
 
     @Redirect(method = "advanceTree", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/block/grower/TreeGrower;growTree(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)Z"))
@@ -37,7 +38,7 @@ public class MixinSaplingBlock {
     }
 
     @Inject(method = "advanceTree", at = @At(value = "INVOKE",
-            target =  "Lnet/minecraft/world/level/block/grower/TreeGrower;growTree(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)Z",
+            target = "Lnet/minecraft/world/level/block/grower/TreeGrower;growTree(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/util/RandomSource;)Z",
             shift = At.Shift.AFTER))
     private void banner$fireStructureGrowEvent(ServerLevel level, BlockPos pos, BlockState state,
                                                RandomSource random, CallbackInfo ci) {

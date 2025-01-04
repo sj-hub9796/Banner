@@ -23,9 +23,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractMinecartContainer.class)
 public abstract class MixinAbstractMinecartContainer extends AbstractMinecart implements ContainerEntity {
 
-    @Shadow private NonNullList<ItemStack> itemStacks;
-
     public List<HumanEntity> transaction;
+    @Shadow
+    private NonNullList<ItemStack> itemStacks;
     private int maxStack;
 
     protected MixinAbstractMinecartContainer(EntityType<?> entityType, Level level) {

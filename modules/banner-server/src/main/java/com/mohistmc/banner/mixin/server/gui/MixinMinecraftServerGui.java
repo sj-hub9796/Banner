@@ -15,6 +15,6 @@ public class MixinMinecraftServerGui {
 
     @Redirect(method = "print", at = @At(value = "INVOKE", target = "Ljavax/swing/text/Document;insertString(ILjava/lang/String;Ljavax/swing/text/AttributeSet;)V"))
     private void banner$resetString(Document document, int i, String s, AttributeSet attributeSet) throws BadLocationException {
-        document.insertString(document.getLength(), ANSI.matcher(s).replaceAll(""), (AttributeSet) null); // CraftBukkit
+        document.insertString(document.getLength(), ANSI.matcher(s).replaceAll(""), null); // CraftBukkit
     }
 }

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(CrossbowItem.class)
 public class MixinCrossbowItem {
 
-    private static AtomicBoolean banner$capturedBoolean = new AtomicBoolean(true);
+    private static final AtomicBoolean banner$capturedBoolean = new AtomicBoolean(true);
 
     /*
     @Inject(method = "shootProjectile", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/Projectile;shoot(DDDFF)V"))

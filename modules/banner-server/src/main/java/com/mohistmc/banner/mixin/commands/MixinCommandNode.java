@@ -17,13 +17,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = CommandNode.class, remap = false)
 public abstract class MixinCommandNode<S> implements Comparable<CommandNode<S>>, InjectionCommandNode {
 
-    @Shadow @Final private Map<String, CommandNode<S>> children;
+    @Shadow
+    @Final
+    private Map<String, CommandNode<S>> children;
 
-    @Shadow @Final private Map<String, LiteralCommandNode<S>> literals;
+    @Shadow
+    @Final
+    private Map<String, LiteralCommandNode<S>> literals;
 
-    @Shadow @Final private Map<String, ArgumentCommandNode<S, ?>> arguments;
+    @Shadow
+    @Final
+    private Map<String, ArgumentCommandNode<S, ?>> arguments;
 
-    @Shadow @Final private Predicate<S> requirement;
+    @Shadow
+    @Final
+    private Predicate<S> requirement;
 
     public void removeCommand(String name) {
         children.remove(name);

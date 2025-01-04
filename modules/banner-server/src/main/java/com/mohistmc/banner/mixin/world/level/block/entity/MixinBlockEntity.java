@@ -31,14 +31,19 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(BlockEntity.class)
 public abstract class MixinBlockEntity implements InjectionBlockEntity {
 
-    @Shadow @Nullable public Level level;
-    @Shadow @Final public BlockPos worldPosition;
-
-    @Shadow protected abstract void applyImplicitComponents(BlockEntity.DataComponentInput dataComponentInput);
-
-    @Shadow private DataComponentMap components;
     private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
+    @Shadow
+    @Nullable
+    public Level level;
+    @Shadow
+    @Final
+    public BlockPos worldPosition;
     public CraftPersistentDataContainer persistentDataContainer;
+    @Shadow
+    private DataComponentMap components;
+
+    @Shadow
+    protected abstract void applyImplicitComponents(BlockEntity.DataComponentInput dataComponentInput);
 
     @Inject(method = "loadAdditional", at = @At("RETURN"))
     public void banner$loadPersistent(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfo ci) {

@@ -26,18 +26,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(net.minecraft.world.entity.monster.Slime.class)
 public abstract class MixinSlime extends Mob implements InjectionSlime {
 
+    private boolean canWander = true;
+    private transient List<LivingEntity> banner$slimes;
     protected MixinSlime(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
     }
+    // @formatter:on
 
     // @formatter:off
     @Shadow public abstract int getSize();
+
     @Shadow public abstract EntityType<? extends net.minecraft.world.entity.monster.Slime> getType();
-    // @formatter:on
-
-    private boolean canWander = true;
-
-    private transient List<LivingEntity> banner$slimes;
 
     /**
      * @author wdog5
@@ -100,7 +99,7 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
 
     @Inject(method = "addAdditionalSaveData",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/nbt/CompoundTag;putInt(Ljava/lang/String;I)V"))
+                    target = "Lnet/minecraft/nbt/CompoundTag;putInt(Ljava/lang/String;I)V"))
     private void banner$putData(CompoundTag compound, CallbackInfo ci) {
         compound.putBoolean("Paper.canWander", this.canWander); // Paper
     }

@@ -20,16 +20,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SculkCatalystBlockEntity.class)
 public abstract class MixinSculkCatalystBlockEntity extends BlockEntity {
 
-    @Shadow @Final private SculkCatalystBlockEntity.CatalystListener catalystListener;
+    @Shadow
+    @Final
+    private SculkCatalystBlockEntity.CatalystListener catalystListener;
 
     public MixinSculkCatalystBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
-    }
-
-    @Override
-    public void setLevel(Level level) {
-        super.setLevel(level);
-        ((InjectionCatalystListener) this.catalystListener).banner$setLevel(level);
     }
 
     @Inject(method = "serverTick", at = @At("HEAD"))
@@ -40,6 +36,12 @@ public abstract class MixinSculkCatalystBlockEntity extends BlockEntity {
     @Inject(method = "serverTick", at = @At("RETURN"))
     private static void banner$resetSource(Level p_222780_, BlockPos p_222781_, BlockState p_222782_, SculkCatalystBlockEntity blockEntity, CallbackInfo ci) {
         CraftEventFactory.sourceBlockOverride = null;
+    }
+
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+        ((InjectionCatalystListener) this.catalystListener).banner$setLevel(level);
     }
 
     @Inject(method = "loadAdditional", at = @At("HEAD"))

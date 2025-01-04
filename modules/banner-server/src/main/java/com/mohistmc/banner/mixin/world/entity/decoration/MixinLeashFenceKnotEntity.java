@@ -53,7 +53,7 @@ public abstract class MixinLeashFenceKnotEntity extends BlockAttachedEntity {
         if (!flag) {
             boolean die = true;
             for (final Mob entityinsentient : list) {
-                if (entityinsentient.isLeashed() && entityinsentient.getLeashHolder() == (Object) this) {
+                if (entityinsentient.isLeashed() && entityinsentient.getLeashHolder() == this) {
                     if (CraftEventFactory.callPlayerUnleashEntityEvent(entityinsentient, entityhuman, enumhand).isCancelled()) {
                         die = false;
                     } else {

@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.Shadow;
 public abstract class MixinFlatLevelSource implements InjectionFlatLevelSource {
 
     @Mutable
-    @Shadow @Final private FlatLevelGeneratorSettings settings;
+    @Shadow
+    @Final
+    private FlatLevelGeneratorSettings settings;
 
     private BiomeSource banner$biomeSource;
 

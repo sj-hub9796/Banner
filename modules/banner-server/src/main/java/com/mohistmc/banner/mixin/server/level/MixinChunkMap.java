@@ -36,8 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ChunkMap.class)
 public abstract class MixinChunkMap extends ChunkStorage implements InjectionChunkMap {
 
-    // @formatter:off
-    @Shadow protected abstract void tick();
+    public final BukkitCallbackExecutor callbackExecutor = new BukkitCallbackExecutor();
     @Shadow @Final public ServerLevel level;
     @Shadow @Final @Mutable private RandomState randomState;
     // @formatter:on
@@ -46,7 +45,8 @@ public abstract class MixinChunkMap extends ChunkStorage implements InjectionChu
         super(regionStorageInfo, path, dataFixer, bl);
     }
 
-    public final BukkitCallbackExecutor callbackExecutor = new BukkitCallbackExecutor();
+    // @formatter:off
+    @Shadow protected abstract void tick();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$updateRandom(ServerLevel serverLevel, LevelStorageSource.LevelStorageAccess levelStorageAccess, DataFixer dataFixer, StructureTemplateManager structureTemplateManager, Executor executor, BlockableEventLoop blockableEventLoop, LightChunkGetter lightChunkGetter, ChunkGenerator chunkGenerator, ChunkProgressListener chunkProgressListener, ChunkStatusUpdateListener chunkStatusUpdateListener, Supplier supplier, int i, boolean bl, CallbackInfo ci) {

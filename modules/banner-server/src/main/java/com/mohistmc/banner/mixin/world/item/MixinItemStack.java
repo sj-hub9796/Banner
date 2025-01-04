@@ -69,44 +69,56 @@ public abstract class MixinItemStack implements InjectionItemStack {
     @Shadow @Deprecated private Item item;
     @Shadow private int count;
     // @formatter:on
+    @Shadow
+    @Final
+    private PatchedDataComponentMap components;
 
-    @Shadow public abstract Item getItem();
-
-    @Shadow public abstract void setDamageValue(int damage);
-
-    @Shadow public abstract int getDamageValue();
-
-    @Shadow public abstract int getCount();
-
-    @Shadow public abstract void setCount(int count);
-
-    @Shadow public abstract ItemStack copy();
-
-    @Shadow public abstract void shrink(int decrement);
-
-    @Shadow @Final private PatchedDataComponentMap components;
-
-    @Shadow public abstract void applyComponents(DataComponentMap dataComponentMap);
-
-    @Shadow public abstract boolean isDamageableItem();
-
-    @Shadow public abstract int getMaxDamage();
-
-    @Shadow public abstract boolean canPlaceOnBlockInAdventureMode(BlockInWorld blockInWorld);
-
-    @Shadow public abstract void applyComponents(DataComponentPatch dataComponentPatch);
-
-    @Override
-    public void restorePatch(DataComponentPatch empty) {
-        this.components.restorePatch(empty);
-    }
-
+    @Shadow
+    public abstract Item getItem();
 
     @SuppressWarnings("all")
     @Override
     @Deprecated
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    @Shadow
+    public abstract int getDamageValue();
+
+    @Shadow
+    public abstract void setDamageValue(int damage);
+
+    @Shadow
+    public abstract int getCount();
+
+    @Shadow
+    public abstract void setCount(int count);
+
+    @Shadow
+    public abstract ItemStack copy();
+
+    @Shadow
+    public abstract void shrink(int decrement);
+
+    @Shadow
+    public abstract void applyComponents(DataComponentMap dataComponentMap);
+
+    @Shadow
+    public abstract boolean isDamageableItem();
+
+    @Shadow
+    public abstract int getMaxDamage();
+
+    @Shadow
+    public abstract boolean canPlaceOnBlockInAdventureMode(BlockInWorld blockInWorld);
+
+    @Shadow
+    public abstract void applyComponents(DataComponentPatch dataComponentPatch);
+
+    @Override
+    public void restorePatch(DataComponentPatch empty) {
+        this.components.restorePatch(empty);
     }
 
     /**
@@ -206,11 +218,11 @@ public abstract class MixinItemStack implements InjectionItemStack {
                 StructureGrowEvent structureEvent = null;
                 if (treeType != null) {
                     boolean isBonemeal = getItem() == Items.BONE_MEAL;
-                    structureEvent = new StructureGrowEvent(location, treeType, isBonemeal, (org.bukkit.entity.Player) player.getBukkitEntity(), (List< org.bukkit.block.BlockState>) (List<? extends org.bukkit.block.BlockState>) blocks);
+                    structureEvent = new StructureGrowEvent(location, treeType, isBonemeal, (org.bukkit.entity.Player) player.getBukkitEntity(), (List<org.bukkit.block.BlockState>) (List<? extends org.bukkit.block.BlockState>) blocks);
                     org.bukkit.Bukkit.getPluginManager().callEvent(structureEvent);
                 }
 
-                BlockFertilizeEvent fertilizeEvent = new BlockFertilizeEvent(CraftBlock.at(world, blockPos), (org.bukkit.entity.Player) player.getBukkitEntity(), (List< org.bukkit.block.BlockState>) (List<? extends org.bukkit.block.BlockState>) blocks);
+                BlockFertilizeEvent fertilizeEvent = new BlockFertilizeEvent(CraftBlock.at(world, blockPos), (org.bukkit.entity.Player) player.getBukkitEntity(), (List<org.bukkit.block.BlockState>) (List<? extends org.bukkit.block.BlockState>) blocks);
                 fertilizeEvent.setCancelled(structureEvent != null && structureEvent.isCancelled());
                 org.bukkit.Bukkit.getPluginManager().callEvent(fertilizeEvent);
 
@@ -221,7 +233,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                         this.setCount(newCount);
                     }
                     for (CraftBlockState blockstate : blocks) {
-                        world.setBlock(blockstate.getPosition(),blockstate.getHandle(), blockstate.getFlag()); // SPIGOT-7248 - manual update to avoid physics where appropriate
+                        world.setBlock(blockstate.getPosition(), blockstate.getHandle(), blockstate.getFlag()); // SPIGOT-7248 - manual update to avoid physics where appropriate
                     }
                     player.awardStat(Stats.ITEM_USED.get(item)); // SPIGOT-7236 - award stat
                 }
@@ -315,7 +327,7 @@ public abstract class MixinItemStack implements InjectionItemStack {
                     // SPIGOT-7315: Moved from BlockBed#setPlacedBy
                     if (placeEvent != null && this.item instanceof BedItem) {
                         BlockPos position = ((CraftBlock) placeEvent.getBlock()).getPosition();
-                        BlockState blockData =  world.getBlockState(position);
+                        BlockState blockData = world.getBlockState(position);
 
                         if (blockData.getBlock() instanceof BedBlock) {
                             world.blockUpdated(position, Blocks.AIR);

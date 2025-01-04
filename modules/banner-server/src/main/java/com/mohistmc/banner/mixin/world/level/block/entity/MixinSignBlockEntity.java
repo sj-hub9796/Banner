@@ -37,19 +37,21 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(SignBlockEntity.class)
 public abstract class MixinSignBlockEntity extends BlockEntity implements CommandSource {
 
-    @Shadow protected abstract SignText setMessages(Player player, List<FilteredText> list, SignText signText);
+    private final AtomicReference<Player> banner$player = new AtomicReference<>();
+    private final AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
+    private final AtomicBoolean banner$front = new AtomicBoolean();
+    private final AtomicBoolean banner$bl = new AtomicBoolean();
+    public MixinSignBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+        super(blockEntityType, blockPos, blockState);
+    }
 
     @Shadow
     private static CommandSourceStack createCommandSourceStack(@Nullable Player player, Level level, BlockPos blockPos) {
         return null;
     }
 
-    public MixinSignBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-    }
-
-    private AtomicReference<Player> banner$player = new AtomicReference<>();
-    private AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
+    @Shadow
+    protected abstract SignText setMessages(Player player, List<FilteredText> list, SignText signText);
 
     @Inject(method = "executeClickCommandsIfPresent", at = @At("HEAD"))
     private void banner$getInfo(Player player, Level level, BlockPos blockPos, boolean bl,
@@ -64,9 +66,6 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
             ci.cancel();
         }
     }
-
-    private AtomicBoolean banner$front = new AtomicBoolean();
-    private AtomicBoolean banner$bl = new AtomicBoolean();
 
     @Inject(method = "updateSignText", at = @At("HEAD"))
     private void banner$getBl(Player player, boolean bl, List<FilteredText> list, CallbackInfo ci) {
@@ -141,7 +140,7 @@ public abstract class MixinSignBlockEntity extends BlockEntity implements Comman
     }
 
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
-        return wrapper.getEntity() != null ? wrapper.getEntity().banner$getBukkitSender(wrapper) : new CraftBlockCommandSender(wrapper, (BlockEntity) (Object) this);
+        return wrapper.getEntity() != null ? wrapper.getEntity().banner$getBukkitSender(wrapper) : new CraftBlockCommandSender(wrapper, (BlockEntity) this);
     }
 
     @Override

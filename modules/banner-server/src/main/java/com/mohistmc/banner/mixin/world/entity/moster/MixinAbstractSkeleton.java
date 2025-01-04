@@ -33,7 +33,7 @@ public abstract class MixinAbstractSkeleton extends Monster {
             ci.cancel();
             return;
         }
-        if (event.getProjectile() !=  abstractArrow.getBukkitEntity()) {
+        if (event.getProjectile() != abstractArrow.getBukkitEntity()) {
             this.playSound(SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
             ci.cancel();
         }

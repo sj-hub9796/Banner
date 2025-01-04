@@ -25,10 +25,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SignBlock.class)
 public abstract class MixinSignBlock implements InjectionSignBlock {
 
-    @Shadow public abstract void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText);
-
-    private AtomicReference<PlayerSignOpenEvent.Cause> banner$signOpenCause =
+    private final AtomicReference<PlayerSignOpenEvent.Cause> banner$signOpenCause =
             new AtomicReference<>(PlayerSignOpenEvent.Cause.UNKNOWN);
+
+    @Shadow
+    public abstract void openTextEdit(Player player, SignBlockEntity signEntity, boolean isFrontText);
 
     @Inject(method = "openTextEdit",
             at = @At("HEAD"))
@@ -49,7 +50,8 @@ public abstract class MixinSignBlock implements InjectionSignBlock {
                         bukkitSign,
                         isFrontText ? org.bukkit.block.sign.Side.FRONT : org.bukkit.block.sign.Side.BACK,
                         cause);
-        if (!CraftEventFactory.callPlayerSignOpenEvent(player, signEntity, isFrontText, cause) || event.isCancelled()) return; // Banner
+        if (!CraftEventFactory.callPlayerSignOpenEvent(player, signEntity, isFrontText, cause) || event.isCancelled()) {
+        } // Banner
         // Paper end
     }
 

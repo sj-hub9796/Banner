@@ -33,14 +33,16 @@ public abstract class MixinChunkHolder extends GenerationChunkHolder implements 
     @Shadow @Final private ShortSet[] changedBlocksPerSection;
     @Shadow private int ticketLevel;
     // @formatter:on
+    @Shadow
+    @Final
+    private LevelHeightAccessor levelHeightAccessor;
 
     public MixinChunkHolder(ChunkPos chunkPos) {
         super(chunkPos);
     }
 
-    @Shadow public abstract CompletableFuture<ChunkResult<LevelChunk>> getFullChunkFuture();
-
-    @Shadow @Final private LevelHeightAccessor levelHeightAccessor;
+    @Shadow
+    public abstract CompletableFuture<ChunkResult<LevelChunk>> getFullChunkFuture();
 
     @Override
     public LevelChunk getFullChunkNow() {
@@ -71,7 +73,7 @@ public abstract class MixinChunkHolder extends GenerationChunkHolder implements 
         // ChunkUnloadEvent: Called before the chunk is unloaded: isChunkLoaded is still true and chunk can still be modified by plugins.
         if (ChunkLevel.fullStatus(this.oldTicketLevel).isOrAfter(FullChunkStatus.FULL) && !ChunkLevel.fullStatus(this.ticketLevel).isOrAfter(FullChunkStatus.FULL)) {
             this.getFullChunkFuture().thenAccept((either) -> {
-                LevelChunk chunk = (LevelChunk)either.orElse(null);
+                LevelChunk chunk = either.orElse(null);
                 if (chunk != null) {
                     chunkMap.bridge$callbackExecutor().execute(() -> {
                         // Minecraft will apply the chunks tick lists to the world once the chunk got loaded, and then store the tick
@@ -99,7 +101,7 @@ public abstract class MixinChunkHolder extends GenerationChunkHolder implements 
         // ChunkLoadEvent: Called after the chunk is loaded: isChunkLoaded returns true and chunk is ready to be modified by plugins.
         if (!ChunkLevel.fullStatus(this.oldTicketLevel).isOrAfter(FullChunkStatus.FULL) && ChunkLevel.fullStatus(this.ticketLevel).isOrAfter(FullChunkStatus.FULL)) {
             this.getFullChunkFuture().thenAccept((either) -> {
-                LevelChunk chunk = (LevelChunk)either.orElse(null);
+                LevelChunk chunk = either.orElse(null);
                 if (chunk != null) {
                     chunkMap.bridge$callbackExecutor().execute(() -> {
                         chunk.loadCallback();

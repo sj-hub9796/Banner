@@ -14,13 +14,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PanicGoal.class)
 public abstract class MixinPanicGoal extends Goal {
 
-    @Shadow @Final protected PathfinderMob mob;
+    @Shadow
+    @Final
+    protected PathfinderMob mob;
 
     @Inject(method = "canContinueToUse", at = @At("HEAD"), cancellable = true)
     private void banner$addCheckPanic(CallbackInfoReturnable<Boolean> cir) {
         // CraftBukkit start - introduce a temporary timeout hack until this is fixed properly
         if ((this.mob.tickCount - this.mob.lastHurtByMobTimestamp) > 100) {
-            this.mob.setLastHurtByMob((LivingEntity) null);
+            this.mob.setLastHurtByMob(null);
             cir.setReturnValue(false);
         }
         // CraftBukkit end

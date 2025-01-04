@@ -27,7 +27,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(TeleportCommand.class)
 public class MixinTeleportCommand {
 
-    @Shadow @Final private static SimpleCommandExceptionType INVALID_POSITION;
+    @Shadow
+    @Final
+    private static SimpleCommandExceptionType INVALID_POSITION;
 
 
     /**
@@ -69,7 +71,8 @@ public class MixinTeleportCommand {
                     facing.perform(source, entity);
                 }
 
-                label23: {
+                label23:
+                {
                     if (entity instanceof LivingEntity livingEntity) {
                         if (livingEntity.isFallFlying()) {
                             break label23;

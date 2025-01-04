@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LevelStorageSource.LevelStorageAccess.class)
 public abstract class MixinLevelStorageAccess implements InjectionLevelStorageAccess {
 
-    @Shadow @Final public LevelStorageSource.LevelDirectory levelDirectory;
+    @Shadow
+    @Final
+    public LevelStorageSource.LevelDirectory levelDirectory;
     public ResourceKey<LevelStem> dimensionType;
 
     @Inject(method = "getDimensionPath", cancellable = true, at = @At("HEAD"))

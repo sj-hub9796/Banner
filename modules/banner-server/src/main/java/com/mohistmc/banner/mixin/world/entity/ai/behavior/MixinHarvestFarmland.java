@@ -19,7 +19,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(HarvestFarmland.class)
 public abstract class MixinHarvestFarmland {
 
-    @Shadow @Nullable private BlockPos aboveFarmlandPos;
+    @Shadow
+    @Nullable
+    private BlockPos aboveFarmlandPos;
 
     @WrapWithCondition(method = "tick(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/npc/Villager;J)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;destroyBlock(Lnet/minecraft/core/BlockPos;ZLnet/minecraft/world/entity/Entity;)Z"))

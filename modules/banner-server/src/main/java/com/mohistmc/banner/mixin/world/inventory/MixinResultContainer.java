@@ -16,7 +16,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ResultContainer.class)
 public abstract class MixinResultContainer implements Container {
 
-    @Shadow @Final private NonNullList<ItemStack> itemStacks;
+    @Shadow
+    @Final
+    private NonNullList<ItemStack> itemStacks;
     private int maxStack = MAX_STACK;
 
     @Override
@@ -26,9 +28,12 @@ public abstract class MixinResultContainer implements Container {
 
     // Don't need a transaction; the InventoryCrafting keeps track of it for us
     @Override
-    public void onOpen(CraftHumanEntity who) {}
+    public void onOpen(CraftHumanEntity who) {
+    }
+
     @Override
-    public void onClose(CraftHumanEntity who) {}
+    public void onClose(CraftHumanEntity who) {
+    }
 
 
     @Override

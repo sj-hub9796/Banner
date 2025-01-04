@@ -18,11 +18,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Cat.class)
 public abstract class MixinCat extends TamableAnimal {
 
+    private final AtomicReference<Player> bannerPlayer = new AtomicReference<>();
+
     protected MixinCat(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
     }
-
-    private AtomicReference<Player> bannerPlayer = new AtomicReference<>();
 
     @Inject(method = "mobInteract", at = @At("HEAD"))
     private void setBannerPlayer(Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir) {

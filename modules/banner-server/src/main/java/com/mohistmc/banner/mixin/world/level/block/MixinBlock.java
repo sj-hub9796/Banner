@@ -38,7 +38,7 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
     @Overwrite
     private static void popResource(Level level, Supplier<ItemEntity> itemEntitySupplier, ItemStack stack) {
         if (!level.isClientSide && !stack.isEmpty() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
-            ItemEntity itemEntity = (ItemEntity)itemEntitySupplier.get();
+            ItemEntity itemEntity = itemEntitySupplier.get();
             itemEntity.setDefaultPickUpDelay();
             // CraftBukkit start
             if (level.bridge$captureDrops() != null) {
@@ -48,6 +48,18 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
             }
             // CraftBukkit end
         }
+    }
+
+    // Spigot start
+    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
+    private static float range(float min, float value, float max) {
+        if (value < min) {
+            return min;
+        }
+        if (value > max) {
+            return max;
+        }
+        return value;
     }
 
     @Override
@@ -70,19 +82,7 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
 
     @Inject(method = "playerDestroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
     private void banner$reason(Level level, Player player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack tool, CallbackInfo ci) {
-       player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);
-    }
-
-    // Spigot start
-    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
-    private static float range(float min, float value, float max) {
-        if (value < min) {
-            return min;
-        }
-        if (value > max) {
-            return max;
-        }
-        return value;
+        player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.BLOCK_MINED);
     }
     // Spigot end
 }

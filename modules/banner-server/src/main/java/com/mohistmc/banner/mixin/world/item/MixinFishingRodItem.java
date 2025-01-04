@@ -5,7 +5,7 @@ import net.minecraft.world.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(FishingRodItem.class)
-public class MixinFishingRodItem extends Item{
+public class MixinFishingRodItem extends Item {
 
     public MixinFishingRodItem(Properties properties) {
         super(properties);

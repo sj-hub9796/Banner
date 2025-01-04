@@ -35,7 +35,7 @@ public abstract class MixinEnderDragonPhaseManager {
             }
 
             EnderDragonChangePhaseEvent event = new EnderDragonChangePhaseEvent(
-                    (CraftEnderDragon)  this.dragon.getBukkitEntity(),
+                    (CraftEnderDragon) this.dragon.getBukkitEntity(),
                     (this.currentPhase == null) ? null : CraftEnderDragon.getBukkitPhase(this.currentPhase.getPhase()),
                     CraftEnderDragon.getBukkitPhase(phaseIn)
             );

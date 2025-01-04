@@ -21,7 +21,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(DispenserMenu.class)
 public abstract class MixinDispenserMenu extends AbstractContainerMenu {
 
-    @Shadow @Final public Container dispenser;
+    @Shadow
+    @Final
+    public Container dispenser;
     // CraftBukkit start
     private CraftInventoryView bukkitEntity = null;
     private Inventory player;
@@ -37,7 +39,7 @@ public abstract class MixinDispenserMenu extends AbstractContainerMenu {
         this.player = inventory;
     }
 
-    @Inject(method = "stillValid", at= @At("HEAD"))
+    @Inject(method = "stillValid", at = @At("HEAD"))
     private void banner$checkValid(Player player, CallbackInfoReturnable<Boolean> cir) {
         if (!this.bridge$checkReachable()) {
             cir.cancel();

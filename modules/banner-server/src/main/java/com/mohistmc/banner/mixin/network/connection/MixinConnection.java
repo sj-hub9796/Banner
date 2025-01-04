@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Connection.class)
 public class MixinConnection implements InjectionConnection {
 
-    @Shadow public Channel channel;
+    @Shadow
+    public Channel channel;
     public String hostname = ""; // CraftBukkit - add field
     public java.util.UUID spoofedUUID;
     public com.mojang.authlib.properties.Property[] spoofedProfile;

@@ -10,7 +10,8 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(MinecartCommandBlock.MinecartCommandBase.class)
 public abstract class MixinMinecartCommandBlock_MinecartCommandBase implements CommandSource {
 
-    @SuppressWarnings("target") @Shadow(aliases = {"field_7745"}, remap = false)
+    @SuppressWarnings("target")
+    @Shadow(aliases = {"field_7745"}, remap = false)
     private MinecartCommandBlock outerThis;
 
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {

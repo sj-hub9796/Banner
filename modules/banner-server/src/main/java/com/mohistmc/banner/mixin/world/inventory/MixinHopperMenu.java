@@ -20,7 +20,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(HopperMenu.class)
 public abstract class MixinHopperMenu extends AbstractContainerMenu {
 
-    @Shadow @Final private Container hopper;
+    @Shadow
+    @Final
+    private Container hopper;
     private CraftInventoryView bukkitEntity = null;
     private Inventory playerInventory;
 
@@ -44,7 +46,7 @@ public abstract class MixinHopperMenu extends AbstractContainerMenu {
             return bukkitEntity;
         }
         CraftInventory inventory = new CraftInventory(this.hopper);
-        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), inventory, (AbstractContainerMenu) (Object) this);
+        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), inventory, (AbstractContainerMenu) this);
         return bukkitEntity;
     }
 }

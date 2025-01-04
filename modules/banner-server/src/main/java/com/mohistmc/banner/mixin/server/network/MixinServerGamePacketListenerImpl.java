@@ -155,18 +155,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommonPacketListenerImpl implements InjectionServerGamePacketListenerImpl {
 
+    private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
+    private static final int CREATIVE_PLACE_DISTANCE_SQUARED = 7 * 7;
+    @Shadow
+    @Final
+    static Logger LOGGER;
     @Shadow
     public ServerPlayer player;
+    public boolean processedDisconnect;
     @Mutable
     @Shadow
     @Final
     private FutureChain chatMessageChain;
-
-    @Shadow
-    private static boolean containsInvalidValues(double x, double y, double z, float yRot, float xRot) {
-        return false;
-    }
-
     @Shadow
     private double vehicleLastGoodZ;
     @Shadow
@@ -175,13 +175,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     private double vehicleLastGoodX;
     @Shadow
     private boolean clientVehicleIsFloating;
-
-    @Shadow
-    protected abstract boolean noBlocksAround(Entity entity);
-
-    @Shadow
-    @Final
-    static Logger LOGGER;
     @Shadow
     private int receivedMovePacketCount;
     @Shadow
@@ -197,23 +190,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     private Vec3 awaitingPositionFromClient;
     @Shadow
     private int tickCount;
-
-    @Shadow
-    public abstract void resetPosition();
-
     @Shadow
     private int awaitingTeleportTime;
-
-    @Shadow
-    private static double clampHorizontal(double value) {
-        return 0;
-    }
-
-    @Shadow
-    private static double clampVertical(double value) {
-        return 0;
-    }
-
     @Shadow
     private double firstGoodX;
     @Shadow
@@ -228,14 +206,62 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     private double lastGoodZ;
     @Shadow
     private boolean clientIsFloating;
+    @Shadow
+    private int dropSpamTickCount;
+    @Shadow
+    private int awaitingTeleport;
+    @Shadow
+    @Nullable
+    private Entity lastVehicle;
+    @Shadow
+    private int chatSpamTickCount;
+    private CraftServer cserver;
+    private int allowedPlayerTicks;
+    private int dropCount;
+    private int lastTick;
+    private volatile int lastBookTick;
+    private double lastPosX;
+    private double lastPosY;
+    private double lastPosZ;
+    private float lastPitch;
+    private float lastYaw;
+    private boolean justTeleported;
+    private boolean hasMoved; // Spigot
+    private int limitedPackets;
+    private long lastLimitedPacket = -1;
+    private final AtomicReference<PlayerRecipeBookClickEvent> banner$recipeClickEvent = new AtomicReference<>();
+    private transient PlayerTeleportEvent.TeleportCause banner$cause;
+    private transient boolean banner$noTeleportEvent;
+    private transient boolean banner$teleportCancelled;
 
     @Shadow
-    public abstract void ackBlockChangesUpTo(int i);
+    private static boolean containsInvalidValues(double x, double y, double z, float yRot, float xRot) {
+        return false;
+    }
+
+    @Shadow
+    private static double clampHorizontal(double value) {
+        return 0;
+    }
+
+    @Shadow
+    private static double clampVertical(double value) {
+        return 0;
+    }
 
     @Shadow
     private static boolean isChatMessageIllegal(String message) {
         return false;
     }
+
+    @Shadow
+    protected abstract boolean noBlocksAround(Entity entity);
+
+    @Shadow
+    public abstract void resetPosition();
+
+    @Shadow
+    public abstract void ackBlockChangesUpTo(int i);
 
     @Shadow
     protected abstract PlayerChatMessage getSignedMessage(ServerboundChatPacket packet, LastSeenMessages lastSeenMessages) throws SignedMessageChain.DecodeException;
@@ -253,55 +279,34 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
     protected abstract void detectRateSpam();
 
     @Shadow
-    private int dropSpamTickCount;
-    @Shadow
-    private int awaitingTeleport;
-
-    @Shadow
-    @Nullable
-    private Entity lastVehicle;
-
-    @Shadow
     protected abstract boolean isPlayerCollidingWithAnythingNew(LevelReader levelReader, AABB aABB, double d, double e, double f);
-
-    @Shadow
-    private int chatSpamTickCount;
 
     @Shadow
     public abstract ServerPlayer getPlayer();
 
     @Shadow
     public abstract void teleport(double d, double e, double f, float g, float h);
-    @Shadow public abstract void teleport(double d, double e, double f, float g, float h, Set<RelativeMovement> set);
 
-    @Shadow protected abstract boolean updateAwaitingTeleport();
+    @Shadow
+    public abstract void teleport(double d, double e, double f, float g, float h, Set<RelativeMovement> set);
 
-    @Shadow public abstract void sendDisguisedChatMessage(Component component, ChatType.Bound bound);
+    @Shadow
+    protected abstract boolean updateAwaitingTeleport();
 
-    @Shadow protected abstract <S> Map<String, PlayerChatMessage> collectSignedArguments(ServerboundChatCommandSignedPacket serverboundChatCommandSignedPacket, SignableCommand<S> signableCommand, LastSeenMessages lastSeenMessages) throws SignedMessageChain.DecodeException;
+    @Shadow
+    public abstract void sendDisguisedChatMessage(Component component, ChatType.Bound bound);
 
-    @Shadow protected abstract Optional<LastSeenMessages> unpackAndApplyLastSeen(LastSeenMessages.Update update);
+    @Shadow
+    protected abstract <S> Map<String, PlayerChatMessage> collectSignedArguments(ServerboundChatCommandSignedPacket serverboundChatCommandSignedPacket, SignableCommand<S> signableCommand, LastSeenMessages lastSeenMessages) throws SignedMessageChain.DecodeException;
 
-    @Shadow protected abstract void tryHandleChat(String string, Runnable runnable);
+    @Shadow
+    protected abstract Optional<LastSeenMessages> unpackAndApplyLastSeen(LastSeenMessages.Update update);
 
-    @Shadow protected abstract Filterable<String> filterableFromOutgoing(FilteredText filteredText);
+    @Shadow
+    protected abstract void tryHandleChat(String string, Runnable runnable);
 
-    private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
-    private static final int CREATIVE_PLACE_DISTANCE_SQUARED = 7 * 7;
-    private CraftServer cserver;
-    public boolean processedDisconnect;
-    private int allowedPlayerTicks;
-    private int dropCount;
-    private int lastTick;
-    private volatile int lastBookTick;
-
-    private double lastPosX;
-    private double lastPosY;
-    private double lastPosZ;
-    private float lastPitch;
-    private float lastYaw;
-    private boolean justTeleported;
-    private boolean hasMoved; // Spigot
+    @Shadow
+    protected abstract Filterable<String> filterableFromOutgoing(FilteredText filteredText);
 
     @Override
     public CraftPlayer getCraftPlayer() {
@@ -339,7 +344,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
      */
     @Overwrite
     public void handleMoveVehicle(final ServerboundMoveVehiclePacket packetplayinvehiclemove) {
-        PacketUtils.ensureRunningOnSameThread(packetplayinvehiclemove, ((ServerGamePacketListener) (Object) this), this.player.serverLevel());
+        PacketUtils.ensureRunningOnSameThread(packetplayinvehiclemove, ((ServerGamePacketListener) this), this.player.serverLevel());
         if (containsInvalidValues(packetplayinvehiclemove.getX(), packetplayinvehiclemove.getY(), packetplayinvehiclemove.getZ(), packetplayinvehiclemove.getYRot(), packetplayinvehiclemove.getXRot())) {
             this.disconnect(Component.translatable("multiplayer.disconnect.invalid_vehicle_movement"));
         } else {
@@ -387,9 +392,9 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                 }
                 speed *= 2f; // TODO: Get the speed of the vehicle instead of the player
 
-                if (d10 - d9 > Math.max(100.0D, Math.pow((double) (10.0F * (float) i * speed), 2)) && !this.isSingleplayerOwner()) {
+                if (d10 - d9 > Math.max(100.0D, Math.pow(10.0F * (float) i * speed, 2)) && !this.isSingleplayerOwner()) {
                     // CraftBukkit end
-                    LOGGER.warn("{} (vehicle of {}) moved too quickly! {},{},{}", new Object[]{entity.getName().getString(), this.player.getName().getString(), d6, d7, d8});
+                    LOGGER.warn("{} (vehicle of {}) moved too quickly! {},{},{}", entity.getName().getString(), this.player.getName().getString(), d6, d7, d8);
                     this.connection.send(new ClientboundMoveVehiclePacket(entity));
                     return;
                 }
@@ -422,7 +427,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
                 if (d10 > 0.0625D) {
                     flag2 = true;
-                    LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", new Object[]{entity.getName().getString(), this.player.getName().getString(), Math.sqrt(d10)});
+                    LOGGER.warn("{} (vehicle of {}) moved wrongly! {}", entity.getName().getString(), this.player.getName().getString(), Math.sqrt(d10));
                 }
 
                 entity.absMoveTo(d3, d4, d5, f, f1);
@@ -571,7 +576,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
         CommandSigningContext.SignedArguments commandsigningcontext_a = new CommandSigningContext.SignedArguments(map);
 
-        parseresults = Commands.<CommandSourceStack>mapSource(parseresults, (commandlistenerwrapper) -> { // CraftBukkit - decompile error
+        parseresults = Commands.mapSource(parseresults, (commandlistenerwrapper) -> { // CraftBukkit - decompile error
             return commandlistenerwrapper.withSigningContext(commandsigningcontext_a, this.chatMessageChain);
         });
         this.server.getCommands().performCommand(parseresults, command); // CraftBukkit
@@ -601,7 +606,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     @Inject(method = "handleSelectTrade", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/MerchantMenu;setSelectionHint(I)V"))
     private void banner$tradeSelect(ServerboundSelectTradePacket packet, CallbackInfo ci, @Local int i, @Local MerchantMenu merchantMenu) {
-        var event = CraftEventFactory.callTradeSelectEvent(this.player, i, (MerchantMenu) merchantMenu);
+        var event = CraftEventFactory.callTradeSelectEvent(this.player, i, merchantMenu);
         if (event.isCancelled()) {
             this.player.getBukkitEntity().updateInventory();
             ci.cancel();
@@ -619,7 +624,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         }
         this.lastBookTick = BukkitFieldHooks.currentTick();
     }
-
 
     /**
      * @author wdog5
@@ -660,7 +664,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
             this.disconnect(Component.translatable("multiplayer.disconnect.invalid_player_movement"));
         } else {
             ServerLevel worldserver = this.player.serverLevel();
-            if (!this.player.wonGame && ! this.player.isImmobile()) {
+            if (!this.player.wonGame && !this.player.isImmobile()) {
                 if (this.tickCount == 0) {
                     this.resetPosition();
                 }
@@ -730,7 +734,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                                 if (!this.player.isChangingDimension() && (!this.player.serverLevel().getGameRules().getBoolean(GameRules.RULE_DISABLE_ELYTRA_MOVEMENT_CHECK) || !this.player.isFallFlying())) {
                                     float f2 = this.player.isFallFlying() ? 300.0F : 100.0F;
 
-                                    if (d11 - d10 > Math.max(f2, Math.pow((double) (org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed), 2)) && !this.isSingleplayerOwner()) {
+                                    if (d11 - d10 > Math.max(f2, Math.pow(org.spigotmc.SpigotConfig.movedTooQuicklyMultiplier * (float) i * speed, 2)) && !this.isSingleplayerOwner()) {
                                         // CraftBukkit end
                                         LOGGER.warn("{} moved too quickly! {},{},{}", this.player.getName().getString(), d7, d8, d9);
                                         this.teleport(this.player.getX(), this.player.getY(), this.player.getZ(), this.player.getYRot(), this.player.getXRot());
@@ -798,7 +802,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                                 }
                                 double delta = Math.pow(this.lastPosX - to.getX(), 2.0) + Math.pow(this.lastPosY - to.getY(), 2.0) + Math.pow(this.lastPosZ - to.getZ(), 2.0);
                                 float deltaAngle = Math.abs(this.lastYaw - to.getYaw()) + Math.abs(this.lastPitch - to.getPitch());
-                                if ((delta > 1f / 256 || deltaAngle > 10f) && ! this.player.isImmobile()) {
+                                if ((delta > 1f / 256 || deltaAngle > 10f) && !this.player.isImmobile()) {
                                     this.lastPosX = to.getX();
                                     this.lastPosY = to.getY();
                                     this.lastPosZ = to.getZ();
@@ -914,9 +918,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         this.player.stopUsingItem(); // CraftBukkit - SPIGOT-4706
     }
 
-    private int limitedPackets;
-    private long lastLimitedPacket = -1;
-
     @Override
     public boolean checkLimit(long timestamp) {
         if (lastLimitedPacket != -1 && timestamp - lastLimitedPacket < 30 && limitedPackets++ >= 4) {
@@ -985,7 +986,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         }
         itemStack = this.player.getItemInHand(interactionHand); // Update in case it was changed in the event
         if (itemStack.isEmpty()) {
-            return;
         }
         // CraftBukkit end
     }
@@ -1127,7 +1127,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                                 return null;
                             }
                             for (ServerPlayer recipient : server.getPlayerList().players) {
-                                 recipient.getBukkitEntity().sendMessage(player.getUUID(), message);
+                                recipient.getBukkitEntity().sendMessage(player.getUUID(), message);
                             }
                         } else {
                             for (Player player2 : queueEvent.getRecipients()) {
@@ -1179,7 +1179,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     @Override
     public void handleCommand(String s) {
-        if ( org.spigotmc.SpigotConfig.logCommands ) // Spigot
+        if (org.spigotmc.SpigotConfig.logCommands) // Spigot
             LOGGER.info(this.player.getScoreboardName() + " issued server command: " + s);
 
         CraftPlayer player = this.getCraftPlayer();
@@ -1193,13 +1193,10 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
         try {
             if (this.cserver.dispatchCommand(event.getPlayer(), event.getMessage().substring(1))) {
-                return;
             }
         } catch (org.bukkit.command.CommandException ex) {
             player.sendMessage(org.bukkit.ChatColor.RED + "An internal error occurred while attempting to perform this command");
             java.util.logging.Logger.getLogger(ServerGamePacketListenerImpl.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            return;
-        } finally {
         }
     }
 
@@ -1263,8 +1260,8 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     @Inject(method = "handleInteract",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;serverLevel()Lnet/minecraft/server/level/ServerLevel;",
-            ordinal = 1), cancellable = true)
+                    target = "Lnet/minecraft/server/level/ServerPlayer;serverLevel()Lnet/minecraft/server/level/ServerLevel;",
+                    ordinal = 1), cancellable = true)
     private void banner$checkInteract(ServerboundInteractPacket packet, CallbackInfo ci) {
         if (this.player.isImmobile()) ci.cancel(); // CraftBukkit
     }
@@ -1273,7 +1270,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
             at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;doCloseContainer()V"))
     private void banner$invClose(ServerboundContainerClosePacket packetIn, CallbackInfo ci) {
         if (this.player.isImmobile()) ci.cancel(); // CraftBukkit
-      CraftEventFactory.handleInventoryCloseEvent(this.player);
+        CraftEventFactory.handleInventoryCloseEvent(this.player);
     }
 
     /**
@@ -1295,7 +1292,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                 int i = packet.getSlotNum();
 
                 if (!this.player.containerMenu.isValidSlotIndex(i)) {
-                    LOGGER.debug("Player {} clicked invalid slot index: {}, available slots: {}", new Object[]{this.player.getName(), i, this.player.containerMenu.slots.size()});
+                    LOGGER.debug("Player {} clicked invalid slot index: {}, available slots: {}", this.player.getName(), i, this.player.containerMenu.slots.size());
                 } else {
                     boolean flag = packet.getStateId() != this.player.containerMenu.getStateId();
 
@@ -1307,7 +1304,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
                     BukkitSnapshotCaptures.captureContainerOwner(this.player);
                     InventoryView inventory = this.player.containerMenu.getBukkitView();
-                    if(inventory == null) {
+                    if (inventory == null) {
                         inventory = new CraftInventoryView(this.player.getBukkitEntity(), Bukkit.createInventory(this.player.getBukkitEntity(), InventoryType.CHEST), this.player.containerMenu);
                         this.player.containerMenu.setBukkitView(inventory);
                     }
@@ -1333,7 +1330,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
                                     if (!player.containerMenu.getCarried().isEmpty()) {
                                         action = packet.getButtonNum() == 0 ? InventoryAction.DROP_ALL_CURSOR : InventoryAction.DROP_ONE_CURSOR;
                                     }
-                                } else if (packet.getSlotNum() < 0)  {
+                                } else if (packet.getSlotNum() < 0) {
                                     action = InventoryAction.NOTHING;
                                 } else {
                                     Slot slot = this.player.containerMenu.getSlot(packet.getSlotNum());
@@ -1609,11 +1606,9 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         }
     }
 
-    private AtomicReference<PlayerRecipeBookClickEvent> banner$recipeClickEvent = new AtomicReference<>();
-
     @Inject(method = "handlePlaceRecipe",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/MinecraftServer;getRecipeManager()Lnet/minecraft/world/item/crafting/RecipeManager;"),
+                    target = "Lnet/minecraft/server/MinecraftServer;getRecipeManager()Lnet/minecraft/world/item/crafting/RecipeManager;"),
             cancellable = true)
     private void banner$recipeClickEvent(ServerboundPlaceRecipePacket packet, CallbackInfo ci) {
         // CraftBukkit start - implement PlayerRecipeBookClickEvent
@@ -1637,7 +1632,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
         if (this.player.gameMode.isCreative()) {
             final boolean flag = packetplayinsetcreativeslot.slotNum() < 0;
             ItemStack itemstack = packetplayinsetcreativeslot.itemStack();
-            CustomData customdata = (CustomData) itemstack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
+            CustomData customdata = itemstack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY);
 
             if (customdata.contains("x") && customdata.contains("y") && customdata.contains("z") && this.player.getBukkitEntity().hasPermission("minecraft.nbt.copy")) {
                 BlockPos blockpos = BlockEntity.getPosFromTag(customdata.getUnsafe());
@@ -1651,7 +1646,7 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
             final boolean flag2 = packetplayinsetcreativeslot.slotNum() >= 1 && packetplayinsetcreativeslot.slotNum() <= 45;
             boolean flag3 = itemstack.isEmpty() || itemstack.getCount() <= itemstack.getMaxStackSize();
             if (flag || (flag2 && !ItemStack.matches(this.player.inventoryMenu.getSlot(packetplayinsetcreativeslot.slotNum()).getItem(), packetplayinsetcreativeslot.itemStack()))) {
-                final InventoryView inventory =  this.player.inventoryMenu.getBukkitView();
+                final InventoryView inventory = this.player.inventoryMenu.getBukkitView();
                 final org.bukkit.inventory.ItemStack item = CraftItemStack.asBukkitCopy(packetplayinsetcreativeslot.itemStack());
                 InventoryType.SlotType type = InventoryType.SlotType.QUICKBAR;
                 if (flag) {
@@ -1694,9 +1689,9 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
 
     @Redirect(method = "method_17820",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/inventory/RecipeBookMenu;handlePlacement(ZLnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/server/level/ServerPlayer;)V"))
+                    target = "Lnet/minecraft/world/inventory/RecipeBookMenu;handlePlacement(ZLnet/minecraft/world/item/crafting/RecipeHolder;Lnet/minecraft/server/level/ServerPlayer;)V"))
     private <C extends Container> void banner$recipeClickEvent0(RecipeBookMenu instance, boolean bl, RecipeHolder<?> recipeHolder, ServerPlayer serverPlayer) {
-        ((RecipeBookMenu)this.player.containerMenu).handlePlacement(banner$recipeClickEvent.get().isShiftClick(), recipeHolder, this.player);
+        ((RecipeBookMenu) this.player.containerMenu).handlePlacement(banner$recipeClickEvent.get().isShiftClick(), recipeHolder, this.player);
     }
 
     @Inject(method = "updateSignText", cancellable = true, at = @At("HEAD"))
@@ -1723,11 +1718,6 @@ public abstract class MixinServerGamePacketListenerImpl extends MixinServerCommo
             }
         }
     }
-
-    private transient PlayerTeleportEvent.TeleportCause banner$cause;
-
-    private transient boolean banner$noTeleportEvent;
-    private transient boolean banner$teleportCancelled;
 
     @Decorate(method = "teleport(DDDFFLjava/util/Set;)V", inject = true, at = @At("HEAD"))
     private void banner$teleportEvent(double x, double y, double z, float yaw, float pitch, Set<RelativeMovement> relativeSet) throws Throwable {

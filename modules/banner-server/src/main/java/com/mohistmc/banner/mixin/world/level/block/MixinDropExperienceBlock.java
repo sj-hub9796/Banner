@@ -14,7 +14,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(DropExperienceBlock.class)
 public abstract class MixinDropExperienceBlock extends Block {
 
-    @Shadow @Final private IntProvider xpRange;
+    @Shadow
+    @Final
+    private IntProvider xpRange;
 
     public MixinDropExperienceBlock(Properties properties) {
         super(properties);

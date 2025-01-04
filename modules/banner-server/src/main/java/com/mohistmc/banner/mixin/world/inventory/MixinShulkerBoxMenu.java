@@ -46,7 +46,7 @@ public abstract class MixinShulkerBoxMenu extends AbstractContainerMenu {
             return bukkitEntity;
         }
 
-        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), new CraftInventory(this.container), (AbstractContainerMenu) (Object) this);
+        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), new CraftInventory(this.container), (AbstractContainerMenu) this);
         return bukkitEntity;
     }
 }

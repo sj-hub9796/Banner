@@ -38,26 +38,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LevelChunk.class)
 public abstract class MixinLevelChunk extends ChunkAccess implements InjectionLevelChunk {
 
+    private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
+    @Mutable @Shadow @Final public Level level;
+    // CraftBukkit start
+    public org.bukkit.Chunk bukkitChunk;
+    // @formatter:on
+    public boolean mustNotSave;
+    public boolean needsDecoration;
+    public CraftPersistentDataContainer persistentDataContainer = new CraftPersistentDataContainer(DATA_TYPE_REGISTRY);
+    public AtomicBoolean banner$doPlace = new AtomicBoolean(true);
+    public ServerLevel r;
     public MixinLevelChunk(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, @org.jetbrains.annotations.Nullable LevelChunkSection[] levelChunkSections, @org.jetbrains.annotations.Nullable BlendingData blendingData) {
         super(chunkPos, upgradeData, levelHeightAccessor, registry, l, levelChunkSections, blendingData);
     }
 
     // @formatter:off
     @Shadow @Nullable public abstract BlockState setBlockState(BlockPos pos, BlockState state, boolean isMoving);
-    @Mutable @Shadow @Final public Level level;
-    // @formatter:on
 
-    @Shadow public abstract Level getLevel();
-
-    // CraftBukkit start
-    public org.bukkit.Chunk bukkitChunk;
-
-    public boolean mustNotSave;
-    public boolean needsDecoration;
-    private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
-    public CraftPersistentDataContainer persistentDataContainer = new CraftPersistentDataContainer( DATA_TYPE_REGISTRY );
-    public AtomicBoolean banner$doPlace = new AtomicBoolean(true);
-    public ServerLevel r;
+    @Shadow
+    public abstract Level getLevel();
 
     @Override
     public ServerLevel banner$r() {

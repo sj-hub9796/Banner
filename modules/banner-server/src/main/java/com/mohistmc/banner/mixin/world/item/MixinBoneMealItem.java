@@ -11,7 +11,7 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(BoneMealItem.class)
-public abstract class MixinBoneMealItem{
+public abstract class MixinBoneMealItem {
 
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
     private static InteractionResult applyBonemeal(UseOnContext context) {

@@ -15,9 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(StructurePlaceSettings.class)
 public abstract class MixinStructurePlaceSettings {
 
-    @Shadow public int palette;
+    @Shadow
+    public int palette;
 
-    @Shadow public abstract RandomSource getRandom(@Nullable BlockPos seedPos);
+    @Shadow
+    public abstract RandomSource getRandom(@Nullable BlockPos seedPos);
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void banner$resetValue(CallbackInfo ci) {
@@ -36,7 +38,7 @@ public abstract class MixinStructurePlaceSettings {
             return palettes.get(this.palette);
             // CraftBukkit end
         } else {
-            return (StructureTemplate.Palette)palettes.get(this.getRandom(pos).nextInt(i));
+            return palettes.get(this.getRandom(pos).nextInt(i));
         }
     }
 }

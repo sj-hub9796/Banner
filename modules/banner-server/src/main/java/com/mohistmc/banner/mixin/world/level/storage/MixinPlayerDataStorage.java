@@ -32,12 +32,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(PlayerDataStorage.class)
 public abstract class MixinPlayerDataStorage implements InjectionPlayerDataStorage {
 
-    @Shadow @Final private File playerDir;
-
-    @Shadow @Final private static Logger LOGGER;
-
-    @Shadow @Final protected DataFixer fixerUpper;
-    @Shadow @Final private static DateTimeFormatter FORMATTER;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    @Final
+    private static DateTimeFormatter FORMATTER;
+    @Shadow
+    @Final
+    protected DataFixer fixerUpper;
+    @Shadow
+    @Final
+    private File playerDir;
 
     @Inject(method = "save", at = @At("HEAD"), cancellable = true)
     private void banner$allowDataSaving(Player player, CallbackInfo ci) {
@@ -62,12 +68,12 @@ public abstract class MixinPlayerDataStorage implements InjectionPlayerDataStora
     public void backup(String name, String s1, String s) { // name, uuid, extension
         Path path = this.playerDir.toPath();
         // String s1 = entityhuman.getStringUUID(); // CraftBukkit - used above
-        Path path1 = path.resolve(s1 +  s);
+        Path path1 = path.resolve(s1 + s);
 
         // s1 = entityhuman.getStringUUID(); // CraftBukkit - used above
-        Path path2 = path.resolve(s1 +  "_corrupted_" +  LocalDateTime.now().format(FORMATTER) + s);
+        Path path2 = path.resolve(s1 + "_corrupted_" + LocalDateTime.now().format(FORMATTER) + s);
 
-        if (Files.isRegularFile(path1, new LinkOption[0])) {
+        if (Files.isRegularFile(path1)) {
             try {
                 Files.copy(path1, path2, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
             } catch (Exception exception) {
@@ -115,16 +121,14 @@ public abstract class MixinPlayerDataStorage implements InjectionPlayerDataStora
         // CraftBukkit end
         File file = this.playerDir;
         // String s1 = entityhuman.getStringUUID(); // CraftBukkit - used above
-        File file1 = new File(file, s1 +  s);
+        File file1 = new File(file, s1 + s);
         // Spigot Start
         boolean usingWrongFile = false;
-        if ( !file1.exists() )
-        {
-            file1 = new File( file, java.util.UUID.nameUUIDFromBytes( ( "OfflinePlayer:" +  name ).getBytes( java.nio.charset.StandardCharsets.UTF_8 ) ).toString() +  s );
-            if ( file1.exists() )
-            {
+        if (!file1.exists()) {
+            file1 = new File(file, java.util.UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(java.nio.charset.StandardCharsets.UTF_8)) + s);
+            if (file1.exists()) {
                 usingWrongFile = true;
-                org.bukkit.Bukkit.getServer().getLogger().warning( "Using offline mode UUID file for player " +  name +  " as it is the only copy we can find." );
+                org.bukkit.Bukkit.getServer().getLogger().warning("Using offline mode UUID file for player " + name + " as it is the only copy we can find.");
             }
         }
         // Spigot End
@@ -133,9 +137,8 @@ public abstract class MixinPlayerDataStorage implements InjectionPlayerDataStora
             try {
                 // Spigot Start
                 Optional<CompoundTag> optional = Optional.of(NbtIo.readCompressed(file1.toPath(), NbtAccounter.unlimitedHeap()));
-                if ( usingWrongFile )
-                {
-                    file1.renameTo( new File( file1.getPath() +  ".offline-read" ) );
+                if (usingWrongFile) {
+                    file1.renameTo(new File(file1.getPath() + ".offline-read"));
                 }
                 return optional;
                 // Spigot End

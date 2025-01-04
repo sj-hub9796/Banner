@@ -12,11 +12,15 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(RecipeHolder.class)
 public class MixinRecipeHolder<T extends net.minecraft.world.item.crafting.Recipe<?>> implements InjectionRecipeHolder {
 
-    @Shadow @Final private T value;
-    @Shadow @Final private ResourceLocation id;
+    @Shadow
+    @Final
+    private T value;
+    @Shadow
+    @Final
+    private ResourceLocation id;
 
     @Override
     public Recipe toBukkitRecipe() {
-        return ((net.minecraft.world.item.crafting.Recipe<?>) this.value).toBukkitRecipe(CraftNamespacedKey.fromMinecraft(this.id));
+        return this.value.toBukkitRecipe(CraftNamespacedKey.fromMinecraft(this.id));
     }
 }

@@ -97,47 +97,69 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerLevel.class)
 public abstract class MixinServerLevel extends Level implements WorldGenLevel, InjectionServerLevel {
 
-    @Shadow public abstract LevelTicks<Block> getBlockTicks();
-
-    @Shadow @Final private ServerChunkCache chunkSource;
-
-    @Shadow public abstract List<ServerPlayer> players();
-
-    @Shadow public abstract boolean sendParticles(ServerPlayer player, boolean longDistance, double posX, double posY, double posZ, Packet<?> packet);
-    @Shadow @Final public ServerLevelData serverLevelData;
-
-    @Shadow @NotNull public abstract MinecraftServer getServer();
-
-    @Shadow public abstract <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed);
-
-    @Shadow @Final public PersistentEntitySectionManager<Entity> entityManager;
-    @Shadow protected abstract void wakeUpAllPlayers();
-
-    @Shadow @Final public static BlockPos END_SPAWN_POINT;
-
-    @Shadow public abstract boolean addFreshEntity(Entity entity);
-
-    @Shadow public abstract void addDuringTeleport(Entity entity);
-    @Shadow public abstract boolean addWithUUID(Entity entity);
-
-    @Shadow public abstract DimensionDataStorage getDataStorage();
-    @Shadow public abstract ServerChunkCache getChunkSource();
-
-    @Shadow protected abstract boolean addEntity(Entity entity);
-
+    @Shadow
+    @Final
+    public static BlockPos END_SPAWN_POINT;
+    private final AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
+    private final AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>(false);
+    @Shadow
+    @Final
+    public ServerLevelData serverLevelData;
+    @Shadow
+    @Final
+    public PersistentEntitySectionManager<Entity> entityManager;
     public LevelStorageSource.LevelStorageAccess convertable;
     public UUID uuid;
     public PrimaryLevelData K;
-
+    public ResourceKey<LevelStem> typeKey;
+    // Banner start
+    public AtomicBoolean canaddFreshEntity = new AtomicBoolean(false);
+    @Shadow
+    @Final
+    private ServerChunkCache chunkSource;
     private transient boolean banner$force;
     private transient LightningStrikeEvent.Cause banner$cause;
-    private final AtomicReference<CreatureSpawnEvent.SpawnReason> banner$reason = new AtomicReference<>();
-    private final AtomicReference<Boolean> banner$timeSkipCancelled = new AtomicReference<>(false);
-    public ResourceKey<LevelStem> typeKey;
 
     protected MixinServerLevel(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
         super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl, bl2, l, i);
     }
+
+    @Shadow
+    public abstract LevelTicks<Block> getBlockTicks();
+
+    @Shadow
+    public abstract List<ServerPlayer> players();
+
+    @Shadow
+    public abstract boolean sendParticles(ServerPlayer player, boolean longDistance, double posX, double posY, double posZ, Packet<?> packet);
+
+    @Shadow
+    @NotNull
+    public abstract MinecraftServer getServer();
+
+    @Shadow
+    public abstract <T extends ParticleOptions> int sendParticles(T type, double posX, double posY, double posZ, int particleCount, double xOffset, double yOffset, double zOffset, double speed);
+
+    @Shadow
+    protected abstract void wakeUpAllPlayers();
+
+    @Shadow
+    public abstract boolean addFreshEntity(Entity entity);
+
+    @Shadow
+    public abstract void addDuringTeleport(Entity entity);
+
+    @Shadow
+    public abstract boolean addWithUUID(Entity entity);
+
+    @Shadow
+    public abstract DimensionDataStorage getDataStorage();
+
+    @Shadow
+    public abstract ServerChunkCache getChunkSource();
+
+    @Shadow
+    protected abstract boolean addEntity(Entity entity);
 
     @ShadowConstructor
     public void banner$constructor(MinecraftServer minecraftServer, Executor backgroundExecutor, LevelStorageSource.LevelStorageAccess levelSave, ServerLevelData worldInfo, ResourceKey<Level> dimension, LevelStem levelStem, ChunkProgressListener statusListener, boolean isDebug, long seed, List<CustomSpawner> specialSpawners, boolean shouldBeTicking, RandomSequences randomSequences) {
@@ -272,7 +294,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
             cause = banner$cause;
             banner$cause = null;
         }
-        if (DistValidate.isValid((LevelAccessor) this)) {
+        if (DistValidate.isValid(this)) {
             // Banner start - Compat for Modded Weather,ignore modded weather effect
             if (entity.getBukkitEntity() instanceof org.bukkit.entity.LightningStrike) {
                 LightningStrikeEvent lightning = CraftEventFactory.callLightningStrikeEvent((LightningStrike) entity.getBukkitEntity(), cause);
@@ -329,7 +351,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
 
     @Inject(method = "save", at = @At(value = "JUMP", ordinal = 0, opcode = Opcodes.IFNULL))
     private void banner$worldSaveEvent(ProgressListener progress, boolean flush, boolean skipSave, CallbackInfo ci) {
-        if (DistValidate.isValid((LevelAccessor) this)) {
+        if (DistValidate.isValid(this)) {
             Bukkit.getPluginManager().callEvent(new WorldSaveEvent(getWorld()));
         }
     }
@@ -373,13 +395,10 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     private void banner$addEntityEvent(Entity entityIn, CallbackInfoReturnable<Boolean> cir) {
         CreatureSpawnEvent.SpawnReason reason = banner$reason.get() == null ? CreatureSpawnEvent.SpawnReason.DEFAULT : banner$reason.get();
         banner$reason.set(null);
-        if (DistValidate.isValid((LevelAccessor) this) && !CraftEventFactory.doEntityAddEventCalling((ServerLevel) (Object) this, entityIn, reason)) {
+        if (DistValidate.isValid(this) && !CraftEventFactory.doEntityAddEventCalling((ServerLevel) (Object) this, entityIn, reason)) {
             cir.setReturnValue(false);
         }
     }
-
-    // Banner start
-    public AtomicBoolean canaddFreshEntity = new AtomicBoolean(false);
 
     @Override
     public boolean canAddFreshEntity() {
@@ -423,7 +442,7 @@ public abstract class MixinServerLevel extends Level implements WorldGenLevel, I
     public boolean tryAddFreshEntityWithPassengers(Entity entity, CreatureSpawnEvent.SpawnReason reason) {
         if (entity.getSelfAndPassengers().map(Entity::getUUID).anyMatch(this.entityManager::isLoaded)) {
             return false;
-        }else {
+        } else {
             pushAddEntityReason(reason);
             return this.addAllEntities(entity, reason);
         }

@@ -21,24 +21,28 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(StemBlock.class)
 public class MixinStemBlock {
 
-    @Shadow @Final private ResourceKey<Block> fruit;
+    @Shadow
+    @Final
+    private ResourceKey<Block> fruit;
 
-    @Redirect(method = "randomTick", at = @At (value = "INVOKE",
+    @Redirect(method = "randomTick", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     private boolean banner$growEvent(ServerLevel level, BlockPos pos, BlockState state, int flags) {
         return CraftEventFactory.handleBlockGrowEvent(level, pos, state, flags);
     }
 
-    @Inject(method = "randomTick", at = @At (value = "INVOKE",
+    @Inject(method = "randomTick", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z",
             ordinal = 0),
             cancellable = true,
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$growEvent0(BlockState state, ServerLevel level, BlockPos pos, RandomSource random, CallbackInfo ci, float f, int i, Direction direction, BlockPos blockPos) {
-        if (!CraftEventFactory.handleBlockGrowEvent(level, blockPos, state)) { ci.cancel(); }
+        if (!CraftEventFactory.handleBlockGrowEvent(level, blockPos, state)) {
+            ci.cancel();
+        }
     }
 
-    @Redirect(method = "randomTick", at = @At (value = "INVOKE",
+    @Redirect(method = "randomTick", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z",
             ordinal = 0))
     private boolean banner$growEvent(ServerLevel instance, BlockPos pos, BlockState state) {

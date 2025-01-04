@@ -37,19 +37,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CraftingMenu.class)
 public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe> {
 
+    private static boolean banner$capture;
     // @formatter:off
     @Mutable @Shadow @Final private CraftingContainer craftSlots;
     @Shadow @Final private ResultContainer resultSlots;
-
+    private CraftInventoryView bukkitEntity;
+    // @formatter:on
+    private Inventory playerInventory;
     public MixinCraftingMenu(MenuType<?> menuType, int i) {
         super(menuType, i);
     }
 
-    @Accessor("access") public abstract ContainerLevelAccess bridge$getWorldPos();
-    // @formatter:on
+    @Redirect(method = "slotChangedCraftingGrid", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Optional;isPresent()Z"))
+    private static boolean banner$testRepair(Optional<RecipeHolder<CraftingRecipe>> optional) {
+        banner$capture = optional.map(it -> it.toBukkitRecipe()).orElse(null) instanceof RepairItemRecipe;
+        return optional.isPresent();
+    }
 
-    private CraftInventoryView bukkitEntity;
-    private Inventory playerInventory;
+    @ModifyVariable(method = "slotChangedCraftingGrid", ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V"))
+    private static ItemStack banner$preCraft(ItemStack stack, AbstractContainerMenu container, Level level, Player player, CraftingContainer craftingContainer, ResultContainer resultContainer) {
+        return CraftEventFactory.callPreCraftEvent(craftingContainer, resultContainer, stack, container.getBukkitView(), banner$capture);
+    }
+
+    @Accessor("access") public abstract ContainerLevelAccess bridge$getWorldPos();
 
     @Inject(method = "stillValid", cancellable = true, at = @At("HEAD"))
     public void banner$unreachable(Player playerIn, CallbackInfoReturnable<Boolean> cir) {
@@ -61,24 +71,11 @@ public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingInput, Cr
         BukkitSnapshotCaptures.captureWorkbenchContainer((CraftingMenu) (Object) this);
     }
 
-    private static transient boolean banner$capture;
-
-    @Redirect(method = "slotChangedCraftingGrid", at = @At(value = "INVOKE", remap = false, target = "Ljava/util/Optional;isPresent()Z"))
-    private static boolean banner$testRepair(Optional<RecipeHolder<CraftingRecipe>> optional) {
-        banner$capture = optional.map(it -> ((RecipeHolder) (Object) it).toBukkitRecipe()).orElse(null) instanceof RepairItemRecipe;
-        return optional.isPresent();
-    }
-
-    @ModifyVariable(method = "slotChangedCraftingGrid", ordinal = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ResultContainer;setItem(ILnet/minecraft/world/item/ItemStack;)V"))
-    private static ItemStack banner$preCraft(ItemStack stack, AbstractContainerMenu container, Level level, Player player, CraftingContainer craftingContainer, ResultContainer resultContainer) {
-        return CraftEventFactory.callPreCraftEvent(craftingContainer, resultContainer, stack, container.getBukkitView(), banner$capture );
-    }
-
     @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V", at = @At("RETURN"))
     public void banner$init(int i, Inventory playerInventory, ContainerLevelAccess callable, CallbackInfo ci) {
-        ((TransientCraftingContainer)this.craftSlots).setOwner(playerInventory.player);
-        ((TransientCraftingContainer)this.craftSlots).bridge$setResultInventory(this.resultSlots);
-         this.playerInventory = playerInventory;
+        ((TransientCraftingContainer) this.craftSlots).setOwner(playerInventory.player);
+        ((TransientCraftingContainer) this.craftSlots).bridge$setResultInventory(this.resultSlots);
+        this.playerInventory = playerInventory;
     }
 
     @Override
@@ -88,7 +85,7 @@ public abstract class MixinCraftingMenu extends RecipeBookMenu<CraftingInput, Cr
         }
 
         CraftInventoryCrafting inventory = new CraftInventoryCrafting(this.craftSlots, this.resultSlots);
-        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), inventory, (AbstractContainerMenu) (Object) this);
+        bukkitEntity = new CraftInventoryView(this.playerInventory.player.getBukkitEntity(), inventory, (AbstractContainerMenu) this);
         return bukkitEntity;
     }
 }

@@ -14,13 +14,16 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(SmithingTrimRecipe.class)
 public abstract class MixinSmithingTrimRecipe implements SmithingRecipe {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     Ingredient addition;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     Ingredient base;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     Ingredient template;
 
     // CraftBukkit start

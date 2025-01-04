@@ -36,32 +36,47 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractMinecart.class)
 public abstract class MixinAbstractMinecart extends VehicleEntity implements InjectionAbstractMinecart {
 
-    public MixinAbstractMinecart(EntityType<?> entityType, Level level) {
-        super(entityType, level);
-    }
-
-    // @formatter:off
-    @Shadow protected abstract void moveAlongTrack(BlockPos pos, BlockState state);
-    @Shadow public abstract void activateMinecart(int x, int y, int z, boolean receivingPower);
-    @Shadow private boolean flipped;
-    @Shadow public abstract AbstractMinecart.Type getMinecartType();
-    // @formatter:on
-
-    @Shadow private boolean onRails;
-    @Shadow private int lerpSteps;
-    @Shadow private double lerpX;
-    @Shadow private double lerpY;
-    @Shadow private double lerpZ;
-    @Shadow private double lerpYRot;
-    @Shadow private double lerpXRot;
     public boolean slowWhenEmpty = true;
+    public double maxSpeed = 0.4D;
+    @Shadow private boolean flipped;
+    @Shadow
+    private boolean onRails;
+    @Shadow
+    private int lerpSteps;
+    // @formatter:on
+    @Shadow
+    private double lerpX;
+    @Shadow
+    private double lerpY;
+    @Shadow
+    private double lerpZ;
+    @Shadow
+    private double lerpYRot;
+    @Shadow
+    private double lerpXRot;
     private double derailedX = 0.5;
     private double derailedY = 0.5;
     private double derailedZ = 0.5;
     private double flyingX = 0.95;
     private double flyingY = 0.95;
     private double flyingZ = 0.95;
-    public double maxSpeed = 0.4D;
+    // Banner start - fix mixin by Spelunkery mod
+    private double prevX;
+    private double prevY;
+    private double prevZ;
+    private float prevYaw;
+    private float prevPitch;
+
+    public MixinAbstractMinecart(EntityType<?> entityType, Level level) {
+        super(entityType, level);
+    }
+
+    // @formatter:off
+    @Shadow protected abstract void moveAlongTrack(BlockPos pos, BlockState state);
+
+    @Shadow public abstract void activateMinecart(int x, int y, int z, boolean receivingPower);
+
+    @Shadow public abstract AbstractMinecart.Type getMinecartType();
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
     private void banner$init(EntityType<?> type, Level worldIn, CallbackInfo ci) {
@@ -74,13 +89,6 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
         flyingZ = 0.95;
         maxSpeed = 0.4D;
     }
-
-    // Banner start - fix mixin by Spelunkery mod
-    private double prevX;
-    private double prevY;
-    private double prevZ;
-    private float prevYaw;
-    private float prevPitch;
     // Banner end
 
     /**
@@ -135,7 +143,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
             if (this.onRails) {
                 this.moveAlongTrack(blockposition, iblockdata);
                 if (iblockdata.is(Blocks.ACTIVATOR_RAIL)) {
-                    this.activateMinecart(i, j, k, (Boolean) iblockdata.getValue(PoweredRailBlock.POWERED));
+                    this.activateMinecart(i, j, k, iblockdata.getValue(PoweredRailBlock.POWERED));
                 }
             } else {
                 this.comeOffTrack();
@@ -153,7 +161,7 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
                 }
             }
 
-            double d6 = (double) Mth.wrapDegrees(this.getYRot() - this.yRotO);
+            double d6 = Mth.wrapDegrees(this.getYRot() - this.yRotO);
 
             if (d6 < -170.0D || d6 >= 170.0D) {
                 this.setYRot(this.getYRot() + 180.0F);
@@ -174,11 +182,11 @@ public abstract class MixinAbstractMinecart extends VehicleEntity implements Inj
             }
             // CraftBukkit end
             if (this.getMinecartType() == AbstractMinecart.Type.RIDEABLE && this.getDeltaMovement().horizontalDistanceSqr() > 0.01D) {
-                List<Entity> list = this.level().getEntities((Entity) this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D), EntitySelector.pushableBy(this));
+                List<Entity> list = this.level().getEntities(this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D), EntitySelector.pushableBy(this));
 
                 if (!list.isEmpty()) {
                     for (Entity value : list) {
-                        Entity entity = (Entity) value;
+                        Entity entity = value;
 
                         if (!(entity instanceof Player) && !(entity instanceof IronGolem) && !(entity instanceof AbstractMinecart) && !this.isVehicle() && !entity.isPassenger()) {
                             // CraftBukkit start

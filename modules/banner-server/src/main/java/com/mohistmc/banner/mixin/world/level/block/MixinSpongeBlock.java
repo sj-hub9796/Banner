@@ -24,7 +24,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(SpongeBlock.class)
 public abstract class MixinSpongeBlock extends Block {
 
-    @Shadow @Final private static Direction[] ALL_DIRECTIONS;
+    @Shadow
+    @Final
+    private static Direction[] ALL_DIRECTIONS;
 
     public MixinSpongeBlock(Properties properties) {
         super(properties);

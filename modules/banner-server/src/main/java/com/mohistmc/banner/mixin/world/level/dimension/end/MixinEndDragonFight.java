@@ -17,12 +17,14 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(EndDragonFight.class)
 public class MixinEndDragonFight implements InjectionEndDragonFight {
 
-    @Shadow @Final public ServerBossEvent dragonEvent;
+    @Shadow
+    @Final
+    public ServerBossEvent dragonEvent;
     public boolean banner$respawnDragon = false;
 
     @Inject(method = "respawnDragon",
             at = @At(value = "FIELD",
-            target = "Lnet/minecraft/world/level/dimension/end/EndDragonFight;respawnCrystals:Ljava/util/List;",
+                    target = "Lnet/minecraft/world/level/dimension/end/EndDragonFight;respawnCrystals:Ljava/util/List;",
                     shift = At.Shift.AFTER))
     private void banner$setRespawnResult(List<EndCrystal> crystals, CallbackInfo ci) {
         banner$respawnDragon = true;

@@ -18,13 +18,16 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ShapelessRecipe.class)
 public abstract class MixinShapelessRecipe implements CraftingRecipe, InjectionShapelessRecipe {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     ItemStack result;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     String group;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     NonNullList<Ingredient> ingredients;
 
     @Override

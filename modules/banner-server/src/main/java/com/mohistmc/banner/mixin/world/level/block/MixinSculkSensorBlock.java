@@ -24,8 +24,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SculkSensorBlock.class)
 public abstract class MixinSculkSensorBlock extends Block {
 
+    @Unique
+    private static int newCurrent;
+
     public MixinSculkSensorBlock(Properties properties) {
         super(properties);
+    }
+
+    @Inject(method = "deactivate", cancellable = true, at = @At("HEAD"))
+    private static void banner$deactivate(Level level, BlockPos pos, BlockState state, CallbackInfo ci) {
+        BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(CraftBlock.at(level, pos), state.getValue(SculkSensorBlock.POWER), 0);
+        Bukkit.getPluginManager().callEvent(eventRedstone);
+
+        if (eventRedstone.getNewCurrent() > 0) {
+            level.setBlock(pos, state.setValue(SculkSensorBlock.POWER, eventRedstone.getNewCurrent()), 3);
+            ci.cancel();
+        }
     }
 
     @Inject(method = "stepOn", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockEntity(Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/block/entity/BlockEntity;"))
@@ -42,22 +56,9 @@ public abstract class MixinSculkSensorBlock extends Block {
         }
     }
 
-    @Inject(method = "deactivate", cancellable = true, at = @At("HEAD"))
-    private static void banner$deactivate(Level level, BlockPos pos, BlockState state, CallbackInfo ci) {
-        BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(CraftBlock.at(level, pos), state.getValue(SculkSensorBlock.POWER), 0);
-        Bukkit.getPluginManager().callEvent(eventRedstone);
-
-        if (eventRedstone.getNewCurrent() > 0) {
-            level.setBlock(pos, state.setValue(SculkSensorBlock.POWER, eventRedstone.getNewCurrent()), 3);
-            ci.cancel();
-        }
-    }
-
-    @Unique private static int newCurrent;
-
     @Inject(method = "activate", cancellable = true, at = @At("HEAD"))
     private void banner$activate(Entity entity, Level level, BlockPos blockPos,
-                                        BlockState blockState, int i, int j, CallbackInfo ci) {
+                                 BlockState blockState, int i, int j, CallbackInfo ci) {
         BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(CraftBlock.at(level, blockPos), blockState.getValue(SculkSensorBlock.POWER), i);
         level.getCraftServer().getPluginManager().callEvent(eventRedstone);
         if (eventRedstone.getNewCurrent() <= 0) {

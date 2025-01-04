@@ -33,20 +33,45 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BeehiveBlockEntity.class)
 public abstract class MixinBeehiveBlockEntity extends BlockEntity implements InjectionBeehiveBlockEntity {
 
-    @Shadow @Final private List<BeehiveBlockEntity.BeeData> stored;
-
-    @Shadow @Nullable public BlockPos savedFlowerPos;
+    private static boolean banner$force;
+    @Shadow
+    @Nullable
+    public BlockPos savedFlowerPos;
+    public int maxBees = 3; // CraftBukkit - allow setting max amount of bees a hive can hold
+    @Shadow
+    @Final
+    private List<BeehiveBlockEntity.BeeData> stored;
+    public MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+        super(blockEntityType, blockPos, blockState);
+    }
 
     @Shadow
     protected static boolean releaseOccupant(Level level, BlockPos blockPos, BlockState blockState, BeehiveBlockEntity.Occupant occupant, @Nullable List<Entity> list, BeehiveBlockEntity.BeeReleaseStatus beeReleaseStatus, @Nullable BlockPos blockPos2) {
         return false;
     }
 
-    public int maxBees = 3; // CraftBukkit - allow setting max amount of bees a hive can hold
-    private static transient boolean banner$force;
+    private static boolean releaseBee(Level world, BlockPos pos, BlockState state, BeehiveBlockEntity.BeeData beeData, @Nullable List<Entity> list, BeehiveBlockEntity.BeeReleaseStatus status, @Nullable BlockPos pos1, boolean force) {
+        banner$force = force;
+        try {
+            return releaseOccupant(world, pos, state, beeData.toOccupant(), list, status, pos1);
+        } finally {
+            banner$force = false;
+        }
+    }
 
-    public MixinBeehiveBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
+    @Redirect(method = "releaseOccupant", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isNight()Z"))
+    private static boolean banner$bypassNightCheck(Level world) {
+        return !banner$force && world.isNight();
+    }
+
+    @Inject(method = "releaseOccupant", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private static void banner$spawnFirst(Level level, BlockPos blockPos, BlockState blockState, BeehiveBlockEntity.Occupant occupant, List<Entity> list, BeehiveBlockEntity.BeeReleaseStatus beeReleaseStatus, BlockPos blockPos2, CallbackInfoReturnable<Boolean> cir) {
+        level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BEEHIVE);
+    }
+
+    @Redirect(method = "releaseOccupant", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private static boolean banner$addedBefore(Level world, Entity entityIn) {
+        return true;
     }
 
     /**
@@ -88,30 +113,6 @@ public abstract class MixinBeehiveBlockEntity extends BlockEntity implements Inj
                 ci.cancel();
             }
         }
-    }
-
-    private static boolean releaseBee(Level world, BlockPos pos, BlockState state, BeehiveBlockEntity.BeeData beeData, @Nullable List<Entity> list, BeehiveBlockEntity.BeeReleaseStatus status, @Nullable BlockPos pos1, boolean force) {
-        banner$force = force;
-        try {
-            return releaseOccupant(world, pos, state, beeData.toOccupant(), list, status, pos1);
-        } finally {
-            banner$force = false;
-        }
-    }
-
-    @Redirect(method = "releaseOccupant", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isNight()Z"))
-    private static boolean banner$bypassNightCheck(Level world) {
-        return !banner$force && world.isNight();
-    }
-
-    @Inject(method = "releaseOccupant", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private static void banner$spawnFirst(Level level, BlockPos blockPos, BlockState blockState, BeehiveBlockEntity.Occupant occupant, List<Entity> list, BeehiveBlockEntity.BeeReleaseStatus beeReleaseStatus, BlockPos blockPos2, CallbackInfoReturnable<Boolean> cir) {
-        level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BEEHIVE);
-    }
-
-    @Redirect(method = "releaseOccupant", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    private static boolean banner$addedBefore(Level world, Entity entityIn) {
-        return true;
     }
 
     @Inject(method = "loadAdditional", at = @At("RETURN"))

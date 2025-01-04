@@ -28,15 +28,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerHandshakePacketListenerImpl.class)
 public abstract class MixinServerHandshakePacketListenerImpl implements ServerHandshakePacketListener {
 
-    @Shadow @Final private Connection connection;
-    @Shadow @Final private MinecraftServer server;
     // CraftBukkit start - add fields
     private static final HashMap<InetAddress, Long> throttleTracker = new HashMap<InetAddress, Long>();
-    private static int throttleCounter = 0;
     // CraftBukkit end
     private static final Gson gson = new Gson();
     private static final java.util.regex.Pattern HOST_PATTERN = java.util.regex.Pattern.compile("[0-9a-f\\.:]{0,45}");
-
+    private static int throttleCounter = 0;
+    @Shadow
+    @Final
+    private Connection connection;
+    @Shadow
+    @Final
+    private MinecraftServer server;
 
     @Inject(method = "handleIntention", at = @At("HEAD"))
     private void banner$setHostName(ClientIntentionPacket packet, CallbackInfo ci) {
@@ -76,9 +79,9 @@ public abstract class MixinServerHandshakePacketListenerImpl implements ServerHa
             String[] split = packet.hostName().split("\00");
             if (SpigotConfig.bungee) {
                 if ((split.length == 3 || split.length == 4) && (HOST_PATTERN.matcher(split[1]).matches())) {
-                     this.connection.banner$setHostName(split[0]);
+                    this.connection.banner$setHostName(split[0]);
                     this.connection.address = new InetSocketAddress(split[1], ((InetSocketAddress) this.connection.getRemoteAddress()).getPort());
-                     this.connection.banner$setSpoofedUUID(UndashedUuid.fromStringLenient(split[2]));
+                    this.connection.banner$setSpoofedUUID(UndashedUuid.fromStringLenient(split[2]));
                 } else {
                     var component = Component.literal("If you wish to use IP forwarding, please enable it in your BungeeCord config as well!");
                     this.connection.send(new ClientboundLoginDisconnectPacket(component));

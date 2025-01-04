@@ -69,29 +69,36 @@ public abstract class MixinServerEntity implements InjectionServerEntity {
     @Shadow @Final private Consumer<Packet<?>> broadcast;
     @Shadow private int tickCount;
     @Shadow @Final private ServerLevel level;
-    @Shadow protected abstract void sendDirtyEntityData();
     @Shadow @Final private int updateInterval;
     @Shadow @Final private VecDeltaCodec positionCodec;
     @Shadow private boolean wasRiding;
     @Shadow private int teleportDelay;
     @Shadow private boolean wasOnGround;
     @Shadow @Final private boolean trackDelta;
-    @Shadow protected abstract void broadcastAndSend(Packet<?> packet);
     @Shadow @Nullable private List<SynchedEntityData.DataValue<?>> trackedDataValues;
+    @Shadow
+    private int lastSentXRot;
+    @Shadow
+    private int lastSentYRot;
     // @formatter:on
+    @Shadow
+    private Vec3 lastSentMovement;
+    @Shadow
+    private int lastSentYHeadRot;
+    private Set<ServerPlayerConnection> trackedPlayers;
+    @Unique
+    private int lastTick;
+    @Unique
+    private int lastUpdate, lastPosUpdate, lastMapUpdate;
 
     @Shadow
     private static Stream<Entity> removedPassengers(List<Entity> list, List<Entity> list2) {
         return null;
     }
 
-    @Shadow private int lastSentXRot;
-    @Shadow private int lastSentYRot;
-    @Shadow private Vec3 lastSentMovement;
-    @Shadow private int lastSentYHeadRot;
-    private Set<ServerPlayerConnection> trackedPlayers;
-    @Unique private int lastTick;
-    @Unique private int lastUpdate, lastPosUpdate, lastMapUpdate;
+    @Shadow protected abstract void sendDirtyEntityData();
+
+    @Shadow protected abstract void broadcastAndSend(Packet<?> packet);
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(ServerLevel serverWorld, Entity entity, int updateFrequency, boolean sendVelocityUpdates, Consumer<Packet<?>> packetConsumer, CallbackInfo ci) {

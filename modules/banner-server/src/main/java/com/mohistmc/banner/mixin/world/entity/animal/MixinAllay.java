@@ -28,14 +28,15 @@ public abstract class MixinAllay extends PathfinderMob implements InjectionAllay
     // @formatter:off
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_CAN_DUPLICATE;
     // @formatter:on
-
-    @Shadow protected abstract void duplicateAllay();
+    public boolean forceDancing = false;
+    private transient Allay banner$duplicate;
 
     protected MixinAllay(EntityType<? extends PathfinderMob> entityType, Level level) {
         super(entityType, level);
     }
 
-    public boolean forceDancing = false;
+    @Shadow
+    protected abstract void duplicateAllay();
 
     @Override
     public void setCanDuplicate(boolean canDuplicate) {
@@ -62,8 +63,6 @@ public abstract class MixinAllay extends PathfinderMob implements InjectionAllay
             cir.setReturnValue(false);
         }
     }
-
-    private transient Allay banner$duplicate;
 
     @Redirect(method = "duplicateAllay", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean banner$captureDuplicate(Level instance, Entity entity) {

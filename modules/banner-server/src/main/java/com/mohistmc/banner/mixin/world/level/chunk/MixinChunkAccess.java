@@ -32,20 +32,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ChunkAccess.class)
 public abstract class MixinChunkAccess implements BlockGetter, BiomeManager.NoiseBiomeSource, LightChunk, StructureAccess, InjectionChunkAccess {
 
-    @Shadow public abstract int getHeight();
-
-    @Shadow @Final protected LevelChunkSection[] sections;
-
-    @Shadow public abstract int getMinBuildHeight();
-
     // CraftBukkit start - SPIGOT-6814: move to IChunkAccess to account for 1.17 to 1.18 chunk upgrading.
     private static final CraftPersistentDataTypeRegistry DATA_TYPE_REGISTRY = new CraftPersistentDataTypeRegistry();
     public DirtyCraftPersistentDataContainer persistentDataContainer = new DirtyCraftPersistentDataContainer(DATA_TYPE_REGISTRY);
     // CraftBukkit end
     public Registry<Biome> biomeRegistry;
+    @Shadow
+    @Final
+    protected LevelChunkSection[] sections;
+
+    @Shadow
+    public abstract int getHeight();
+
+    @Shadow
+    public abstract int getMinBuildHeight();
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void banner$init(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome>  registry, long l, LevelChunkSection[] levelChunkSections, BlendingData blendingData, CallbackInfo ci) {
+    private void banner$init(ChunkPos chunkPos, UpgradeData upgradeData, LevelHeightAccessor levelHeightAccessor, Registry<Biome> registry, long l, LevelChunkSection[] levelChunkSections, BlendingData blendingData, CallbackInfo ci) {
         this.biomeRegistry = registry;
     }
 

@@ -36,19 +36,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerLoginPacketListenerImpl.class)
 public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginPacketListener, TickablePacketListener, InjectionServerLoginPacketListenerImpl, CraftPlayer.TransferCookieConnection {
 
-    @Shadow public abstract void disconnect(Component component);
-    @Shadow @Final private MinecraftServer server;
-
-    @Shadow @Final public Connection connection;
-    @Shadow @Final private static AtomicInteger UNIQUE_THREAD_ID;
-
-    @Shadow @Nullable private String requestedUsername;
-
-    @Shadow @Final private static Logger LOGGER;
-
-    @Shadow abstract void startClientVerification(GameProfile gameProfile);
-
+    @Shadow
+    @Final
+    private static AtomicInteger UNIQUE_THREAD_ID;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    @Final
+    public Connection connection;
+    @Shadow
+    @Final
+    private MinecraftServer server;
+    @Shadow
+    @Nullable
+    private String requestedUsername;
     private ServerPlayer player; // CraftBukkit
+
+    @Shadow
+    public abstract void disconnect(Component component);
+
+    @Shadow
+    abstract void startClientVerification(GameProfile gameProfile);
 
     @Inject(method = "handleLoginAcknowledgement", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Connection;setupInboundProtocol(Lnet/minecraft/network/ProtocolInfo;Lnet/minecraft/network/PacketListener;)V"))
     private void banenr$setPlayer(ServerboundLoginAcknowledgedPacket p_298815_, CallbackInfo ci, @Local ServerConfigurationPacketListenerImpl listener) {
@@ -70,7 +79,7 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
 
     @Redirect(method = "handleHello",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerLoginPacketListenerImpl;startClientVerification(Lcom/mojang/authlib/GameProfile;)V",
+                    target = "Lnet/minecraft/server/network/ServerLoginPacketListenerImpl;startClientVerification(Lcom/mojang/authlib/GameProfile;)V",
                     ordinal = 1))
     private void banner$handleHello(ServerLoginPacketListenerImpl instance, GameProfile gameProfile) {
         // CraftBukkit start
@@ -128,12 +137,10 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
             this.server.bridge$processQueue().add(waitable);
             if (waitable.get() != PlayerPreLoginEvent.Result.ALLOWED) {
                 disconnect(event.getKickMessage());
-                return;
             }
         } else {
             if (asyncEvent.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
                 disconnect(asyncEvent.getKickMessage());
-                return;
             }
         }
     }

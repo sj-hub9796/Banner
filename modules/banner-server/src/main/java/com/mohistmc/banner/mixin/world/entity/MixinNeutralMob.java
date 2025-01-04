@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(NeutralMob.class)
 public interface MixinNeutralMob extends InjectionNeutralMob {
 
-    @Shadow void setTarget(@Nullable LivingEntity livingEntity);
+    @Shadow
+    void setTarget(@Nullable LivingEntity livingEntity);
 
     @Decorate(method = "readPersistentAngerSaveData", inject = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/NeutralMob;setTarget(Lnet/minecraft/world/entity/LivingEntity;)V"))
     private void banner$targetReason() {

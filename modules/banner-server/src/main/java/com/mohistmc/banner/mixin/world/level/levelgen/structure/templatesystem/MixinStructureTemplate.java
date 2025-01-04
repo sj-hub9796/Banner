@@ -38,6 +38,7 @@ public class MixinStructureTemplate implements InjectionStructureTemplate {
         }
         // CraftBukkit end
     }
+
     @Override
     public CraftPersistentDataContainer bridge$persistentDataContainer() {
         return persistentDataContainer;

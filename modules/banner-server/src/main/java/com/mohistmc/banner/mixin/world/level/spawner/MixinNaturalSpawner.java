@@ -120,7 +120,7 @@ public abstract class MixinNaturalSpawner {
         if (!iblockdata.isRedstoneConductor(ichunkaccess, blockposition)) {
             BlockPos.MutableBlockPos blockposition_mutableblockposition = new BlockPos.MutableBlockPos();
             int j = 0;
-            for(int k = 0; k < 3; ++k) {
+            for (int k = 0; k < 3; ++k) {
                 int l = blockposition.getX();
                 int i1 = blockposition.getZ();
 
@@ -129,16 +129,16 @@ public abstract class MixinNaturalSpawner {
                 int k1 = Mth.ceil(worldserver.random.nextFloat() * 4.0F);
                 int l1 = 0;
 
-                for(int i2 = 0; i2 < k1; ++i2) {
+                for (int i2 = 0; i2 < k1; ++i2) {
                     l += worldserver.random.nextInt(6) - worldserver.random.nextInt(6);
                     i1 += worldserver.random.nextInt(6) - worldserver.random.nextInt(6);
                     blockposition_mutableblockposition.set(l, i, i1);
                     double d0 = (double) l + 0.5D;
                     double d1 = (double) i1 + 0.5D;
-                    Player entityhuman = worldserver.getNearestPlayer(d0, (double) i, d1, -1.0D, false);
+                    Player entityhuman = worldserver.getNearestPlayer(d0, i, d1, -1.0D, false);
 
                     if (entityhuman != null) {
-                        double d2 = entityhuman.distanceToSqr(d0, (double) i, d1);
+                        double d2 = entityhuman.distanceToSqr(d0, i, d1);
 
                         if (isRightDistanceToPlayerAndSpawnPoint(worldserver, ichunkaccess, blockposition_mutableblockposition, d2)) {
                             if (biomesettingsmobs_c == null) {
@@ -148,7 +148,7 @@ public abstract class MixinNaturalSpawner {
                                     break;
                                 }
 
-                                biomesettingsmobs_c = (MobSpawnSettings.SpawnerData) optional.get();
+                                biomesettingsmobs_c = optional.get();
                                 k1 = biomesettingsmobs_c.minCount + worldserver.random.nextInt(1 + biomesettingsmobs_c.maxCount - biomesettingsmobs_c.minCount);
                             }
 
@@ -159,7 +159,7 @@ public abstract class MixinNaturalSpawner {
                                     return;
                                 }
 
-                                entityinsentient.moveTo(d0, (double) i, d1, worldserver.random.nextFloat() * 360.0F, 0.0F);
+                                entityinsentient.moveTo(d0, i, d1, worldserver.random.nextFloat() * 360.0F, 0.0F);
                                 if (isValidPositionForMob(worldserver, entityinsentient, d2)) {
                                     groupdataentity = entityinsentient.finalizeSpawn(worldserver, worldserver.getCurrentDifficultyAt(entityinsentient.blockPosition()), MobSpawnType.NATURAL, groupdataentity);
                                     // CraftBukkit start

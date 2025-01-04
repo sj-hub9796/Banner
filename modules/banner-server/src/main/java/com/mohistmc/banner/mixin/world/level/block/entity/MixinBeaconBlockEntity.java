@@ -26,22 +26,18 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 // Banner TODO fix patches
 @Mixin(BeaconBlockEntity.class)
-public abstract class MixinBeaconBlockEntity extends BlockEntity implements InjectionBeaconBlockEntity{
+public abstract class MixinBeaconBlockEntity extends BlockEntity implements InjectionBeaconBlockEntity {
 
-    @Shadow public int levels;
+    @Shadow
+    public int levels;
 
     public MixinBeaconBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
 
-    @Inject(method = "loadAdditional", at = @At("RETURN"))
-    public void banner$level(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfo ci) {
-        this.levels = compoundTag.getInt("Levels");
-    }
-
     @Inject(method = "tick",
             at = @At(value = "FIELD",
-            target = "Lnet/minecraft/world/level/block/entity/BeaconBlockEntity;lastCheckY:I", ordinal = 5),
+                    target = "Lnet/minecraft/world/level/block/entity/BeaconBlockEntity;lastCheckY:I", ordinal = 5),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private static void banner$activationEvent(Level level, BlockPos pos, BlockState state,
                                                BeaconBlockEntity blockEntity, CallbackInfo ci,
@@ -59,35 +55,11 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
         // Paper end
     }
 
-    @Inject(method = "setRemoved", at = @At("HEAD"))
-    private void banner$beaconEvent(CallbackInfo ci) {
-        // Paper start - BeaconDeactivatedEvent
-        org.bukkit.block.Block block = CraftBlock.at(level, worldPosition);
-        new io.papermc.paper.event.block.BeaconDeactivatedEvent(block).callEvent();
-        // Paper end
-    }
-
-    /*
-    @Override
-    public PotionEffect getPrimaryEffect() {
-        return (this.primaryPower != null) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.primaryPower, getLevel(this.levels), getAmplification(levels, primaryPower, secondaryPower), true, true)) : null;
-    }
-
-    @Override
-    public PotionEffect getSecondaryEffect() {
-        return (hasSecondaryEffect(levels, primaryPower, secondaryPower)) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.secondaryPower, getLevel(this.levels), getAmplification(levels, primaryPower, secondaryPower), true, true)) : null;
-    }*/
-
     private static boolean hasSecondaryEffect(int i, @Nullable MobEffect mobeffectlist, @Nullable MobEffect mobeffectlist1) {
         {
-            if (i >= 4 && mobeffectlist != mobeffectlist1 && mobeffectlist1 != null) {
-                return true;
-            }
-
-            return false;
+            return i >= 4 && mobeffectlist != mobeffectlist1 && mobeffectlist1 != null;
         }
     }
-
 
     // CraftBukkit start - split into components
     private static byte getAmplification(int i, @Nullable MobEffect mobeffectlist, @Nullable MobEffect mobeffectlist1) {
@@ -102,6 +74,17 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
         }
     }
 
+    /*
+    @Override
+    public PotionEffect getPrimaryEffect() {
+        return (this.primaryPower != null) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.primaryPower, getLevel(this.levels), getAmplification(levels, primaryPower, secondaryPower), true, true)) : null;
+    }
+
+    @Override
+    public PotionEffect getSecondaryEffect() {
+        return (hasSecondaryEffect(levels, primaryPower, secondaryPower)) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.secondaryPower, getLevel(this.levels), getAmplification(levels, primaryPower, secondaryPower), true, true)) : null;
+    }*/
+
     private static int getLevel(int i) {
         {
             int j = (9 + i * 2) * 20;
@@ -112,12 +95,25 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity implements Inje
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
     private static List getHumansInRange(Level world, BlockPos blockposition, int i) {
         {
-            double d0 = (double) (i * 10 + 10);
+            double d0 = i * 10 + 10;
 
-            AABB axisalignedbb = (new AABB(blockposition)).inflate(d0).expandTowards(0.0D, (double) world.getHeight(), 0.0D);
+            AABB axisalignedbb = (new AABB(blockposition)).inflate(d0).expandTowards(0.0D, world.getHeight(), 0.0D);
             List<Player> list = world.getEntitiesOfClass(Player.class, axisalignedbb);
 
             return list;
         }
+    }
+
+    @Inject(method = "loadAdditional", at = @At("RETURN"))
+    public void banner$level(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfo ci) {
+        this.levels = compoundTag.getInt("Levels");
+    }
+
+    @Inject(method = "setRemoved", at = @At("HEAD"))
+    private void banner$beaconEvent(CallbackInfo ci) {
+        // Paper start - BeaconDeactivatedEvent
+        org.bukkit.block.Block block = CraftBlock.at(level, worldPosition);
+        new io.papermc.paper.event.block.BeaconDeactivatedEvent(block).callEvent();
+        // Paper end
     }
 }

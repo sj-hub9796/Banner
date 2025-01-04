@@ -23,9 +23,13 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ProjectileDispenseBehavior.class)
 public abstract class MixinProjectileDispenseBehavior {
 
-    @Shadow @Final private ProjectileItem projectileItem;
+    @Shadow
+    @Final
+    private ProjectileItem projectileItem;
 
-    @Shadow @Final private ProjectileItem.DispenseConfig dispenseConfig;
+    @Shadow
+    @Final
+    private ProjectileItem.DispenseConfig dispenseConfig;
 
     /**
      * @author wdog5
@@ -35,7 +39,7 @@ public abstract class MixinProjectileDispenseBehavior {
     public ItemStack execute(BlockSource isourceblock, ItemStack stack) {
         Level level = isourceblock.level();
         Position position = DispenserBlock.getDispensePosition(isourceblock);
-        Direction direction = (Direction)isourceblock.state().getValue(DispenserBlock.FACING);
+        Direction direction = isourceblock.state().getValue(DispenserBlock.FACING);
         Projectile projectile = this.projectileItem.asProjectile(level, position, stack, direction);
         // CraftBukkit start
         //projectile.shoot((double)direction.getStepX(), (double)((float)direction.getStepY() + 0.1F), (double)direction.getStepZ(), this.getPower(), this.getUncertainty());
@@ -43,7 +47,7 @@ public abstract class MixinProjectileDispenseBehavior {
         org.bukkit.block.Block block = level.getWorld().getBlockAt(isourceblock.pos().getX(), isourceblock.pos().getY(), isourceblock.pos().getZ());
         CraftItemStack craftItem = CraftItemStack.asCraftMirror(itemstack1);
 
-        BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), new org.bukkit.util.Vector((double) direction.getStepX(), (double) ((float) direction.getStepY() + 0.1F), (double) direction.getStepZ()));
+        BlockDispenseEvent event = new BlockDispenseEvent(block, craftItem.clone(), new org.bukkit.util.Vector(direction.getStepX(), (float) direction.getStepY() + 0.1F, (double) direction.getStepZ()));
         if (!BukkitFieldHooks.isEventFired()) {
             level.getCraftServer().getPluginManager().callEvent(event);
         }
@@ -57,14 +61,14 @@ public abstract class MixinProjectileDispenseBehavior {
             stack.grow(1);
             // Chain to handler for new item
             ItemStack eventStack = CraftItemStack.asNMSCopy(event.getItem());
-            DispenseItemBehavior idispensebehavior = (DispenseItemBehavior) DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
+            DispenseItemBehavior idispensebehavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
             if (idispensebehavior != DispenseItemBehavior.NOOP && idispensebehavior != this) {
                 idispensebehavior.dispense(isourceblock, eventStack);
                 return stack;
             }
         }
         projectile.shoot(event.getVelocity().getX(), event.getVelocity().getY(), event.getVelocity().getZ(), this.dispenseConfig.power(), this.dispenseConfig.uncertainty());
-        projectile.banner$setProjectileSource(new CraftBlockProjectileSource((DispenserBlockEntity) isourceblock.blockEntity()));
+        projectile.banner$setProjectileSource(new CraftBlockProjectileSource(isourceblock.blockEntity()));
 
         level.addFreshEntity(projectile);
         //stack.shrink(1);// CraftBukkit - Handled during event processing

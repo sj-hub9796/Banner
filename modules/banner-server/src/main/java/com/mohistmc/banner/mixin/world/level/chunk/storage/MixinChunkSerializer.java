@@ -31,7 +31,7 @@ public class MixinChunkSerializer {
     private static void banner$loadPersistent(ServerLevel serverLevel, PoiManager poiManager, RegionStorageInfo regionStorageInfo, ChunkPos chunkPos, CompoundTag compoundTag, CallbackInfoReturnable<ProtoChunk> cir, ChunkPos chunkPos2, UpgradeData upgradeData, boolean bl, ListTag listTag, int i, LevelChunkSection[] levelChunkSections, boolean bl2, ChunkSource chunkSource, LevelLightEngine levelLightEngine, Registry registry, Codec codec, boolean bl3, long m, ChunkType chunkType, BlendingData blendingData, ChunkAccess chunkAccess) {
         net.minecraft.nbt.Tag persistentBase = compoundTag.get("ChunkBukkitValues");
         if (persistentBase instanceof CompoundTag) {
-            ((CraftPersistentDataContainer) (chunkAccess).bridge$persistentDataContainer()).putAll((CompoundTag) persistentBase);
+            (chunkAccess).bridge$persistentDataContainer().putAll((CompoundTag) persistentBase);
         }
     }
 

@@ -25,13 +25,13 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @SuppressWarnings("deprecation")
 public abstract class MixinLeadItem {
 
+    @Unique
+    private static final AtomicReference<InteractionHand> banner$hand = new AtomicReference<>(InteractionHand.MAIN_HAND);
+
     @Shadow
     public static InteractionResult bindPlayerMobs(Player player, Level level, BlockPos pos) {
         return null;
     }
-
-    @Unique
-    private static AtomicReference<InteractionHand> banner$hand = new AtomicReference<>(InteractionHand.MAIN_HAND);
 
     @Inject(method = "bindPlayerMobs",
             at = @At(value = "INVOKE",

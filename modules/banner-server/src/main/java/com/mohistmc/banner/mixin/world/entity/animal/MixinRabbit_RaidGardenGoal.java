@@ -19,7 +19,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(targets = "net.minecraft.world.entity.animal.Rabbit$RaidGardenGoal")
 public class MixinRabbit_RaidGardenGoal {
 
-    @Shadow @Final private Rabbit rabbit;
+    @Shadow
+    @Final
+    private Rabbit rabbit;
 
     @Inject(method = "tick", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))

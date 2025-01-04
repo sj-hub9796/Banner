@@ -34,7 +34,7 @@ public class MixinTridentItem {
 
     @Inject(method = "releaseUsing",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
             locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     public void banner$addEntity(ItemStack itemStack, Level level, LivingEntity livingEntity, int i, CallbackInfo ci, Player player, int j, float f, Holder holder, ThrownTrident thrownTrident) {
         // CraftBukkit start
@@ -45,7 +45,7 @@ public class MixinTridentItem {
             ci.cancel();
         }
         itemStack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(livingEntity.getUsedItemHand()));
-        ((ThrownTrident) thrownTrident).pickupItemStack = itemStack.copy();// SPIGOT-4511 update since damage call moved
+        thrownTrident.pickupItemStack = itemStack.copy();// SPIGOT-4511 update since damage call moved
         // CraftBukkkit end
     }
 

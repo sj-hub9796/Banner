@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BaseSpawner.class)
 public abstract class MixinBaseSpawner {
 
-    @Shadow public SimpleWeightedRandomList<SpawnData> spawnPotentials;
+    @Shadow
+    public SimpleWeightedRandomList<SpawnData> spawnPotentials;
 
 
     @Inject(method = "setEntityId", at = @At("RETURN"))

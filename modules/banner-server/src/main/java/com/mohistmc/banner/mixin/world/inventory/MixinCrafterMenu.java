@@ -21,9 +21,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class MixinCrafterMenu extends AbstractContainerMenu {
 
 
-    @Shadow @Final private CraftingContainer container;
-    @Shadow @Final private ResultContainer resultContainer;
-    @Shadow @Final private Player player;
+    @Shadow
+    @Final
+    private CraftingContainer container;
+    @Shadow
+    @Final
+    private ResultContainer resultContainer;
+    @Shadow
+    @Final
+    private Player player;
 
     private CraftCrafterView bukkitEntity;
 

@@ -14,7 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Tadpole.class)
 public abstract class MixinTadpole {
 
-    @Shadow protected abstract void setAge(int i);
+    @Shadow
+    protected abstract void setAge(int i);
 
     @Inject(method = "ageUp()V",
             at = @At(value = "INVOKE",

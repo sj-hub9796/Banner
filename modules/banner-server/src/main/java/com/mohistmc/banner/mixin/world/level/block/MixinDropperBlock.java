@@ -28,9 +28,13 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(DropperBlock.class)
 public class MixinDropperBlock {
 
-    @Shadow @Final private static DispenseItemBehavior DISPENSE_BEHAVIOUR;
+    @Shadow
+    @Final
+    private static DispenseItemBehavior DISPENSE_BEHAVIOUR;
 
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
 
     /**
      * @author wdog5
@@ -64,7 +68,7 @@ public class MixinDropperBlock {
                         if (iinventory instanceof CompoundContainer) {
                             destinationInventory = new CraftInventoryDoubleChest((CompoundContainer) iinventory);
                         } else {
-                            destinationInventory =  iinventory.getOwner().getInventory();
+                            destinationInventory = iinventory.getOwner().getInventory();
                         }
                         InventoryMoveItemEvent event = new InventoryMoveItemEvent((dispensertileentity).getOwner().getInventory(), craftItemStack, destinationInventory, true);
                         Bukkit.getPluginManager().callEvent(event);

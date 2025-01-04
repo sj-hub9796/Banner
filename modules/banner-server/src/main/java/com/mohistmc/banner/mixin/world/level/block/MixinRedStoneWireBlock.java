@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(RedStoneWireBlock.class)
 public abstract class MixinRedStoneWireBlock {
 
-    @Shadow protected abstract int calculateTargetStrength(Level level, BlockPos pos);
+    @Shadow
+    protected abstract int calculateTargetStrength(Level level, BlockPos pos);
 
     @Redirect(method = "updatePowerStrength", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/RedStoneWireBlock;calculateTargetStrength(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)I"))
     public int banner$blockRedstone(RedStoneWireBlock redstoneWireBlock, Level world, BlockPos pos, Level world1, BlockPos pos1, BlockState state) {

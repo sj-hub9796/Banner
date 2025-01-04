@@ -14,9 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(Fox.FoxEatBerriesGoal.class)
-public abstract class MixinFox_EatBerriesGoal extends MoveToBlockGoal{
+public abstract class MixinFox_EatBerriesGoal extends MoveToBlockGoal {
 
-    @SuppressWarnings("target") @Shadow(aliases = {"field_17975"}, remap = false)
+    @SuppressWarnings("target")
+    @Shadow(aliases = {"field_17975"}, remap = false)
     private Fox outerThis;
 
     public MixinFox_EatBerriesGoal(PathfinderMob creature, double speedIn, int length) {

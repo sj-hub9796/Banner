@@ -22,10 +22,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ShulkerBoxBlockEntity.class)
 public abstract class MixinShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements InjectionShulkerBoxBlockEntity {
 
-    @Shadow private NonNullList<ItemStack> itemStacks;
     public List<HumanEntity> transaction = new java.util.ArrayList<>();
-    private int maxStack = 64;
     public boolean opened;
+    @Shadow
+    private NonNullList<ItemStack> itemStacks;
+    private int maxStack = 64;
 
     protected MixinShulkerBoxBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);

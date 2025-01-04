@@ -23,8 +23,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GrindstoneMenu.class)
 public abstract class MixinGrindstoneMenu extends AbstractContainerMenu {
 
-    @Shadow @Final private Container repairSlots;
-    @Shadow @Final private Container resultSlots;
+    @Shadow
+    @Final
+    private Container repairSlots;
+    @Shadow
+    @Final
+    private Container resultSlots;
     private CraftInventoryView bukkitEntity = null;
     private Player player;
 
@@ -55,7 +59,7 @@ public abstract class MixinGrindstoneMenu extends AbstractContainerMenu {
         }
 
         CraftInventoryGrindstone inventory = new CraftInventoryGrindstone(this.repairSlots, this.resultSlots);
-        bukkitEntity = new CraftInventoryView(this.player, inventory, (AbstractContainerMenu) (Object) this);
+        bukkitEntity = new CraftInventoryView(this.player, inventory, (AbstractContainerMenu) this);
         return bukkitEntity;
     }
 }

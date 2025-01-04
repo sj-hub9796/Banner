@@ -25,7 +25,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(BigDripleafBlock.class)
 public class MixinBigDripleafBlock {
 
-    @Shadow @Final private static EnumProperty<Tilt> TILT;
+    @Shadow
+    @Final
+    private static EnumProperty<Tilt> TILT;
 
     @Inject(method = "onProjectileHit", cancellable = true, at = @At("HEAD"))
     private void banner$projectileHit(Level level, BlockState state, BlockHitResult hitResult, Projectile projectile, CallbackInfo ci) {

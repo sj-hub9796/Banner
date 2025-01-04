@@ -19,19 +19,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LoomMenu.class)
-public abstract class MixinLoomMenu extends AbstractContainerMenu{
-
-    protected MixinLoomMenu(@Nullable MenuType<?> menuType, int i) {
-        super(menuType, i);
-    }
+public abstract class MixinLoomMenu extends AbstractContainerMenu {
 
     // @formatter:off
     @Shadow @Final private Container inputContainer;
     @Shadow @Final private Container outputContainer;
-    // @formatter:on
-
     private CraftLoomView bukkitEntity;
+    // @formatter:on
     private Inventory playerInventory;
+    protected MixinLoomMenu(@Nullable MenuType<?> menuType, int i) {
+        super(menuType, i);
+    }
 
     @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V", at = @At("RETURN"))
     public void banner$init(int id, Inventory playerInventory, ContainerLevelAccess worldCallable, CallbackInfo ci) {

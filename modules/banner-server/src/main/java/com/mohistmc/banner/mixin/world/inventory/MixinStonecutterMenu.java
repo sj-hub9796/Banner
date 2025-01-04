@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(StonecutterMenu.class)
-public abstract class MixinStonecutterMenu extends AbstractContainerMenu{
+public abstract class MixinStonecutterMenu extends AbstractContainerMenu {
 
 
     // @formatter:off
@@ -26,13 +26,11 @@ public abstract class MixinStonecutterMenu extends AbstractContainerMenu{
     @Shadow @Final
     ResultContainer resultContainer;
     // @formatter:on
-
+    private CraftStonecutterView bukkitEntity = null;
+    private Inventory playerInventory;
     protected MixinStonecutterMenu(@Nullable MenuType<?> menuType, int i) {
         super(menuType, i);
     }
-
-    private CraftStonecutterView bukkitEntity = null;
-    private Inventory playerInventory;
 
     @Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V", at = @At("RETURN"))
     public void banner$init(int windowIdIn, Inventory playerInventoryIn, ContainerLevelAccess worldPosCallableIn, CallbackInfo ci) {

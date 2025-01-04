@@ -22,16 +22,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BeaconMenu.class)
 public abstract class MixinBeaconMenu extends AbstractContainerMenu {
 
+    // @formatter:off
+    @Shadow @Final private Container beacon;
+    private CraftBeaconView bukkitEntity;
+    // @formatter:on
+    private Inventory playerInventory;
     protected MixinBeaconMenu(@Nullable MenuType<?> menuType, int i) {
         super(menuType, i);
     }
-
-    // @formatter:off
-    @Shadow @Final private Container beacon;
-    // @formatter:on
-
-    private CraftBeaconView bukkitEntity;
-    private Inventory playerInventory;
 
     @Inject(method = "<init>(ILnet/minecraft/world/Container;Lnet/minecraft/world/inventory/ContainerData;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V", at = @At("RETURN"))
     public void banner$init(int id, Container inventory, ContainerData containerData, ContainerLevelAccess worldPosCallable, CallbackInfo ci) {

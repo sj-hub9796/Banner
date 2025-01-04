@@ -14,7 +14,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(RunAroundLikeCrazyGoal.class)
 public class MixinRunAroundLikeCrazyGoal {
 
-    @Shadow @Final private AbstractHorse horse;
+    @Shadow
+    @Final
+    private AbstractHorse horse;
 
     @Redirect(method = "tick", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;tameWithName(Lnet/minecraft/world/entity/player/Player;)Z"))

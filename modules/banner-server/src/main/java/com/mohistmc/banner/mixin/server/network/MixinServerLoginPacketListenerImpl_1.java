@@ -13,7 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net.minecraft.server.network.ServerLoginPacketListenerImpl$1")
 public class MixinServerLoginPacketListenerImpl_1 {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     ServerLoginPacketListenerImpl field_14176;
 
     @Inject(method = "run", at = @At(value = "INVOKE",

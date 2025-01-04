@@ -17,15 +17,14 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(BarrelBlockEntity.class)
 public abstract class MixinBarrelBlockEntity extends RandomizableContainerBlockEntity {
 
-    @Shadow private NonNullList<ItemStack> items;
-
+    // CraftBukkit start - add fields and methods
+    public List<HumanEntity> transaction = new ArrayList<>();
+    @Shadow
+    private NonNullList<ItemStack> items;
+    private int maxStack = MAX_STACK;
     protected MixinBarrelBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
-
-    // CraftBukkit start - add fields and methods
-    public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = MAX_STACK;
 
     @Override
     public List<ItemStack> getContents() {

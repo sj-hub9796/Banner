@@ -40,27 +40,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Mob.class)
 public abstract class MixinMob extends LivingEntity implements InjectionMob {
 
-    @Shadow private boolean persistenceRequired;
-
-    @Shadow @Nullable protected abstract SoundEvent getAmbientSound();
-
-    @Shadow @Nullable private LivingEntity target;
-
-    @Shadow @Nullable public abstract LivingEntity getTarget();
-
-    @Shadow protected abstract boolean canReplaceCurrentItem(ItemStack candidate, ItemStack existing);
-
-    @Shadow public abstract boolean canHoldItem(ItemStack stack);
-
-    @Shadow protected abstract float getEquipmentDropChance(EquipmentSlot slot);
-
-    @Shadow protected abstract void setItemSlotAndDropWhenKilled(EquipmentSlot slot, ItemStack stack);
-    @Shadow @Nullable public abstract <T extends Mob> T convertTo(EntityType<T> entityType, boolean bl);
-
-    @Shadow @Nullable private Leashable.LeashData leashData;
     public boolean aware = true; // CraftBukkit
-
     protected transient boolean banner$targetSuccess = false;
+    @Shadow
+    private boolean persistenceRequired;
+    @Shadow
+    @Nullable
+    private LivingEntity target;
+    @Shadow
+    @Nullable
+    private Leashable.LeashData leashData;
     private transient EntityTargetEvent.TargetReason banner$reason;
     private transient boolean banner$fireEvent;
     private transient ItemEntity banner$item;
@@ -69,6 +58,72 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     protected MixinMob(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow
+    @Nullable
+    protected abstract SoundEvent getAmbientSound();
+
+    @Shadow
+    @Nullable
+    public abstract LivingEntity getTarget();
+
+    /**
+     * @author wdog5
+     * @reason
+     */
+    @Overwrite
+    public void setTarget(@Nullable LivingEntity livingEntity) {
+        boolean fireEvent = banner$fireEvent;
+        banner$fireEvent = false;
+        EntityTargetEvent.TargetReason reason = banner$reason == null ? EntityTargetEvent.TargetReason.UNKNOWN : banner$reason;
+        banner$reason = null;
+        if (getTarget() == livingEntity) {
+            banner$targetSuccess = false;
+            return;
+        }
+        if (fireEvent) {
+            if (reason == EntityTargetEvent.TargetReason.UNKNOWN && this.getTarget() != null && livingEntity == null) {
+                reason = (this.getTarget().isAlive() ? EntityTargetEvent.TargetReason.FORGOT_TARGET : EntityTargetEvent.TargetReason.TARGET_DIED);
+            }
+            if (reason == EntityTargetEvent.TargetReason.UNKNOWN) {
+                BannerMod.LOGGER.warn("Unknown target reason setting {} target to {}", this, livingEntity);
+            }
+            CraftLivingEntity ctarget = null;
+            if (livingEntity != null) {
+                ctarget = (CraftLivingEntity) livingEntity.getBukkitEntity();
+            }
+            EntityTargetLivingEntityEvent event = new EntityTargetLivingEntityEvent(this.getBukkitEntity(), ctarget, reason);
+            Bukkit.getPluginManager().callEvent(event);
+            level().getCraftServer().getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                banner$targetSuccess = false;
+                return;
+            }
+            if (event.getTarget() != null) {
+                livingEntity = ((CraftLivingEntity) event.getTarget()).getHandle();
+            } else {
+                livingEntity = null;
+            }
+        }
+        this.target = livingEntity;
+        banner$targetSuccess = true;
+    }
+
+    @Shadow
+    protected abstract boolean canReplaceCurrentItem(ItemStack candidate, ItemStack existing);
+
+    @Shadow
+    public abstract boolean canHoldItem(ItemStack stack);
+
+    @Shadow
+    protected abstract float getEquipmentDropChance(EquipmentSlot slot);
+
+    @Shadow
+    protected abstract void setItemSlotAndDropWhenKilled(EquipmentSlot slot, ItemStack stack);
+
+    @Shadow
+    @Nullable
+    public abstract <T extends Mob> T convertTo(EntityType<T> entityType, boolean bl);
 
     @Inject(method = "setCanPickUpLoot", at = @At("HEAD"))
     public void banner$setPickupLoot(boolean canPickup, CallbackInfo ci) {
@@ -114,51 +169,9 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         }
     }
 
-
     @Inject(method = "pickUpItem", at = @At("HEAD"))
     private void banner$captureItemEntity(ItemEntity itemEntity, CallbackInfo ci) {
         banner$item = itemEntity;
-    }
-
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public void setTarget(@Nullable LivingEntity livingEntity) {
-        boolean fireEvent = banner$fireEvent;
-        banner$fireEvent = false;
-        EntityTargetEvent.TargetReason reason = banner$reason == null ? EntityTargetEvent.TargetReason.UNKNOWN : banner$reason;
-        banner$reason = null;
-        if (getTarget() == livingEntity) {
-            banner$targetSuccess = false;
-            return;
-        }
-        if (fireEvent) {
-            if (reason == EntityTargetEvent.TargetReason.UNKNOWN && this.getTarget() != null && livingEntity == null) {
-                reason = (this.getTarget().isAlive() ? EntityTargetEvent.TargetReason.FORGOT_TARGET : EntityTargetEvent.TargetReason.TARGET_DIED);
-            }
-            if (reason == EntityTargetEvent.TargetReason.UNKNOWN) {
-                BannerMod.LOGGER.warn("Unknown target reason setting {} target to {}", this, livingEntity);
-            }
-            CraftLivingEntity ctarget = null;
-            if (livingEntity != null) {
-                ctarget = (CraftLivingEntity) livingEntity.getBukkitEntity();
-            }
-            EntityTargetLivingEntityEvent event = new EntityTargetLivingEntityEvent(this.getBukkitEntity(), ctarget, reason);            Bukkit.getPluginManager().callEvent(event);
-            level().getCraftServer().getPluginManager().callEvent(event);
-            if (event.isCancelled()) {
-                banner$targetSuccess = false;
-                return;
-            }
-            if (event.getTarget() != null) {
-                livingEntity = ((CraftLivingEntity) event.getTarget()).getHandle();
-            } else {
-                livingEntity = null;
-            }
-        }
-        this.target = livingEntity;
-        banner$targetSuccess = true;
     }
 
     /**
@@ -287,14 +300,6 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
         }
     }*/
 
-    @Mixin(Mob.class)
-    public abstract static class PaperSpawnAffect extends LivingEntity {
-
-        protected PaperSpawnAffect(EntityType<? extends LivingEntity> entityType, Level level) {
-            super(entityType, level);
-        }
-    }
-
     @Override
     public <T extends Mob> T convertTo(EntityType<T> entitytypes, boolean flag, EntityTransformEvent.TransformReason transformReason, CreatureSpawnEvent.SpawnReason spawnReason) {
         this.level().pushAddEntityReason(spawnReason);
@@ -347,5 +352,13 @@ public abstract class MixinMob extends LivingEntity implements InjectionMob {
     @Override
     public boolean getBanner$targetSuccess() {
         return banner$targetSuccess;
+    }
+
+    @Mixin(Mob.class)
+    public abstract static class PaperSpawnAffect extends LivingEntity {
+
+        protected PaperSpawnAffect(EntityType<? extends LivingEntity> entityType, Level level) {
+            super(entityType, level);
+        }
     }
 }

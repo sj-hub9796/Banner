@@ -25,17 +25,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MapItemSavedData.class)
 public class MixinMapItemSavedData implements InjectionMapItemSavedData {
 
-    @Shadow @Final public ResourceKey<Level> dimension;
+    @Shadow
+    @Final
+    public ResourceKey<Level> dimension;
     public CraftMapView mapView;
-    private CraftServer server;
     public UUID uniqueId = null;
     public String id;
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void banner$init(int i, int j, byte b, boolean bl, boolean bl2, boolean bl3, ResourceKey resourceKey, CallbackInfo ci) {
-        this.mapView = new CraftMapView((MapItemSavedData) (Object) this);
-        this.server = (CraftServer) Bukkit.getServer();
-    }
+    private CraftServer server;
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     @Redirect(method = "load", at = @At(value = "INVOKE", target = "Ljava/util/Optional;orElseThrow(Ljava/util/function/Supplier;)Ljava/lang/Object;"))
@@ -52,6 +48,12 @@ public class MixinMapItemSavedData implements InjectionMapItemSavedData {
             }
             throw new IllegalArgumentException("Invalid map dimension: " + nbt.get("dimension"));
         });
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void banner$init(int i, int j, byte b, boolean bl, boolean bl2, boolean bl3, ResourceKey resourceKey, CallbackInfo ci) {
+        this.mapView = new CraftMapView((MapItemSavedData) (Object) this);
+        this.server = (CraftServer) Bukkit.getServer();
     }
 
     @Inject(method = "save", at = @At("HEAD"))

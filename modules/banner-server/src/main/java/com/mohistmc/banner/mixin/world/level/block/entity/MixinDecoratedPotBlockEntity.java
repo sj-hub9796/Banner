@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.world.level.block.entity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.RandomizableContainer;
@@ -21,9 +22,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(DecoratedPotBlockEntity.class)
 public abstract class MixinDecoratedPotBlockEntity extends BlockEntity implements RandomizableContainer, ContainerSingleItem {
 
-    @Shadow private ItemStack item;
-
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Shadow
+    private ItemStack item;
     private int maxStack = MAX_STACK;
 
     public MixinDecoratedPotBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
@@ -32,7 +33,7 @@ public abstract class MixinDecoratedPotBlockEntity extends BlockEntity implement
 
     @Override
     public List<ItemStack> getContents() {
-        return Arrays.asList(this.item);
+        return Collections.singletonList(this.item);
     }
 
     @Override

@@ -24,7 +24,7 @@ public interface MixinNeighborUpdater {
             cancellable = true)
     private static void banner$redstoneEvent(Level level, BlockState state, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving, CallbackInfo ci) {
         // CraftBukkit start
-        CraftWorld cworld = ((ServerLevel) level).getWorld();
+        CraftWorld cworld = level.getWorld();
         if (cworld != null) {
             BlockPhysicsEvent event = new BlockPhysicsEvent(CraftBlock.at(level, pos),
                     CraftBlockData.fromData(state), CraftBlock.at(level, fromPos));

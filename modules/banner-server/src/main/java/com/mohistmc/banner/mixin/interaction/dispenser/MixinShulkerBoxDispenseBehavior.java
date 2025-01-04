@@ -42,7 +42,7 @@ public class MixinShulkerBoxDispenseBehavior {
         if (!event.getItem().equals(craftItem)) {
             // Chain to handler for new item
             ItemStack eventStack = CraftItemStack.asNMSCopy(event.getItem());
-            DispenseItemBehavior behavior = (DispenseItemBehavior)DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
+            DispenseItemBehavior behavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
             if (behavior != DispenseItemBehavior.NOOP && behavior != this) {
                 behavior.dispense(source, eventStack);
                 cir.setReturnValue(stack);

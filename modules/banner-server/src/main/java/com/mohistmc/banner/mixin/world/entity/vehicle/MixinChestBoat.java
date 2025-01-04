@@ -20,9 +20,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ChestBoat.class)
 public abstract class MixinChestBoat extends Boat implements HasCustomInventoryScreen, ContainerEntity {
 
-    @Shadow private NonNullList<ItemStack> itemStacks;
-
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Shadow
+    private NonNullList<ItemStack> itemStacks;
     private int maxStack = MAX_STACK;
 
     public MixinChestBoat(EntityType<? extends Boat> entityType, Level level) {

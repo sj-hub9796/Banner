@@ -52,39 +52,54 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(Player.class)
 public abstract class MixinPlayer extends LivingEntity implements InjectionPlayer {
 
-    @Shadow protected FoodData foodData;
-
-    @Shadow protected PlayerEnderChestContainer enderChestInventory;
-
-    @Shadow @Final private Abilities abilities;
-
-    @Shadow public abstract void tick();
-
-    @Shadow private long timeEntitySatOnShoulder;
-
-    @Shadow public abstract CompoundTag getShoulderEntityLeft();
-
-    @Shadow public abstract CompoundTag getShoulderEntityRight();
-
-    @Shadow public abstract void setShoulderEntityRight(CompoundTag entityCompound);
-
-    @Shadow public abstract void setShoulderEntityLeft(CompoundTag entityCompound);
-
-    @Shadow @Final private Inventory inventory;
-
-    @Shadow public abstract Either<Player.BedSleepingProblem, net.minecraft.util.Unit> startSleepInBed(BlockPos bedPos);
-    @Shadow public abstract boolean blockActionRestricted(Level level, BlockPos pos, GameType gameMode);
-
-    @Shadow public abstract FoodData getFoodData();
+    public boolean fauxSleeping;
+    public int oldLevel = -1;
+    public boolean affectsSpawning = true;
+    // Banner start
+    public AtomicBoolean spawnEntityFromShoulder = new AtomicBoolean(true);
+    @Shadow
+    protected FoodData foodData;
+    @Shadow
+    protected PlayerEnderChestContainer enderChestInventory;
+    protected AtomicReference<Boolean> banner$forceSleep = new AtomicReference<>();
+    protected AtomicBoolean startSleepInBed_force = new AtomicBoolean(false);
+    @Shadow
+    @Final
+    private Abilities abilities;
+    @Shadow
+    private long timeEntitySatOnShoulder;
+    @Shadow
+    @Final
+    private Inventory inventory;
+    private EntityExhaustionEvent.ExhaustionReason banner$exhaustReason;
 
     protected MixinPlayer(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
     }
 
-    public boolean fauxSleeping;
-    public int oldLevel = -1;
-    protected AtomicReference<Boolean> banner$forceSleep = new AtomicReference<>();
-    public boolean affectsSpawning = true;
+    @Shadow
+    public abstract void tick();
+
+    @Shadow
+    public abstract CompoundTag getShoulderEntityLeft();
+
+    @Shadow
+    public abstract void setShoulderEntityLeft(CompoundTag entityCompound);
+
+    @Shadow
+    public abstract CompoundTag getShoulderEntityRight();
+
+    @Shadow
+    public abstract void setShoulderEntityRight(CompoundTag entityCompound);
+
+    @Shadow
+    public abstract Either<Player.BedSleepingProblem, net.minecraft.util.Unit> startSleepInBed(BlockPos bedPos);
+
+    @Shadow
+    public abstract boolean blockActionRestricted(Level level, BlockPos pos, GameType gameMode);
+
+    @Shadow
+    public abstract FoodData getFoodData();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(CallbackInfo ci) {
@@ -106,7 +121,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
             cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "RETURN", ordinal = 1))
     private void banner$playerDropItem(ItemStack droppedItem, boolean dropAround, boolean traceItem, CallbackInfoReturnable<ItemEntity> cir, double d0, ItemEntity itemEntity) {
         org.bukkit.entity.Player player = (org.bukkit.entity.Player) this.getBukkitEntity();
-        org.bukkit.entity.Item drop = ( org.bukkit.entity.Item) itemEntity.getBukkitEntity();
+        org.bukkit.entity.Item drop = (org.bukkit.entity.Item) itemEntity.getBukkitEntity();
 
         PlayerDropItemEvent event = new PlayerDropItemEvent(player, drop);
         Bukkit.getPluginManager().callEvent(event);
@@ -136,7 +151,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     public boolean canHarmPlayer(final net.minecraft.world.entity.player.Player entityhuman) {
         Team team;
         if (entityhuman instanceof ServerPlayer thatPlayer) {
-            team =  thatPlayer.getBukkitEntity().getScoreboard().getPlayerTeam((thatPlayer.getBukkitEntity()));
+            team = thatPlayer.getBukkitEntity().getScoreboard().getPlayerTeam((thatPlayer.getBukkitEntity()));
             if (team == null || team.allowFriendlyFire()) {
                 return true;
             }
@@ -152,9 +167,6 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         }
         return !team.hasPlayer(Bukkit.getOfflinePlayer(this.getScoreboardName()));
     }
-
-    // Banner start
-    public AtomicBoolean spawnEntityFromShoulder = new AtomicBoolean(true);
 
     /**
      * @author wdog5
@@ -185,7 +197,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
                 }
 
                 entity.setPos(this.getX(), this.getY() + 0.699999988079071D, this.getZ());
-                boolean canAdd =  ((ServerLevel)this.level()).addWithUUID(entity);
+                boolean canAdd = ((ServerLevel) this.level()).addWithUUID(entity);
                 spawnEntityFromShoulder.set(canAdd);
             }); // CraftBukkit
         }
@@ -197,8 +209,6 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
         respawnEntityOnShoulder(nbttagcompound);
         return spawnEntityFromShoulder.getAndSet(true);
     }
-
-    private EntityExhaustionEvent.ExhaustionReason banner$exhaustReason;
 
     @Redirect(method = "causeFoodExhaustion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;addExhaustion(F)V"))
     private void banner$exhaustEvent(FoodData foodData, float amount) {
@@ -246,7 +256,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
             if (blockPos != null) {
                 bed = CraftBlock.at(this.level(), blockPos);
             } else {
-                bed =  this.level().getWorld().getBlockAt(player.getLocation());
+                bed = this.level().getWorld().getBlockAt(player.getLocation());
             }
             PlayerBedLeaveEvent event = new PlayerBedLeaveEvent(player, bed, true);
             Bukkit.getPluginManager().callEvent(event);
@@ -255,7 +265,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
 
     @ModifyArg(method = "jumpFromGround", index = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;causeFoodExhaustion(F)V"))
     private float banner$exhaustInfo(float f) {
-        SpigotWorldConfig config =  level().bridge$spigotConfig();
+        SpigotWorldConfig config = level().bridge$spigotConfig();
         if (config != null) {
             if (this.isSprinting()) {
                 f = config.jumpSprintExhaustion;
@@ -274,7 +284,7 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
             playerEntity.setSharedFlag(flag, set);
         }
     }
-    
+
     @Inject(method = "startFallFlying", cancellable = true, at = @At("HEAD"))
     private void banner$startGlidingEvent(CallbackInfo ci) {
         if (CraftEventFactory.callToggleGlideEvent((net.minecraft.world.entity.player.Player) (Object) this, true).isCancelled()) {
@@ -325,8 +335,6 @@ public abstract class MixinPlayer extends LivingEntity implements InjectionPlaye
     public void banner$setAffectsSpawning(boolean affectsSpawning) {
         this.affectsSpawning = affectsSpawning;
     }
-
-    protected AtomicBoolean startSleepInBed_force = new AtomicBoolean(false);
 
     @Override
     public Player forceSleepInBed(boolean force) {

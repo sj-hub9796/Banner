@@ -16,9 +16,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(EatBlockGoal.class)
 public abstract class MixinEatBlockGoal extends Goal {
 
-    @Shadow @Final private Mob mob;
+    @Shadow
+    @Final
+    private Mob mob;
 
-    @Shadow @Final private Level level;
+    @Shadow
+    @Final
+    private Level level;
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z"))
     private boolean banner$eatGrassTick(GameRules instance, GameRules.Key<GameRules.BooleanValue> key) {

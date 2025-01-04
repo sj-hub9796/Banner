@@ -11,7 +11,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(DataComponentPatch.Builder.class)
 public class DataComponentPatch_BuilderMixin {
 
-    @Shadow @Final public Reference2ObjectMap<DataComponentType<?>, Optional<?>> map;
+    @Shadow
+    @Final
+    public Reference2ObjectMap<DataComponentType<?>, Optional<?>> map;
 
     public void copy(DataComponentPatch orig) {
         this.map.putAll(orig.map);

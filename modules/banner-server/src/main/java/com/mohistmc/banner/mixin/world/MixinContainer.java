@@ -46,7 +46,7 @@ public interface MixinContainer extends InjectionContainer {
         if (this instanceof BlockEntity entity) {
             BlockPos blockPos = entity.getBlockPos();
             return new Location(entity.getLevel().getWorld(), blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        }else {
+        } else {
             return null;
         }
     }

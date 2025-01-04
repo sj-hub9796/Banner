@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinRespawnAnchorBlock {
 
     @Redirect(method = "useWithoutItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;setRespawnPosition(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/BlockPos;FZZ)V"))
-    private void banner$cancelSetSpawnPos(ServerPlayer instance, ResourceKey<Level> dimension, BlockPos position, float angle, boolean forced, boolean sendMessage) {}
+    private void banner$cancelSetSpawnPos(ServerPlayer instance, ResourceKey<Level> dimension, BlockPos position, float angle, boolean forced, boolean sendMessage) {
+    }
 
     @Inject(method = "useWithoutItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;playSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V",
             shift = At.Shift.BEFORE))

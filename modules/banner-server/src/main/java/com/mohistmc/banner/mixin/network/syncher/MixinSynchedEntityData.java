@@ -16,12 +16,18 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(SynchedEntityData.class)
 public abstract class MixinSynchedEntityData implements InjectionSynchedEntityData {
 
-    @Shadow protected abstract <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> key);
+    @Shadow
+    private boolean isDirty;
+    @Shadow
+    @Final
+    private SyncedDataHolder entity;
 
-    @Shadow private boolean isDirty;
-    @Shadow @Nullable public abstract List<SynchedEntityData.DataValue<?>> getNonDefaultValues();
+    @Shadow
+    protected abstract <T> SynchedEntityData.DataItem<T> getItem(EntityDataAccessor<T> key);
 
-    @Shadow @Final private SyncedDataHolder entity;
+    @Shadow
+    @Nullable
+    public abstract List<SynchedEntityData.DataValue<?>> getNonDefaultValues();
 
     @Override
     public <T> void markDirty(EntityDataAccessor<T> datawatcherobject) {

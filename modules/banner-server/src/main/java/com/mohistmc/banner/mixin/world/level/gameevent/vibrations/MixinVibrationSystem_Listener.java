@@ -21,12 +21,17 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(VibrationSystem.Listener.class)
 public abstract class MixinVibrationSystem_Listener {
 
-    @Shadow @Final private VibrationSystem system;
+    @Shadow
+    @Final
+    private VibrationSystem system;
 
     @Shadow
-    private static boolean isOccluded(Level level, Vec3 vec3, Vec3 vec32) {return false;}
+    private static boolean isOccluded(Level level, Vec3 vec3, Vec3 vec32) {
+        return false;
+    }
 
-    @Shadow protected abstract void scheduleVibration(ServerLevel serverLevel, VibrationSystem.Data data, Holder<GameEvent> holder, GameEvent.Context context, Vec3 vec3, Vec3 vec32);
+    @Shadow
+    protected abstract void scheduleVibration(ServerLevel serverLevel, VibrationSystem.Data data, Holder<GameEvent> holder, GameEvent.Context context, Vec3 vec3, Vec3 vec32);
 
     /**
      * @author wdog5
@@ -45,7 +50,7 @@ public abstract class MixinVibrationSystem_Listener {
             if (optional.isEmpty()) {
                 return false;
             } else {
-                Vec3 vec32 = (Vec3)optional.get();
+                Vec3 vec32 = optional.get();
 
                 boolean defaultCancel = !user.canReceiveVibration(serverLevel, BlockPos.containing(vec3), holder, context);
                 Entity entity = context.sourceEntity();

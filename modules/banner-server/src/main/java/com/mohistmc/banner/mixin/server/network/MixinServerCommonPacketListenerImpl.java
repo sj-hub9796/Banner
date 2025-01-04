@@ -50,31 +50,36 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerCommonPacketListenerImpl.class)
 public abstract class MixinServerCommonPacketListenerImpl implements ServerCommonPacketListener, InjectionServerCommonPacketListenerImpl, CraftPlayer.TransferCookieConnection {
 
-    @Shadow
-    @Final
-    protected Connection connection;
+    private static final ResourceLocation CUSTOM_REGISTER = ResourceLocation.parse("register");
+    private static final ResourceLocation CUSTOM_UNREGISTER = ResourceLocation.parse("unregister");
     @Shadow
     @Final
     private static Logger LOGGER;
+    public boolean processedDisconnect;
+    @Shadow
+    @Final
+    protected Connection connection;
+    // @formatter:on
     @Shadow
     @Final
     protected MinecraftServer server;
+    protected ServerPlayer player;
+    protected CraftServer cserver;
+    @Shadow
+    @Final
+    private boolean transferred;
 
     @Shadow
     public abstract void send(Packet<?> p_300558_);
 
     @Shadow
     protected abstract boolean isSingleplayerOwner();
-    // @formatter:on
 
-    @Shadow public abstract void onDisconnect(DisconnectionDetails disconnectionDetails);
+    @Shadow
+    public abstract void onDisconnect(DisconnectionDetails disconnectionDetails);
 
-    @Shadow public abstract void disconnect(Component component);
-
-    @Shadow @Final private boolean transferred;
-    protected ServerPlayer player;
-    protected CraftServer cserver;
-    public boolean processedDisconnect;
+    @Shadow
+    public abstract void disconnect(Component component);
 
     @Override
     public CraftPlayer getCraftPlayer() {
@@ -102,7 +107,7 @@ public abstract class MixinServerCommonPacketListenerImpl implements ServerCommo
     }
 
     public final boolean isDisconnected() {
-        return !((ServerPlayer) this.player).bridge$joining() && !this.connection.isConnected();
+        return !this.player.bridge$joining() && !this.connection.isConnected();
     }
 
     @Override
@@ -165,13 +170,9 @@ public abstract class MixinServerCommonPacketListenerImpl implements ServerCommo
             return;
         }
         if (packetIn instanceof ClientboundSetDefaultSpawnPositionPacket packet6) {
-            ((ServerPlayer) this.player).banner$setCompassTarget(new Location(this.getCraftPlayer().getWorld(), packet6.pos.getX(), packet6.pos.getY(), packet6.pos.getZ()));
+            this.player.banner$setCompassTarget(new Location(this.getCraftPlayer().getWorld(), packet6.pos.getX(), packet6.pos.getY(), packet6.pos.getZ()));
         }
     }
-
-
-    private static final ResourceLocation CUSTOM_REGISTER = ResourceLocation.parse("register");
-    private static final ResourceLocation CUSTOM_UNREGISTER = ResourceLocation.parse("unregister");
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"))
     private void banner$customPayload(ServerboundCustomPayloadPacket packet, CallbackInfo ci) {
@@ -239,7 +240,7 @@ public abstract class MixinServerCommonPacketListenerImpl implements ServerCommo
     @Inject(method = "handleCookieResponse", cancellable = true, at = @At("HEAD"))
     private void banner$handleCookie(ServerboundCookieResponsePacket serverboundCookieResponsePacket, CallbackInfo ci) {
         PacketUtils.ensureRunningOnSameThread(serverboundCookieResponsePacket, (ServerCommonPacketListenerImpl) (Object) this, this.server);
-        if (((CraftPlayer) this.player.getBukkitEntity()).handleCookieResponse(serverboundCookieResponsePacket)) {
+        if (this.player.getBukkitEntity().handleCookieResponse(serverboundCookieResponsePacket)) {
             ci.cancel();
         }
     }

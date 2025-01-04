@@ -18,9 +18,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(CrafterBlockEntity.class)
 public abstract class MixinCrafterBlockEntity extends RandomizableContainerBlockEntity {
 
-    @Shadow private NonNullList<ItemStack> items;
-
     public List<HumanEntity> transaction = new java.util.ArrayList<>();
+    @Shadow
+    private NonNullList<ItemStack> items;
     private int maxStack = 1;
 
     protected MixinCrafterBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {

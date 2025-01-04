@@ -47,8 +47,8 @@ public interface MixinCauldronInteraction {
     @Redirect(method = "<clinit>", at = @At(value = "FIELD",
             target = "Lnet/minecraft/core/cauldron/CauldronInteraction;BANNER:Lnet/minecraft/core/cauldron/CauldronInteraction;"))
     private static void banner$resetBanner(CauldronInteraction value) {
-        value =  (blockState, level, blockPos, player, interactionHand, itemStack) -> {
-            BannerPatternLayers bannerPatternLayers = (BannerPatternLayers)itemStack.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY);
+        value = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            BannerPatternLayers bannerPatternLayers = itemStack.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY);
             if (bannerPatternLayers.layers().isEmpty()) {
                 return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             } else {

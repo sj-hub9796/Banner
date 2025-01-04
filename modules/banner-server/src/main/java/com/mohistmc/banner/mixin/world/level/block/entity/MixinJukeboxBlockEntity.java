@@ -21,10 +21,11 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(JukeboxBlockEntity.class)
 public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Clearable, ContainerSingleItem {
 
-    @Shadow private ItemStack item;
     public List<HumanEntity> transaction = new ArrayList<>();
-    private int maxStack = MAX_STACK;
     public boolean opened;
+    @Shadow
+    private ItemStack item;
+    private int maxStack = MAX_STACK;
 
     public MixinJukeboxBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -33,6 +34,11 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
     @Override
     public int getMaxStackSize() {
         return maxStack;
+    }
+
+    @Override
+    public void setMaxStackSize(int size) {
+        maxStack = size;
     }
 
     @Override
@@ -53,11 +59,6 @@ public abstract class MixinJukeboxBlockEntity extends BlockEntity implements Cle
     @Override
     public List<HumanEntity> getViewers() {
         return transaction;
-    }
-
-    @Override
-    public void setMaxStackSize(int size) {
-        maxStack = size;
     }
 
     @Override

@@ -24,17 +24,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(CommandSourceStack.class)
 public abstract class MixinCommandSourceStack implements InjectionCommandSourceStack {
 
-    @Shadow @Final private int permissionLevel;
-
-    @Shadow public abstract ServerLevel getLevel();
-
     @Mutable
-    @Shadow @Final public CommandSource source;
+    @Shadow
+    @Final
+    public CommandSource source;
     public volatile CommandNode currentCommand; // CraftBukkit
+    @Shadow
+    @Final
+    private int permissionLevel;
+
+    @Shadow
+    public abstract ServerLevel getLevel();
 
     @Inject(method = "hasPermission", cancellable = true, at = @At("HEAD"))
     public void banner$checkPermission(int level, CallbackInfoReturnable<Boolean> cir) {
-        CommandNode currentCommand =  this.currentCommand;
+        CommandNode currentCommand = this.currentCommand;
         if (currentCommand != null) {
             cir.setReturnValue(hasPermission(level, VanillaCommandWrapper.getPermission(currentCommand)));
         }

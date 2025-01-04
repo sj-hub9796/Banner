@@ -13,9 +13,11 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(EntityGetter.class)
 public interface MixinEntityGetter extends InjectionEntityGetter {
 
-    @Shadow @Nullable Player getNearestPlayer(double d, double e, double f, double g, @Nullable Predicate<Entity> predicate);
+    @Shadow
+    @Nullable Player getNearestPlayer(double d, double e, double f, double g, @Nullable Predicate<Entity> predicate);
 
-    @Shadow List<? extends Player> players();
+    @Shadow
+    List<? extends Player> players();
 
     @Override
     default @Nullable Player findNearbyPlayer(Entity entity, double maxDistance, @Nullable Predicate<Entity> predicate) {

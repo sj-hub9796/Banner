@@ -24,15 +24,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ShulkerBullet.class)
 public abstract class MixinShulkerBullet extends Projectile implements InjectionShulkerBullet {
 
-    @Shadow @Nullable private Entity finalTarget;
+    @Shadow
+    @Nullable
+    private Entity finalTarget;
 
-    @Shadow @Nullable private Direction currentMoveDirection;
+    @Shadow
+    @Nullable
+    private Direction currentMoveDirection;
 
     public MixinShulkerBullet(EntityType<? extends Projectile> entityType, Level level) {
         super(entityType, level);
     }
 
-    @Shadow protected abstract void selectNextMoveDirection(@Nullable Direction.Axis axis);
+    @Shadow
+    protected abstract void selectNextMoveDirection(@Nullable Direction.Axis axis);
 
     @Override
     public Entity getTarget() {

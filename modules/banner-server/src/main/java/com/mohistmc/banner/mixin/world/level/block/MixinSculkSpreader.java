@@ -15,9 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(SculkSpreader.class)
 public abstract class MixinSculkSpreader implements InjectionSculkSpreader {
 
-    @Shadow public abstract boolean isWorldGeneration();
-
     private transient Level banner$level;
+
+    @Shadow
+    public abstract boolean isWorldGeneration();
 
     @Override
     public void banner$setLevel(Level level) {

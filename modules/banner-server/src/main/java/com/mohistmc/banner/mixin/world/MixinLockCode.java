@@ -13,7 +13,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(LockCode.class)
 public abstract class MixinLockCode {
 
-    @Shadow @Final public String key;
+    @Shadow
+    @Final
+    public String key;
 
     /**
      * @author wdog5

@@ -14,9 +14,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(targets = "net.minecraft.world.entity.monster.Slime.SlimeRandomDirectionGoal")
 public class MixinSlime_SlimeRandomDirectionGoal {
 
-    @Shadow @Final private Slime slime;
+    @Shadow
+    @Final
+    private Slime slime;
 
-    @Shadow private float chosenDegrees;
+    @Shadow
+    private float chosenDegrees;
 
     /**
      * @author wdog5

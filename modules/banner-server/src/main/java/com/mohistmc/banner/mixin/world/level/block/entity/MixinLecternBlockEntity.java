@@ -57,7 +57,7 @@ public abstract class MixinLecternBlockEntity extends BlockEntity implements Cle
     @Overwrite
     public AbstractContainerMenu createMenu(int i, Inventory playerInventory, Player entity) {
         LecternMenu container = new LecternMenu(i, this.bookAccess, this.dataAccess);
-         container.bridge$setPlayerInventory(playerInventory);
+        container.bridge$setPlayerInventory(playerInventory);
         return container;
     }
 
@@ -81,7 +81,7 @@ public abstract class MixinLecternBlockEntity extends BlockEntity implements Cle
     }
 
     public CommandSender getBukkitSender(CommandSourceStack wrapper) {
-        return wrapper.getEntity() != null ?  wrapper.getEntity().banner$getBukkitSender(wrapper) : new CraftBlockCommandSender(wrapper, (BlockEntity) (Object) this);
+        return wrapper.getEntity() != null ? wrapper.getEntity().banner$getBukkitSender(wrapper) : new CraftBlockCommandSender(wrapper, (BlockEntity) this);
     }
 
     @Override

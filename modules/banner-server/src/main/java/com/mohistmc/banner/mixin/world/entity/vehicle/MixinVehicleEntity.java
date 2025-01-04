@@ -22,27 +22,27 @@ public abstract class MixinVehicleEntity extends Entity {
         super(entityType, level);
     }
 
+    @Shadow
+    public abstract int getHurtDir();
+
     // @formatter:off
     @Shadow
     public abstract void setHurtDir(int rollingDirection);
 
     @Shadow
-    public abstract int getHurtDir();
-
-    @Shadow
-    public abstract void setHurtTime(int rollingAmplitude);
+    public abstract float getDamage();
 
     @Shadow
     public abstract void setDamage(float damage);
-
-    @Shadow
-    public abstract float getDamage();
 
     @Shadow
     protected abstract void destroy(DamageSource source);
 
     @Shadow
     public abstract int getHurtTime();
+
+    @Shadow
+    public abstract void setHurtTime(int rollingAmplitude);
 
     @Shadow
     abstract boolean shouldSourceDestroy(DamageSource p_309621_);

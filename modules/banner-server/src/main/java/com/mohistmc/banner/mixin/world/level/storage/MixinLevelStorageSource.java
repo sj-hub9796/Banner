@@ -18,12 +18,15 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(LevelStorageSource.class)
 public abstract class MixinLevelStorageSource implements InjectionLevelStorageSource {
 
-    @Shadow public abstract LevelStorageSource.LevelStorageAccess createAccess(String saveName) throws IOException;
+    @Shadow
+    @Final
+    private DirectoryValidator worldDirValidator;
 
+    @Shadow
+    public abstract LevelStorageSource.LevelStorageAccess createAccess(String saveName) throws IOException;
 
-    @Shadow protected abstract Path getLevelPath(String string);
-
-    @Shadow @Final private DirectoryValidator worldDirValidator;
+    @Shadow
+    protected abstract Path getLevelPath(String string);
 
     @Override
     public LevelStorageSource.LevelStorageAccess validateAndCreateAccess(String s, ResourceKey<LevelStem> dimensionType) throws IOException, ContentValidationException {

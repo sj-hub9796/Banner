@@ -21,10 +21,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LootTable.class)
 public abstract class MixinLootTable implements InjectionLootTable {
-    @Shadow protected abstract ObjectArrayList<ItemStack> getRandomItems(LootContext context);
-    @Shadow public abstract void fill(Container container, LootParams params, long seed);
-
     public CraftLootTable craftLootTable; // CraftBukkit
+    public AtomicBoolean isPlugin = new AtomicBoolean(false);
+
+    @Shadow
+    protected abstract ObjectArrayList<ItemStack> getRandomItems(LootContext context);
+
+    @Shadow
+    public abstract void fill(Container container, LootParams params, long seed);
 
     @Eject(method = "fill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/loot/LootTable;getRandomItems(Lnet/minecraft/world/level/storage/loot/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList;"))
     private ObjectArrayList<ItemStack> banner$nonPluginEvent(LootTable lootTable, LootContext context, CallbackInfo ci, Container inv) {
@@ -41,8 +45,6 @@ public abstract class MixinLootTable implements InjectionLootTable {
         }
         return list;
     }
-
-    public AtomicBoolean isPlugin = new AtomicBoolean(false);
 
     @Override
     public void fillInventory(Container inv, LootParams lootparams, long seed, boolean plugin) {

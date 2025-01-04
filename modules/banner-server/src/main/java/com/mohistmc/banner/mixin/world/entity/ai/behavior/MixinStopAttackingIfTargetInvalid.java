@@ -20,7 +20,9 @@ import org.spongepowered.asm.mixin.Shadow;
 public abstract class MixinStopAttackingIfTargetInvalid {
 
     @Shadow
-    private static boolean isTiredOfTryingToReachTarget(LivingEntity entity, Optional<Long> timeSinceInvalidTarget) { return false; }
+    private static boolean isTiredOfTryingToReachTarget(LivingEntity entity, Optional<Long> timeSinceInvalidTarget) {
+        return false;
+    }
 
     /**
      * @author Mgazul

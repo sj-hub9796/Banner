@@ -21,9 +21,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(LavaFluid.class)
 public abstract class MixinLavaFluid {
 
-    @Shadow protected abstract boolean hasFlammableNeighbours(LevelReader level, BlockPos pos);
+    @Shadow
+    protected abstract boolean hasFlammableNeighbours(LevelReader level, BlockPos pos);
 
-    @Shadow protected abstract boolean isFlammable(LevelReader level, BlockPos pos);
+    @Shadow
+    protected abstract boolean isFlammable(LevelReader level, BlockPos pos);
 
     /**
      * @author wdog5
@@ -36,7 +38,7 @@ public abstract class MixinLavaFluid {
             if (i > 0) {
                 BlockPos blockPos = pos;
 
-                for(int j = 0; j < i; ++j) {
+                for (int j = 0; j < i; ++j) {
                     blockPos = blockPos.offset(random.nextInt(3) - 1, 1, random.nextInt(3) - 1);
                     if (!level.isLoaded(blockPos)) {
                         return;
@@ -60,7 +62,7 @@ public abstract class MixinLavaFluid {
                     }
                 }
             } else {
-                for(int k = 0; k < 3; ++k) {
+                for (int k = 0; k < 3; ++k) {
                     BlockPos blockPos2 = pos.offset(random.nextInt(3) - 1, 0, random.nextInt(3) - 1);
                     if (!level.isLoaded(blockPos2)) {
                         return;

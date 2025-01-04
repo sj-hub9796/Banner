@@ -30,20 +30,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Animal.class)
 public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal {
 
+    @Shadow public int inLove;
+    public ItemStack breedItem;
+    private transient int banner$loveTime;
+    private final AtomicInteger banner$exp = new AtomicInteger(this.getRandom().nextInt(7) + 1);
     protected MixinAnimal(EntityType<? extends AgeableMob> entityType, Level level) {
         super(entityType, level);
     }
+    // @formatter:on
 
     // @formatter:off
     @Shadow public InteractionResult mobInteract(Player playerIn, InteractionHand hand) { return null; }
-    @Shadow public int inLove;
+
     @Shadow public abstract void resetLove();
+
     @Shadow @Nullable public abstract ServerPlayer getLoveCause();
-    // @formatter:on
 
-    @Shadow public abstract void finalizeSpawnChildFromBreeding(ServerLevel serverLevel, Animal animal, @org.jetbrains.annotations.Nullable AgeableMob ageableMob);
-
-    public ItemStack breedItem;
+    @Shadow
+    public abstract void finalizeSpawnChildFromBreeding(ServerLevel serverLevel, Animal animal, @org.jetbrains.annotations.Nullable AgeableMob ageableMob);
 
     @Inject(method = "setInLove(Lnet/minecraft/world/entity/player/Player;)V", cancellable = true, at = @At("HEAD"))
     private void banner$enterLove(Player player, CallbackInfo ci) {
@@ -54,8 +58,6 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
             banner$loveTime = event.getTicksInLove();
         }
     }
-
-    private transient int banner$loveTime;
 
     @Inject(method = "setInLove(Lnet/minecraft/world/entity/player/Player;)V", at = @At(value = "FIELD", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/animal/Animal;inLove:I"))
     private void banner$inLove(Player player, CallbackInfo ci) {
@@ -72,10 +74,8 @@ public abstract class MixinAnimal extends AgeableMob implements InjectionAnimal 
 
     @Inject(method = "spawnChildFromBreeding", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
     private void banner$reason(ServerLevel level, Animal p_27565_, CallbackInfo ci) {
-         level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BREEDING);
+        level.pushAddEntityReason(CreatureSpawnEvent.SpawnReason.BREEDING);
     }
-
-    private AtomicInteger banner$exp = new AtomicInteger(this.getRandom().nextInt(7) + 1);
 
     @Redirect(method = "spawnChildFromBreeding", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/animal/Animal;finalizeSpawnChildFromBreeding(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/animal/Animal;Lnet/minecraft/world/entity/AgeableMob;)V"))

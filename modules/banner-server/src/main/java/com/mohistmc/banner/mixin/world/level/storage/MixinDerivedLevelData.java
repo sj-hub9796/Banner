@@ -14,7 +14,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(DerivedLevelData.class)
 public class MixinDerivedLevelData implements InjectionDerivedLevelData {
 
-    @Shadow @Final public ServerLevelData wrapped;
+    @Shadow
+    @Final
+    public ServerLevelData wrapped;
     private ResourceKey<LevelStem> typeKey;
 
     /**

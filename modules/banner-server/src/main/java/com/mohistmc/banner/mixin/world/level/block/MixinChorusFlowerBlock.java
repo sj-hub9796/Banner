@@ -30,17 +30,20 @@ public abstract class MixinChorusFlowerBlock extends Block {
 
     // @formatter:off
     @Shadow @Final public static IntegerProperty AGE;
+    @Shadow
+    @Final
+    private Block plant;
 
     public MixinChorusFlowerBlock(Properties properties) {
         super(properties);
     }
 
     @Shadow private static boolean allNeighborsEmpty(LevelReader worldIn, BlockPos pos, @Nullable Direction excludingSide) { return false; }
+
     @Shadow protected abstract void placeGrownFlower(Level worldIn, BlockPos pos, int age);
-    @Shadow protected abstract void placeDeadFlower(Level worldIn, BlockPos pos);
     // @formatter:on
 
-    @Shadow @Final private Block plant;
+    @Shadow protected abstract void placeDeadFlower(Level worldIn, BlockPos pos);
 
     /**
      * @author wdog5
@@ -80,7 +83,7 @@ public abstract class MixinChorusFlowerBlock extends Block {
                     flag = true;
                 }
 
-                if (flag && allNeighborsEmpty(worldIn, blockpos, (Direction) null) && worldIn.isEmptyBlock(pos.above(2))) {
+                if (flag && allNeighborsEmpty(worldIn, blockpos, null) && worldIn.isEmptyBlock(pos.above(2))) {
                     if (CraftEventFactory.handleBlockSpreadEvent(worldIn, pos, blockpos, this.defaultBlockState().setValue(ChorusFlowerBlock.AGE, i), 2)) {
                         worldIn.setBlock(pos, ChorusPlantBlock.getStateWithConnections(worldIn, pos, this.plant.defaultBlockState()), 2);
                         this.placeGrownFlower(worldIn, blockpos, i);

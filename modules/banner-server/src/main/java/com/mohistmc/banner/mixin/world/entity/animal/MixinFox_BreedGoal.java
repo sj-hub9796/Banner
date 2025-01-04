@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 @Mixin(targets = "net.minecraft.world.entity.animal.Fox$FoxBreedGoal")
-public abstract class MixinFox_BreedGoal extends BreedGoal{
+public abstract class MixinFox_BreedGoal extends BreedGoal {
 
     public MixinFox_BreedGoal(Animal animal, double speedIn) {
         super(animal, speedIn);
@@ -43,7 +43,7 @@ public abstract class MixinFox_BreedGoal extends BreedGoal{
                 foxentity.addTrustedUUID(serverplayerentity1.getUUID());
             }
             int experience = this.animal.getRandom().nextInt(7) + 1;
-            final EntityBreedEvent entityBreedEvent = CraftEventFactory.callEntityBreedEvent(foxentity, this.animal, this.partner, serverplayerentity,  this.animal.getBreedItem(), experience);
+            final EntityBreedEvent entityBreedEvent = CraftEventFactory.callEntityBreedEvent(foxentity, this.animal, this.partner, serverplayerentity, this.animal.getBreedItem(), experience);
             if (entityBreedEvent.isCancelled()) {
                 return;
             }

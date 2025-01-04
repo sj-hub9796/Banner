@@ -28,11 +28,24 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(RedStoneOreBlock.class)
 public abstract class MixinRedStoneOreBlock {
 
+    private static Entity banner$entity;
+
     @Shadow
     protected static void interact(BlockState state, Level level, BlockPos pos) {
     }
 
-    private static transient Entity banner$entity;
+    private static void interact(BlockState blockState, Level world, BlockPos blockPos, Entity entity) {
+        banner$entity = entity;
+        interact(blockState, world, blockPos);
+    }
+
+    @Inject(method = "interact", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+    private static void banner$entityChangeBlock(BlockState blockState, Level world, BlockPos blockPos, CallbackInfo ci) {
+        if (!CraftEventFactory.callEntityChangeBlockEvent(banner$entity, blockPos, blockState.setValue(RedStoneOreBlock.LIT, true))) {
+            ci.cancel();
+        }
+        banner$entity = null;
+    }
 
     @Inject(method = "attack", at = @At(value = "HEAD"))
     public void banner$interact1(BlockState state, Level worldIn, BlockPos pos, Player player, CallbackInfo ci) {
@@ -68,18 +81,5 @@ public abstract class MixinRedStoneOreBlock {
         if (CraftEventFactory.callBlockFadeEvent(worldIn, pos, state.setValue(RedStoneOreBlock.LIT, false)).isCancelled()) {
             ci.cancel();
         }
-    }
-
-    private static void interact(BlockState blockState, Level world, BlockPos blockPos, Entity entity) {
-        banner$entity = entity;
-        interact(blockState, world, blockPos);
-    }
-
-    @Inject(method = "interact", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
-    private static void banner$entityChangeBlock(BlockState blockState, Level world, BlockPos blockPos, CallbackInfo ci) {
-        if (!CraftEventFactory.callEntityChangeBlockEvent(banner$entity, blockPos, blockState.setValue(RedStoneOreBlock.LIT, true))) {
-            ci.cancel();
-        }
-        banner$entity = null;
     }
 }

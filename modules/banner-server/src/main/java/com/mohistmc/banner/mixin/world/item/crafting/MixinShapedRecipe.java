@@ -20,20 +20,26 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ShapedRecipe.class)
 public abstract class MixinShapedRecipe implements CraftingRecipe, InjectionShapedRecipe {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     ItemStack result;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     String group;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     CraftingBookCategory category;
 
-    @Shadow public abstract int getHeight();
+    @Shadow
+    public abstract int getHeight();
 
-    @Shadow public abstract int getWidth();
+    @Shadow
+    public abstract int getWidth();
 
-    @Shadow public abstract NonNullList<Ingredient> getIngredients();
+    @Shadow
+    public abstract NonNullList<Ingredient> getIngredients();
 
     @Override
     // CraftBukkit start

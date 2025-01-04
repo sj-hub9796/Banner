@@ -16,14 +16,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HorseInventoryMenu.class)
-public abstract class MixinHorseInventoryMenu extends AbstractContainerMenu{
-
-    // @formatter:off
-    @Shadow @Final private Container horseContainer;
-    // @formatter:on
+public abstract class MixinHorseInventoryMenu extends AbstractContainerMenu {
 
     CraftInventoryView bukkitEntity;
+    // @formatter:on
     Inventory playerInventory;
+    // @formatter:off
+    @Shadow @Final private Container horseContainer;
 
     protected MixinHorseInventoryMenu(@Nullable MenuType<?> menuType, int i) {
         super(menuType, i);
@@ -40,6 +39,6 @@ public abstract class MixinHorseInventoryMenu extends AbstractContainerMenu{
             return bukkitEntity;
         }
         return bukkitEntity = new CraftInventoryView(playerInventory.player.getBukkitEntity(),
-                 this.horseContainer.getOwner().getInventory(), (AbstractContainerMenu) (Object) this);
+                this.horseContainer.getOwner().getInventory(), (AbstractContainerMenu) this);
     }
 }

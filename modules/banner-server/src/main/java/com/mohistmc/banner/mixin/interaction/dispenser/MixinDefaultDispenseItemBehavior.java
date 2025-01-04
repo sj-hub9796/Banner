@@ -19,22 +19,11 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(DefaultDispenseItemBehavior.class)
 public class MixinDefaultDispenseItemBehavior {
 
+    private static BlockSource banner$isourceblock;
+    private static boolean banner$dropper;
+    private static ItemEntity banner$itemEntity;
     // CraftBukkit start
     private boolean dropper;
-    private static transient BlockSource banner$isourceblock;
-    private static transient boolean banner$dropper;
-    private static transient ItemEntity banner$itemEntity;
-
-    @ShadowConstructor
-    public void banner$constructor() {
-        throw new RuntimeException();
-    }
-
-    @CreateConstructor
-    public void banner$constructor(boolean dropper) {
-        banner$constructor();
-        this.dropper = dropper;
-    }
 
     /**
      * @author wdog5
@@ -60,7 +49,6 @@ public class MixinDefaultDispenseItemBehavior {
         //spawnItem(level, stack, speed, facing, banner$isourceblock, banner$dropper);
         level.addFreshEntity(itemEntity);
     }*/
-
     private static boolean spawnItem(Level level, ItemStack stack, int speed, Direction facing, BlockSource isourceblock, boolean dropper) {
         banner$dropper = dropper;
         banner$isourceblock = isourceblock;
@@ -85,14 +73,25 @@ public class MixinDefaultDispenseItemBehavior {
         if (!dropper && !event.getItem().getType().equals(craftItem.getType())) {
             // Chain to handler for new item
             ItemStack eventStack = CraftItemStack.asNMSCopy(event.getItem());
-            DispenseItemBehavior idispensebehavior = (DispenseItemBehavior) DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
+            DispenseItemBehavior idispensebehavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
             if (idispensebehavior != DispenseItemBehavior.NOOP && idispensebehavior.getClass() != DispenseItemBehavior.class) {
-                    idispensebehavior.dispense(isourceblock, eventStack);
+                idispensebehavior.dispense(isourceblock, eventStack);
             } else {
                 level.addFreshEntity(banner$itemEntity);
             }
             return false;
         }
         return true;
+    }
+
+    @ShadowConstructor
+    public void banner$constructor() {
+        throw new RuntimeException();
+    }
+
+    @CreateConstructor
+    public void banner$constructor(boolean dropper) {
+        banner$constructor();
+        this.dropper = dropper;
     }
 }

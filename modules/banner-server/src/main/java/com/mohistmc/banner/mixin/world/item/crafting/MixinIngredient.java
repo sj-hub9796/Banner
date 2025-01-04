@@ -12,11 +12,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = Ingredient.class)
 public abstract class MixinIngredient implements InjectionIngredient {
 
-    @Shadow public abstract ItemStack[] getItems();
-
+    private final boolean isVanilla = ((Ingredient) (Object) this).getClass() == Ingredient.class;
     public boolean exact; // CraftBukkit
 
-    private final boolean isVanilla = ((Ingredient) (Object) this).getClass() == Ingredient.class;
+    @Shadow
+    public abstract ItemStack[] getItems();
 
     @Override
     public boolean isVanilla() {

@@ -45,18 +45,6 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
 
     // @formatter:off
     @Shadow public Entity hookedIn;
-    @Shadow private int nibble;
-    @Shadow @Final private int luck;
-    @Shadow public abstract Player getPlayerOwner();
-    @Shadow private int timeUntilHooked;
-    @Shadow private int timeUntilLured;
-    @Shadow @Final private int lureSpeed;
-    @Shadow protected abstract void pullEntity(Entity p_150156_);
-    // @formatter:on
-
-    @Shadow protected abstract boolean shouldStopFishing(Player player);
-
-    @Shadow private float fishAngle;
     public int minWaitTime = 100;
     public int maxWaitTime = 600;
     public boolean applyLure = true;
@@ -64,12 +52,26 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
     public int maxLureTime = 80;
     public float minLureAngle = 0.0F;
     public float maxLureAngle = 360.0F;
+    // @formatter:on
     public boolean rainInfluenced = true;
     public boolean skyInfluenced = true;
-
+    @Shadow private int nibble;
+    @Shadow @Final private int luck;
+    @Shadow private int timeUntilHooked;
+    @Shadow private int timeUntilLured;
+    @Shadow @Final private int lureSpeed;
+    @Shadow
+    private float fishAngle;
     public MixinFishingHook(EntityType<? extends Projectile> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow public abstract Player getPlayerOwner();
+
+    @Shadow protected abstract void pullEntity(Entity p_150156_);
+
+    @Shadow
+    protected abstract boolean shouldStopFishing(Player player);
 
     @Redirect(method = "checkCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;hitTargetOrDeflectSelf(Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/projectile/ProjectileDeflection;"))
     private ProjectileDeflection banner$collide(FishingHook fishingHook, HitResult hitResult) {
@@ -106,7 +108,7 @@ public abstract class MixinFishingHook extends Projectile implements InjectionFi
 
     @Redirect(method = "catchingFish", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;canSeeSky(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean addSkyCheck(Level instance, BlockPos pos) {
-        return this.skyInfluenced  && instance.isRainingAt(pos);
+        return this.skyInfluenced && instance.isRainingAt(pos);
     }
 
     @Redirect(method = "catchingFish", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/util/Mth;nextFloat(Lnet/minecraft/util/RandomSource;FF)F"))

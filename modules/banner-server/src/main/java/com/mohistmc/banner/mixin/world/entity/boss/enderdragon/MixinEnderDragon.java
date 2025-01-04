@@ -40,10 +40,10 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(EnderDragon.class)
 public abstract class MixinEnderDragon extends Mob {
 
-    @Shadow
-    @Nullable private EndDragonFight dragonFight;
-
     private final Explosion explosionSource = new Explosion(this.level(), (EnderDragon) (Object) this, null, null, Double.NaN, Double.NaN, Double.NaN, Float.NaN, true, Explosion.BlockInteraction.DESTROY, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER, SoundEvents.GENERIC_EXPLODE);
+    @Shadow
+    @Nullable
+    private EndDragonFight dragonFight;
 
     protected MixinEnderDragon(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);

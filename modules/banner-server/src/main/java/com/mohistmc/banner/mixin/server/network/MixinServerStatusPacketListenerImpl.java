@@ -44,7 +44,7 @@ public class MixinServerStatusPacketListenerImpl {
         }
 
         // Spigot Start
-        if ( !server.hidesOnlinePlayers() && !profiles.isEmpty() ) {
+        if (!server.hidesOnlinePlayers() && !profiles.isEmpty()) {
             java.util.Collections.shuffle(profiles); // This sucks, its inefficient but we have no simple way of doing it differently
             profiles = profiles.subList(0, Math.min(profiles.size(), org.spigotmc.SpigotConfig.playerSample)); // Cap the sample to n (or less) displayed players, ie: Vanilla behaviour
         }

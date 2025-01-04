@@ -18,9 +18,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(targets = "net/minecraft/world/level/block/entity/LecternBlockEntity$1")
 public abstract class MixinLecternBlockEntity1 implements Container {
 
-    @Shadow(aliases = {"field_17391"}, remap = false) private LecternBlockEntity outerThis;
-
     public List<HumanEntity> transaction = new ArrayList<>();
+    @Shadow(aliases = {"field_17391"}, remap = false)
+    private LecternBlockEntity outerThis;
     private int maxStack = 1;
 
     @Override

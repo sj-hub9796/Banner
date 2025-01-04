@@ -25,7 +25,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LecternMenu.class)
 public abstract class MixinLecternMenu extends AbstractContainerMenu implements InjectionLecternMenu {
 
-    @Shadow @Final private Container lectern;
+    @Shadow
+    @Final
+    private Container lectern;
     private CraftLecternView bukkitEntity;
     private Inventory playerInventory;
 
@@ -57,7 +59,7 @@ public abstract class MixinLecternMenu extends AbstractContainerMenu implements 
 
     @Inject(method = "clickMenuButton", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/Container;removeItemNoUpdate(I)Lnet/minecraft/world/item/ItemStack;"))
     public void banner$takeBook(Player playerIn, int id, CallbackInfoReturnable<Boolean> cir) {
-        PlayerTakeLecternBookEvent event = new PlayerTakeLecternBookEvent((org.bukkit.entity.Player) this.playerInventory.player.getBukkitEntity(), ((CraftInventoryLectern) getBukkitView().getTopInventory()).getHolder());
+        PlayerTakeLecternBookEvent event = new PlayerTakeLecternBookEvent((org.bukkit.entity.Player) this.playerInventory.player.getBukkitEntity(), getBukkitView().getTopInventory().getHolder());
         Bukkit.getServer().getPluginManager().callEvent(event);
         if (event.isCancelled()) {
             cir.setReturnValue(false);

@@ -24,11 +24,17 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(BoatDispenseItemBehavior.class)
 public abstract class MixinBoatDispenseItemBehavior {
 
-    @Shadow @Final private DefaultDispenseItemBehavior defaultDispenseItemBehavior;
+    @Shadow
+    @Final
+    private DefaultDispenseItemBehavior defaultDispenseItemBehavior;
 
-    @Shadow @Final private boolean isChestBoat;
+    @Shadow
+    @Final
+    private boolean isChestBoat;
 
-    @Shadow @Final private Boat.Type type;
+    @Shadow
+    @Final
+    private Boat.Type type;
 
     /**
      * @author wdog5
@@ -36,11 +42,11 @@ public abstract class MixinBoatDispenseItemBehavior {
      */
     @Overwrite
     public ItemStack execute(BlockSource source, ItemStack stack) {
-        Direction direction = (Direction)source.state().getValue(DispenserBlock.FACING);
+        Direction direction = source.state().getValue(DispenserBlock.FACING);
         Level level = source.level();
-        double d = source.pos().getX() + (double)((float)direction.getStepX() * 1.125F);
-        double e = source.pos().getY() + (double)((float)direction.getStepY() * 1.125F);
-        double f = source.pos().getZ() + (double)((float)direction.getStepZ() * 1.125F);
+        double d = source.pos().getX() + (double) ((float) direction.getStepX() * 1.125F);
+        double e = source.pos().getY() + (double) ((float) direction.getStepY() * 1.125F);
+        double f = source.pos().getZ() + (double) ((float) direction.getStepZ() * 1.125F);
         BlockPos blockPos = source.pos().relative(direction);
         double g;
         if (level.getFluidState(blockPos).is(FluidTags.WATER)) {
@@ -73,16 +79,16 @@ public abstract class MixinBoatDispenseItemBehavior {
         if (!event.getItem().equals(craftItem)) {
             stack.grow(1);
             ItemStack eventStack = CraftItemStack.asNMSCopy(event.getItem());
-            DispenseItemBehavior idispensebehavior = (DispenseItemBehavior) DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
+            DispenseItemBehavior idispensebehavior = DispenserBlock.DISPENSER_REGISTRY.get(eventStack.getItem());
             if (idispensebehavior != DispenseItemBehavior.NOOP && idispensebehavior != this) {
                 idispensebehavior.dispense(source, eventStack);
                 return stack;
             }
         }
         Boat boat = this.isChestBoat ? new ChestBoat(level, event.getVelocity().getX(), event.getVelocity().getY(), event.getVelocity().getZ()) : new Boat(level, event.getVelocity().getX(), event.getVelocity().getY(), event.getVelocity().getZ());
-        ((Boat)boat).setVariant(this.type);
-        ((Boat)boat).setYRot(direction.toYRot());
-        if (!level.addFreshEntity((Entity) boat)) stack.grow(1); // CraftBukkit
+        boat.setVariant(this.type);
+        boat.setYRot(direction.toYRot());
+        if (!level.addFreshEntity(boat)) stack.grow(1); // CraftBukkit
         return stack;
     }
 }

@@ -31,14 +31,18 @@ public abstract class MixinCreeper extends Monster implements PowerableMob, Inje
     // @formatter:off
     @Shadow @Final private static EntityDataAccessor<Boolean> DATA_IS_POWERED;
     @Shadow public int explosionRadius;
-    @Shadow protected abstract void spawnLingeringCloud();
     @Shadow
     public int swell;
-    @Shadow public abstract boolean isPowered();
-    // @formatter:on
-
     protected MixinCreeper(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
+    }
+    // @formatter:on
+
+    @Shadow public abstract boolean isPowered();
+
+    @Override
+    public void setPowered(boolean power) {
+        this.entityData.set(DATA_IS_POWERED, power);
     }
 
     @Inject(method = "thunderHit", cancellable = true, at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/monster/Creeper;entityData:Lnet/minecraft/network/syncher/SynchedEntityData;"))
@@ -61,12 +65,7 @@ public abstract class MixinCreeper extends Monster implements PowerableMob, Inje
     @Inject(method = "spawnLingeringCloud", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private void banner$creeperCloud(CallbackInfo ci, Collection<MobEffectInstance> collection, AreaEffectCloud areaeffectcloudentity) {
         areaeffectcloudentity.setOwner((Creeper) (Object) this);
-         this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.EXPLOSION);
-    }
-
-    @Override
-    public void setPowered(boolean power) {
-        this.entityData.set(DATA_IS_POWERED, power);
+        this.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.EXPLOSION);
     }
 
 }

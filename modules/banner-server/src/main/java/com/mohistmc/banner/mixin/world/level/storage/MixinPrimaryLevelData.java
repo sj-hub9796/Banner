@@ -32,17 +32,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PrimaryLevelData.class)
 public abstract class MixinPrimaryLevelData implements InjectionPrimaryLevelData {
 
-    @Shadow public abstract boolean isDifficultyLocked();
-
-    @Shadow private boolean raining;
-
-    @Shadow public abstract String getLevelName();
-
-    @Shadow private boolean thundering;
-    @Shadow public LevelSettings settings;
+    @Shadow
+    public LevelSettings settings;
     public ServerLevel world;
     public Registry<LevelStem> customDimensions;
     protected Tag pdc;
+    @Shadow
+    private boolean raining;
+    @Shadow
+    private boolean thundering;
+
+    @Shadow
+    public abstract boolean isDifficultyLocked();
+
+    @Shadow
+    public abstract String getLevelName();
 
     @Redirect(method = "setTagData", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/levelgen/WorldGenSettings;encode(Lcom/mojang/serialization/DynamicOps;Lnet/minecraft/world/level/levelgen/WorldOptions;Lnet/minecraft/core/RegistryAccess;)Lcom/mojang/serialization/DataResult;"))
     private <T extends Tag> DataResult<T> banner$customDim(DynamicOps<T> ops, WorldOptions options, RegistryAccess registry) {

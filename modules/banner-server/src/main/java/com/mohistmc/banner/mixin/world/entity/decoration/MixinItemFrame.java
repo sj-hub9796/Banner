@@ -27,14 +27,29 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ItemFrame.class)
 public abstract class MixinItemFrame extends HangingEntity implements InjectionItemFrame {
 
+    @Shadow
+    @Final
+    private static EntityDataAccessor<ItemStack> DATA_ITEM;
+
     protected MixinItemFrame(EntityType<? extends HangingEntity> entityType, Level level) {
         super(entityType, level);
     }
 
-    @Shadow protected abstract void onItemChanged(ItemStack item);
+    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
+    private static AABB calculateBoundingBoxStatic(BlockPos blockposition, Direction enumdirection) {
+        // CraftBukkit end
+        float f = 0.46875F;
+        Vec3 vec3d = Vec3.atCenterOf(blockposition).relative(enumdirection, -0.46875D);
+        Direction.Axis enumdirection_enumaxis = enumdirection.getAxis();
+        double d0 = enumdirection_enumaxis == Direction.Axis.X ? 0.0625D : 0.75D;
+        double d1 = enumdirection_enumaxis == Direction.Axis.Y ? 0.0625D : 0.75D;
+        double d2 = enumdirection_enumaxis == Direction.Axis.Z ? 0.0625D : 0.75D;
 
-    @Shadow @Final
-    private static EntityDataAccessor<ItemStack> DATA_ITEM;
+        return AABB.ofSize(vec3d, d0, d1, d2);
+    }
+
+    @Shadow
+    protected abstract void onItemChanged(ItemStack item);
 
     @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/decoration/ItemFrame;dropItem(Lnet/minecraft/world/entity/Entity;Z)V"))
     private void banner$damageNonLiving(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
@@ -57,18 +72,5 @@ public abstract class MixinItemFrame extends HangingEntity implements InjectionI
         if (flag && this.pos != null) {
             this.level().updateNeighbourForOutputSignal(this.pos, Blocks.AIR);
         }
-    }
-
-    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
-    private static AABB calculateBoundingBoxStatic(BlockPos blockposition, Direction enumdirection) {
-        // CraftBukkit end
-        float f = 0.46875F;
-        Vec3 vec3d = Vec3.atCenterOf(blockposition).relative(enumdirection, -0.46875D);
-        Direction.Axis enumdirection_enumaxis = enumdirection.getAxis();
-        double d0 = enumdirection_enumaxis == Direction.Axis.X ? 0.0625D : 0.75D;
-        double d1 = enumdirection_enumaxis == Direction.Axis.Y ? 0.0625D : 0.75D;
-        double d2 = enumdirection_enumaxis == Direction.Axis.Z ? 0.0625D : 0.75D;
-
-        return AABB.ofSize(vec3d, d0, d1, d2);
     }
 }

@@ -32,11 +32,11 @@ public abstract class MixinItemEntity extends Entity {
     // @formatter:off
     @Shadow @Final private static EntityDataAccessor<ItemStack> DATA_ITEM;
     @Shadow public int pickupDelay;
-    @Shadow public abstract ItemStack getItem();
     @Shadow public UUID target;
+    @Shadow
+    private int age;
     // @formatter:on
-
-    @Shadow private int age;
+    private final AtomicBoolean flyAtPlayer = new AtomicBoolean(false);// Paper
 
     public MixinItemEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -48,6 +48,15 @@ public abstract class MixinItemEntity extends Entity {
             ci.cancel();
         }
     }
+
+    @Redirect(method = "merge(Lnet/minecraft/world/entity/item/ItemEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;setItem(Lnet/minecraft/world/item/ItemStack;)V"))
+    private static void banner$setNonEmpty(ItemEntity itemEntity, ItemStack stack) {
+        if (!stack.isEmpty()) {
+            itemEntity.setItem(stack);
+        }
+    }
+
+    @Shadow public abstract ItemStack getItem();
 
     @Inject(method = "hurt", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;markHurt()V"))
     private void banner$damageNonLiving(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
@@ -64,8 +73,6 @@ public abstract class MixinItemEntity extends Entity {
         return instance.inflate(radius, radius - 0.5D, radius);
         // Spigot end
     }
-
-    private AtomicBoolean flyAtPlayer = new AtomicBoolean(false);// Paper
 
     @Inject(method = "playerTouch", at = @At(value = "FIELD",
             target = "Lnet/minecraft/world/entity/item/ItemEntity;pickupDelay:I"),
@@ -104,7 +111,7 @@ public abstract class MixinItemEntity extends Entity {
             }
 
             // Call newer event afterwards
-            EntityPickupItemEvent entityEvent = new EntityPickupItemEvent((org.bukkit.entity.Player) player.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
+            EntityPickupItemEvent entityEvent = new EntityPickupItemEvent(player.getBukkitEntity(), (org.bukkit.entity.Item) this.getBukkitEntity(), remaining);
             entityEvent.setCancelled(!entityEvent.getEntity().getCanPickupItems());
             this.level().getCraftServer().getPluginManager().callEvent(entityEvent);
             flyAtPlayer.set(playerEvent.getFlyAtPlayer()); // Paper
@@ -137,7 +144,7 @@ public abstract class MixinItemEntity extends Entity {
 
     @Inject(method = "playerTouch",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V"),
+                    target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V"),
             cancellable = true)
     private void banner$checkIfFly(Player player, CallbackInfo ci) {
         if (!flyAtPlayer.get()) {
@@ -148,13 +155,6 @@ public abstract class MixinItemEntity extends Entity {
     @Inject(method = "setItem", at = @At("RETURN"))
     private void banner$markDirty(ItemStack stack, CallbackInfo ci) {
         this.getEntityData().markDirty(DATA_ITEM);
-    }
-
-    @Redirect(method = "merge(Lnet/minecraft/world/entity/item/ItemEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/item/ItemEntity;setItem(Lnet/minecraft/world/item/ItemStack;)V"))
-    private static void banner$setNonEmpty(ItemEntity itemEntity, ItemStack stack) {
-        if (!stack.isEmpty()) {
-            itemEntity.setItem(stack);
-        }
     }
 
     @Inject(method = "makeFakeItem", at = @At("RETURN"))

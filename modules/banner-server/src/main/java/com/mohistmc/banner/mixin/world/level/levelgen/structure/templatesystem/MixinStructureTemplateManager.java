@@ -11,7 +11,8 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(StructureTemplateManager.class)
 public abstract class MixinStructureTemplateManager implements InjectionStructureTemplateManager {
 
-    @Shadow protected abstract Optional<StructureTemplate> loadFromResource(ResourceLocation id);
+    @Shadow
+    protected abstract Optional<StructureTemplate> loadFromResource(ResourceLocation id);
 
     // Banner start Fix modernfix mod
     @Override

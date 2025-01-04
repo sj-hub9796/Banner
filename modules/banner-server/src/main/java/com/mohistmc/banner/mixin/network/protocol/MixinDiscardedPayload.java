@@ -12,6 +12,9 @@ import org.spongepowered.asm.mixin.Unique;
 @Mixin(DiscardedPayload.class)
 public class MixinDiscardedPayload implements InjectionDiscardedPayload {
 
+    @Unique
+    private ByteBuf data;
+
     @ShadowConstructor
     public void banner$constructor(ResourceLocation rl) {
         throw new RuntimeException();
@@ -22,9 +25,6 @@ public class MixinDiscardedPayload implements InjectionDiscardedPayload {
         this.banner$constructor(rl);
         this.data = data;
     }
-
-    @Unique
-    private ByteBuf data;
 
     @Override
     public void bridge$setData(ByteBuf data) {

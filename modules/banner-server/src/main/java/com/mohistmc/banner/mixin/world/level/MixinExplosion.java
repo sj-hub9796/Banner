@@ -1,24 +1,18 @@
 package com.mohistmc.banner.mixin.world.level;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.injection.world.level.InjectionExplosion;
 import com.mojang.datafixers.util.Pair;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
-import io.izzel.arclight.mixin.Local;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.TntBlock;
@@ -42,25 +36,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Explosion.class)
 public abstract class MixinExplosion implements InjectionExplosion {
 
+    @Shadow @Final public Entity source;
+    public boolean wasCanceled = false; // CraftBukkit - add field
+    public float yield;
     // @formatter:off
     @Shadow @Final private Level level;
     @Shadow @Final private Explosion.BlockInteraction blockInteraction;
     @Shadow @Mutable @Final private float radius;
-    @Shadow @Final private ObjectArrayList<BlockPos> toBlow;
     @Shadow @Final private double x;
     @Shadow @Final private double y;
     @Shadow @Final private double z;
-    @Shadow @Final public Entity source;
-    @Shadow @Final private Map<Player, Vec3> hitPlayers;
-    @Shadow @Final private boolean fire;
-    @Shadow @Final private RandomSource random;
-    @Shadow @Final private ExplosionDamageCalculator damageCalculator;
-    @Shadow public abstract boolean interactsWithBlocks();
-    @Shadow @Nullable public abstract LivingEntity getIndirectSourceEntity();
-    @Shadow public static float getSeenPercent(Vec3 p_46065_, Entity p_46066_) { return 0f; }
-    // @formatter:on
 
-    @Shadow @Final private DamageSource damageSource;
+    @Inject(method = "addOrAppendStack", cancellable = true, at = @At("HEAD"))
+    private static void banner$fix(List<Pair<ItemStack, BlockPos>> p_311090_, ItemStack stack, BlockPos p_309821_, CallbackInfo ci) {
+        if (stack.isEmpty()) ci.cancel();
+    }
+
+    // @formatter:on
     @Inject(method = "<init>(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/Entity;DDDFZLnet/minecraft/world/level/Explosion$BlockInteraction;)V",
             at = @At("RETURN"))
     public void banner$adjustSize(Level worldIn, Entity exploderIn, double xIn, double yIn, double zIn, float sizeIn, boolean causesFireIn, Explosion.BlockInteraction modeIn, CallbackInfo ci) {
@@ -68,16 +60,13 @@ public abstract class MixinExplosion implements InjectionExplosion {
         this.yield = this.blockInteraction == Explosion.BlockInteraction.DESTROY_WITH_DECAY ? 1.0F / this.radius : 1.0F;
     }
 
-    public boolean wasCanceled = false; // CraftBukkit - add field
-    public float yield;
-
     @Override
     public float bridge$getYield() {
         return yield;
     }
 
     @Decorate(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private boolean banner$handleMultiPart(Entity entity, DamageSource damageSource, float f, @Local(ordinal = -1) List<Entity> list) throws Throwable {
+    private boolean banner$handleMultiPart(Entity entity, DamageSource damageSource, float f) throws Throwable {
         // Special case ender dragon only give knockback if no damage is cancelled
         // Thinks to note:
         // - Setting a velocity to a ComplexEntityPart is ignored (and therefore not needed)
@@ -128,11 +117,6 @@ public abstract class MixinExplosion implements InjectionExplosion {
             return false;
         }
         return (boolean) DecorationOps.callsite().invoke(instance, blockPos, blockState);
-    }
-
-    @Inject(method = "addOrAppendStack", cancellable = true, at = @At("HEAD"))
-    private static void banner$fix(List<Pair<ItemStack, BlockPos>> p_311090_, ItemStack stack, BlockPos p_309821_, CallbackInfo ci) {
-        if (stack.isEmpty()) ci.cancel();
     }
 
     @Override

@@ -16,8 +16,12 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(CompoundContainer.class)
 public abstract class MixinCompoundContainer implements Container {
 
-    @Shadow @Final public Container container1;
-    @Shadow @Final public Container container2;
+    @Shadow
+    @Final
+    public Container container1;
+    @Shadow
+    @Final
+    public Container container2;
     public List<HumanEntity> transaction = new java.util.ArrayList<>();
 
     @Override
@@ -50,7 +54,9 @@ public abstract class MixinCompoundContainer implements Container {
     }
 
     @Override
-    public InventoryHolder getOwner() { return null; }
+    public InventoryHolder getOwner() {
+        return null;
+    }
 
     @Override
     public int getMaxStackSize() {

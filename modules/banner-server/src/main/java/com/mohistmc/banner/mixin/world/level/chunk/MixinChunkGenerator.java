@@ -39,24 +39,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ChunkGenerator.class)
 public abstract class MixinChunkGenerator implements InjectionChunkGenerator {
 
-    // @formatter:off
-    @Shadow public abstract void applyBiomeDecoration(WorldGenLevel p_187712_, ChunkAccess p_187713_, StructureManager p_187714_);
     @Shadow
     @Mutable
     public BiomeSource biomeSource;
+    // Banner start - fix mixin conflict
+    BoundingBox box;
     // @formatter:on
+    org.bukkit.event.world.AsyncStructureSpawnEvent event;
 
     @Shadow
-    private static int fetchReferences(StructureManager structureManager, ChunkAccess chunk, SectionPos sectionPos, Structure structure) {return 0;}
+    private static int fetchReferences(StructureManager structureManager, ChunkAccess chunk, SectionPos sectionPos, Structure structure) {
+        return 0;
+    }
+
+    // @formatter:off
+    @Shadow public abstract void applyBiomeDecoration(WorldGenLevel p_187712_, ChunkAccess p_187713_, StructureManager p_187714_);
 
     @Inject(method = "applyBiomeDecoration", at = @At("RETURN"))
     private void banner$addBukkitDecoration(WorldGenLevel level, ChunkAccess chunkAccess, StructureManager manager, CallbackInfo ci) {
         this.addDecorations(level, chunkAccess, manager);
     }
-
-    // Banner start - fix mixin conflict
-    BoundingBox box;
-    org.bukkit.event.world.AsyncStructureSpawnEvent event;
     // Banner end
 
     /**
@@ -65,7 +67,7 @@ public abstract class MixinChunkGenerator implements InjectionChunkGenerator {
      */
     @Overwrite
     private boolean tryGenerateStructure(StructureSet.StructureSelectionEntry structureSelectionEntry, StructureManager structureManager, RegistryAccess registryAccess, RandomState random, StructureTemplateManager structureTemplateManager, long seed, ChunkAccess chunk, ChunkPos chunkPos, SectionPos sectionPos) {
-        Structure structure = (Structure)structureSelectionEntry.structure().value();
+        Structure structure = structureSelectionEntry.structure().value();
         int i = fetchReferences(structureManager, chunk, sectionPos, structure);
         HolderSet<Biome> holderSet = structure.biomes();
         Objects.requireNonNull(holderSet);
@@ -74,7 +76,7 @@ public abstract class MixinChunkGenerator implements InjectionChunkGenerator {
         if (structureStart.isValid()) {
             structureManager.setStartForStructure(sectionPos, structure, structureStart, chunk);
             box = structureStart.getBoundingBox();
-            event = new org.bukkit.event.world.AsyncStructureSpawnEvent((((LevelAccessor) structureManager.level).getMinecraftWorld()).getWorld(), CraftStructure.minecraftToBukkit(structure), new org.bukkit.util.BoundingBox(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ()), chunkPos.x, chunkPos.z);
+            event = new org.bukkit.event.world.AsyncStructureSpawnEvent((structureManager.level.getMinecraftWorld()).getWorld(), CraftStructure.minecraftToBukkit(structure), new org.bukkit.util.BoundingBox(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ()), chunkPos.x, chunkPos.z);
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 return true;
@@ -96,7 +98,7 @@ public abstract class MixinChunkGenerator implements InjectionChunkGenerator {
 
     @Override
     public void addDecorations(WorldGenLevel region, ChunkAccess chunk, StructureManager structureManager) {
-        org.bukkit.World world =  ((LevelAccessor) region).getMinecraftWorld().getWorld();
+        org.bukkit.World world = region.getMinecraftWorld().getWorld();
         // only call when a populator is present (prevents unnecessary entity conversion)
         if (!world.getPopulators().isEmpty()) {
             CraftLimitedRegion limitedRegion = new CraftLimitedRegion(region, chunk.getPos());

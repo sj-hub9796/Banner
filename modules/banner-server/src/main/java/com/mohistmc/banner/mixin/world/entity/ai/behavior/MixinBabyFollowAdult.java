@@ -33,7 +33,7 @@ public class MixinBabyFollowAdult {
                         return false;
                     } else {
                         LivingEntity ageablemob = entity.get(memoryAccessor);
-                        if (ageableMob.closerThan(ageablemob, (double) (uniformInt.getMaxValue() + 1)) && !ageableMob.closerThan(ageablemob, (double) uniformInt.getMinValue())) {
+                        if (ageableMob.closerThan(ageablemob, uniformInt.getMaxValue() + 1) && !ageableMob.closerThan(ageablemob, uniformInt.getMinValue())) {
                             // CraftBukkit start
                             EntityTargetLivingEntityEvent event = CraftEventFactory.callEntityTargetLivingEvent(ageableMob, ageablemob, EntityTargetEvent.TargetReason.FOLLOW_LEADER);
                             if (event.isCancelled()) {

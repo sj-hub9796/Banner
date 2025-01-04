@@ -32,23 +32,20 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(CampfireBlockEntity.class)
 public abstract class MixinCampfireBlockEntity extends BlockEntity {
-    @Shadow
-    public abstract Optional<CampfireCookingRecipe> getCookableRecipe(ItemStack p_59052_);
-
-    @Shadow @Final public int[] cookingTime;
-
-    @Shadow @Final private RecipeManager.CachedCheck<SingleRecipeInput, CampfireCookingRecipe> quickCheck;
-
-    public MixinCampfireBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
-        super(blockEntityType, blockPos, blockState);
-    }
-
-
     // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILSOFT)
     private static Optional<RecipeHolder<CampfireCookingRecipe>> recipe;
     private static CraftItemStack source;
-    private static  org.bukkit.inventory.ItemStack result;
+    private static org.bukkit.inventory.ItemStack result;
     private static BlockCookEvent blockCookEvent;
+    @Shadow
+    @Final
+    public int[] cookingTime;
+    @Shadow
+    @Final
+    private RecipeManager.CachedCheck<SingleRecipeInput, CampfireCookingRecipe> quickCheck;
+    public MixinCampfireBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
+        super(blockEntityType, blockPos, blockState);
+    }
 
     /**
      * @author wdog5
@@ -66,7 +63,7 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
 
                 if (tileentitycampfire.cookingProgress[i] >= tileentitycampfire.cookingTime[i]) {
                     SingleRecipeInput singleRecipeInput = new SingleRecipeInput(itemstack);
-                    recipe = ((MixinCampfireBlockEntity) (Object) tileentitycampfire).quickCheck.getRecipeFor( singleRecipeInput, world);
+                    recipe = ((MixinCampfireBlockEntity) (Object) tileentitycampfire).quickCheck.getRecipeFor(singleRecipeInput, world);
                     ItemStack itemStack2 = recipe.map((recipecampfire) -> {
                         // Paper end
                         return recipecampfire.value().assemble(singleRecipeInput, world.registryAccess());
@@ -87,7 +84,7 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
                         result = blockCookEvent.getResult();
                         itemStack2 = CraftItemStack.asNMSCopy(result);
                         // CraftBukkit end
-                        Containers.dropItemStack(world, (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), itemStack2);
+                        Containers.dropItemStack(world, blockposition.getX(), blockposition.getY(), blockposition.getZ(), itemStack2);
                         tileentitycampfire.getItems().set(i, ItemStack.EMPTY);
                         world.sendBlockUpdated(blockposition, iblockdata, iblockdata, 3);
                         world.gameEvent(GameEvent.BLOCK_CHANGE, blockposition, GameEvent.Context.of(iblockdata));
@@ -101,6 +98,9 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
         }
 
     }
+
+    @Shadow
+    public abstract Optional<CampfireCookingRecipe> getCookableRecipe(ItemStack p_59052_);
 
     @Inject(method = "placeFood", locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/CampfireBlockEntity;cookingProgress:[I"))

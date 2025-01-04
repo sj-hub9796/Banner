@@ -25,11 +25,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(Goat.class)
 public abstract class MixinGoat extends Animal {
 
+    private final AtomicReference<PlayerBucketFillEvent> banner$event = new AtomicReference<>();
+
     protected MixinGoat(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
     }
-
-    private AtomicReference<PlayerBucketFillEvent> banner$event = new AtomicReference<>();
 
     @Inject(method = "mobInteract", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/entity/player/Player;playSound(Lnet/minecraft/sounds/SoundEvent;FF)V"),

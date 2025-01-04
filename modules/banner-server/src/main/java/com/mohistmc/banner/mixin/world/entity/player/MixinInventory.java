@@ -21,16 +21,26 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Inventory.class)
 public abstract class MixinInventory implements Container, Nameable, InjectionInventory {
 
-    @Shadow @Final public NonNullList<ItemStack> items;
-    @Shadow @Final public NonNullList<ItemStack> armor;
-    @Shadow @Final public NonNullList<ItemStack> offhand;
-    @Shadow @Final private List<NonNullList<ItemStack>> compartments;
-    @Shadow @Final public Player player;
-
-    @Shadow protected abstract boolean hasRemainingSpaceForItem(ItemStack destination, ItemStack origin);
-
+    @Shadow
+    @Final
+    public NonNullList<ItemStack> items;
+    @Shadow
+    @Final
+    public NonNullList<ItemStack> armor;
+    @Shadow
+    @Final
+    public NonNullList<ItemStack> offhand;
+    @Shadow
+    @Final
+    public Player player;
     public List<HumanEntity> transaction = new java.util.ArrayList<>();
+    @Shadow
+    @Final
+    private List<NonNullList<ItemStack>> compartments;
     private int maxStack = MAX_STACK;
+
+    @Shadow
+    protected abstract boolean hasRemainingSpaceForItem(ItemStack destination, ItemStack origin);
 
     @Override
     public List<ItemStack> getContents() {

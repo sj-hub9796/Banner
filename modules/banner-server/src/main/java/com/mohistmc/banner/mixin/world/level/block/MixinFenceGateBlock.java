@@ -18,7 +18,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(FenceGateBlock.class)
 public class MixinFenceGateBlock {
 
-    @Shadow @Final public static BooleanProperty POWERED;
+    @Shadow
+    @Final
+    public static BooleanProperty POWERED;
 
     @Redirect(method = "neighborChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;hasNeighborSignal(Lnet/minecraft/core/BlockPos;)Z"))
     private boolean banner$blockRedstone(Level world, BlockPos pos, BlockState state) {

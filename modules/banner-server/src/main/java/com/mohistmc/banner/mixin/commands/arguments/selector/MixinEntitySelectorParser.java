@@ -13,13 +13,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(EntitySelectorParser.class)
 public abstract class MixinEntitySelectorParser implements InjectionEntitySelectorParser {
 
-    @Shadow protected abstract void parseSelector() throws CommandSyntaxException;
+    @Shadow
+    private boolean usesSelectors;
+    private final AtomicBoolean banner$overridePermissions = new AtomicBoolean(false);
 
-    @Shadow public abstract EntitySelector parse() throws CommandSyntaxException;
+    @Shadow
+    protected abstract void parseSelector() throws CommandSyntaxException;
 
-    @Shadow private boolean usesSelectors;
-
-    private AtomicBoolean banner$overridePermissions = new AtomicBoolean(false);
+    @Shadow
+    public abstract EntitySelector parse() throws CommandSyntaxException;
 
     @Override
     public void parseSelector(boolean overridePermissions) throws CommandSyntaxException {

@@ -37,9 +37,9 @@ public abstract class MixinTreeGrower {
             ordinal = 1),
             locals = LocalCapture.CAPTURE_FAILHARD)
     private void banner$setTreeType1(ServerLevel serverLevel, ChunkGenerator chunkGenerator,
-                                    BlockPos blockPos, BlockState blockState, RandomSource randomSource,
-                                    CallbackInfoReturnable<Boolean> cir, ResourceKey resourceKey,
-                                    ResourceKey resourceKey2, Holder holder2) {
+                                     BlockPos blockPos, BlockState blockState, RandomSource randomSource,
+                                     CallbackInfoReturnable<Boolean> cir, ResourceKey resourceKey,
+                                     ResourceKey resourceKey2, Holder holder2) {
         this.setTreeType(holder2);
     }
 

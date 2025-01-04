@@ -29,7 +29,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(TurtleEggBlock.class)
 public class MixinTurtleEggBlock {
 
-    @Shadow @Final public static IntegerProperty HATCH;
+    @Shadow
+    @Final
+    public static IntegerProperty HATCH;
 
     @Inject(method = "randomTick", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD,
             at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/server/level/ServerLevel;playSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/sounds/SoundSource;FF)V"))

@@ -26,15 +26,16 @@ public abstract class MixinAbstractArrow extends Projectile {
 
     // @formatter:off
     @Shadow public boolean inGround;
-    @Shadow public abstract boolean isNoPhysics();
     @Shadow public int shakeTime;
     @Shadow public net.minecraft.world.entity.projectile.AbstractArrow.Pickup pickup;
-    @Shadow protected abstract ItemStack getPickupItem();
-    // @formatter:on
-
     public MixinAbstractArrow(EntityType<? extends Projectile> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow public abstract boolean isNoPhysics();
+    // @formatter:on
+
+    @Shadow protected abstract ItemStack getPickupItem();
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", opcode = Opcodes.PUTFIELD, target = "Lnet/minecraft/world/entity/projectile/AbstractArrow;hitTargetOrDeflectSelf(Lnet/minecraft/world/phys/HitResult;)Lnet/minecraft/world/entity/projectile/ProjectileDeflection;"))
     private ProjectileDeflection banner$hitEvent(AbstractArrow abstractArrow, HitResult hitResult) {
@@ -46,7 +47,7 @@ public abstract class MixinAbstractArrow extends Projectile {
         EntityCombustByEntityEvent combustEvent = new EntityCombustByEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity(), f);
         Bukkit.getPluginManager().callEvent(combustEvent);
         if (!combustEvent.isCancelled()) {
-             entity.banner$setSecondsOnFire(combustEvent.getDuration(), false);
+            entity.banner$setSecondsOnFire(combustEvent.getDuration(), false);
         }
     }
 
@@ -58,7 +59,7 @@ public abstract class MixinAbstractArrow extends Projectile {
     public void playerTouch(Player playerEntity) {
         if (!this.level().isClientSide && (this.inGround || this.isNoPhysics()) && this.shakeTime <= 0) {
             ItemStack itemstack = this.getPickupItem();
-            if (this.pickup == net.minecraft.world.entity.projectile.AbstractArrow.Pickup.ALLOWED && !itemstack.isEmpty() &&  playerEntity.getInventory().canHold(itemstack) > 0) {
+            if (this.pickup == net.minecraft.world.entity.projectile.AbstractArrow.Pickup.ALLOWED && !itemstack.isEmpty() && playerEntity.getInventory().canHold(itemstack) > 0) {
                 ItemEntity item = new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), itemstack);
                 PlayerPickupArrowEvent event = new PlayerPickupArrowEvent((org.bukkit.entity.Player) playerEntity.getBukkitEntity(), new CraftItem(this.level().getCraftServer(), item), (org.bukkit.entity.AbstractArrow) this.getBukkitEntity());
                 Bukkit.getPluginManager().callEvent(event);

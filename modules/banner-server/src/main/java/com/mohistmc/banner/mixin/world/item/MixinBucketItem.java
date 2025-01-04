@@ -35,11 +35,18 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(BucketItem.class)
 public abstract class MixinBucketItem extends Item {
 
-    @Shadow public abstract boolean emptyContents(@Nullable Player player, Level level, BlockPos pos, @Nullable BlockHitResult result);
+    private transient org.bukkit.inventory.@Nullable ItemStack banner$captureItem;
+    private transient Direction banner$direction;
+    private transient BlockPos banner$click;
+    private transient InteractionHand banner$hand;
+    private transient ItemStack banner$stack;
 
     public MixinBucketItem(Properties properties) {
         super(properties);
     }
+
+    @Shadow
+    public abstract boolean emptyContents(@Nullable Player player, Level level, BlockPos pos, @Nullable BlockHitResult result);
 
     @Inject(method = "use", cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/BucketPickup;pickupBlock(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/LevelAccessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/item/ItemStack;"))
     private void banner$bucketFill(Level worldIn, Player playerIn, InteractionHand handIn, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir, @Local ItemStack stack, @Local BlockHitResult result) {
@@ -63,8 +70,6 @@ public abstract class MixinBucketItem extends Item {
         banner$direction = null;
         banner$click = null;
     }
-
-    private transient org.bukkit.inventory.@Nullable ItemStack banner$captureItem;
 
     @ModifyArg(method = "use", index = 2, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemUtils;createFilledResult(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack banner$useEventItem(ItemStack itemStack) {
@@ -92,11 +97,6 @@ public abstract class MixinBucketItem extends Item {
             banner$stack = null;
         }
     }
-
-    private transient Direction banner$direction;
-    private transient BlockPos banner$click;
-    private transient InteractionHand banner$hand;
-    private transient ItemStack banner$stack;
 
     @Inject(method = "emptyContents", require = 0, cancellable = true, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/dimension/DimensionType;ultraWarm()Z"))
     private void banner$bucketEmpty(Player player, Level worldIn, BlockPos posIn, BlockHitResult rayTrace, CallbackInfoReturnable<Boolean> cir) {

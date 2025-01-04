@@ -16,14 +16,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractHurtingProjectile.class)
 public abstract class MixinAbstractHurtingProjectile extends Projectile implements InjectionAbstractHurtingProjectile {
 
-    @Shadow public abstract void assignDirectionalMovement(Vec3 vec3, double d);
-
     public float bukkitYield = 1; // CraftBukkit
     public boolean isIncendiary = true; // CraftBukkit
-
     public MixinAbstractHurtingProjectile(EntityType<? extends Projectile> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow
+    public abstract void assignDirectionalMovement(Vec3 vec3, double d);
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
     private void banner$init(EntityType<?> entityType, Level level, CallbackInfo ci) {

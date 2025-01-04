@@ -102,42 +102,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerPlayer.class)
 public abstract class MixinServerPlayer extends Player implements InjectionServerPlayer {
 
-    @Shadow public int lastSentExp;
-
-    @Shadow protected abstract boolean bedInRange(BlockPos pos, Direction direction);
-
-    @Shadow protected abstract boolean bedBlocked(BlockPos pos, Direction direction);
-    @Shadow protected abstract int getCoprime(int i);
-
-    @Shadow @Final public MinecraftServer server;
-    @Shadow @Final public ServerPlayerGameMode gameMode;
-    @Shadow private ResourceKey<Level> respawnDimension;
-
-    @Shadow @Nullable public abstract BlockPos getRespawnPosition();
-
-    @Shadow public abstract float getRespawnAngle();
-
-    @Shadow public abstract void setServerLevel(ServerLevel serverLevel);
-
-    @Shadow public abstract ServerLevel serverLevel();
-
-    @Shadow @Nullable private Entity camera;
-    @Shadow private int containerCounter;
-    @Shadow public ServerGamePacketListenerImpl connection;
-
-    @Shadow public abstract void initMenu(AbstractContainerMenu abstractContainerMenu);
-
-    @Shadow public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot);
-
-    @Shadow public abstract void teleportTo(ServerLevel newLevel, double x, double y, double z, float yaw, float pitch);
-
-    @Shadow public abstract void setCamera(@Nullable Entity entityToSpectate);
-    @Shadow public abstract void resetFallDistance();
-
-    @Shadow public abstract boolean canHarmPlayer(Player other);
-
-    @Shadow public abstract void setRespawnPosition(ResourceKey<Level> resourceKey, @Nullable BlockPos blockPos, float f, boolean bl, boolean bl2);
-
+    @Shadow
+    public int lastSentExp;
+    @Shadow
+    @Final
+    public MinecraftServer server;
+    @Shadow
+    @Final
+    public ServerPlayerGameMode gameMode;
+    @Shadow
+    public ServerGamePacketListenerImpl connection;
     // CraftBukkit start
     public String displayName;
     public Component listName;
@@ -151,16 +125,75 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     public boolean sentListPacket = false;
     public Integer clientViewDistance;
     public String kickLeaveMessage = null; // SPIGOT-3034: Forward leave message to PlayerQuitEvent
-    // CraftBukkit end
-
     public long timeOffset = 0;
     public WeatherType weather = null;
     public boolean relativeTime = true;
     public String locale = null; // CraftBukkit - add, lowercase // Paper - default to null
+    public CraftPlayer.TransferCookieConnection transferCookieConnection;
+    @Shadow
+    private ResourceKey<Level> respawnDimension;
+    @Shadow
+    @Nullable
+    private Entity camera;
+    @Shadow
+    private int containerCounter;
     private boolean banner$initialized = false;
     private float pluginRainPosition;
     private float pluginRainPositionPrevious;
-    public CraftPlayer.TransferCookieConnection transferCookieConnection;
+    private transient PlayerSpawnChangeEvent.Cause banner$spawnChangeCause;
+    private final AtomicReference<HorseInventoryMenu> banner$horseMenu = new AtomicReference<>();
+    private final AtomicReference<String> banner$deathString = new AtomicReference<>("null");
+    private final AtomicReference<String> banner$deathMsg = new AtomicReference<>("null");
+    private final AtomicReference<PlayerDeathEvent> banner$deathEvent = new AtomicReference<>();
+    private final AtomicReference<PlayerTeleportEvent.TeleportCause> banner$changeDimensionCause = new AtomicReference<>(PlayerTeleportEvent.TeleportCause.UNKNOWN);
+    // CraftBukkit end
+    private transient BlockStateListPopulator banner$populator;
+    public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
+        super(level, blockPos, f, gameProfile);
+    }
+
+    @Shadow
+    protected abstract boolean bedInRange(BlockPos pos, Direction direction);
+
+    @Shadow
+    protected abstract boolean bedBlocked(BlockPos pos, Direction direction);
+
+    @Shadow
+    protected abstract int getCoprime(int i);
+
+    @Shadow
+    @Nullable
+    public abstract BlockPos getRespawnPosition();
+
+    @Shadow
+    public abstract float getRespawnAngle();
+
+    @Shadow
+    public abstract void setServerLevel(ServerLevel serverLevel);
+
+    @Shadow
+    public abstract ServerLevel serverLevel();
+
+    @Shadow
+    public abstract void initMenu(AbstractContainerMenu abstractContainerMenu);
+
+    @Shadow
+    public abstract boolean teleportTo(ServerLevel level, double x, double y, double z, Set<RelativeMovement> relativeMovements, float yRot, float xRot);
+
+    @Shadow
+    public abstract void teleportTo(ServerLevel newLevel, double x, double y, double z, float yaw, float pitch);
+
+    @Shadow
+    public abstract void setCamera(@Nullable Entity entityToSpectate);
+
+    @Shadow
+    public abstract void resetFallDistance();
+
+    @Shadow
+    public abstract boolean canHarmPlayer(Player other);
+
+    @Shadow
+    public abstract void setRespawnPosition(ResourceKey<Level> resourceKey, @Nullable BlockPos blockPos, float f, boolean bl, boolean bl2);
 
     @Override
     public void bridge$transferCookieConnection(CraftPlayer.TransferCookieConnection transferCookieConnection) {
@@ -170,10 +203,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     @Override
     public CraftPlayer.TransferCookieConnection bridge$transferCookieConnection() {
         return this.transferCookieConnection;
-    }
-
-    public MixinServerPlayer(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-        super(level, blockPos, f, gameProfile);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -210,7 +239,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return persistVehicle && entity.hasExactlyOnePlayerPassenger();
     }
 
-
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     private void banner$writeExtra(CompoundTag compound, CallbackInfo ci) {
         this.getBukkitEntity().setExtraData(compound);
@@ -245,10 +273,9 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
-
     @Redirect(method = "awardKillScore", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Lnet/minecraft/world/scores/ScoreHolder;Ljava/util/function/Consumer;)V"))
     private void banner$useCustomScoreboard(Scoreboard instance, ObjectiveCriteria criteria, ScoreHolder scoreboardName, Consumer<ScoreAccess> points) {
-       this.level().getCraftServer().getScoreboardManager().forAllObjectives(criteria, scoreboardName, points);
+        this.level().getCraftServer().getScoreboardManager().forAllObjectives(criteria, scoreboardName, points);
     }
 
     @Redirect(method = "handleTeamKill", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Lnet/minecraft/world/scores/ScoreHolder;Ljava/util/function/Consumer;)V"))
@@ -275,7 +302,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             }
             if (world == null || position == null) {
                 world = ((CraftWorld) Bukkit.getServer().getWorlds().get(0)).getHandle();
-                position = Vec3.atCenterOf(((ServerLevel) world).getSharedSpawnPos());
+                position = Vec3.atCenterOf(world.getSharedSpawnPos());
             }
             this.setLevel(world);
             this.setPos(position);
@@ -326,8 +353,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         this.moveTo(x, y, z, yaw, pitch);
         this.connection.resetPosition();
     }
-
-    private transient PlayerSpawnChangeEvent.Cause banner$spawnChangeCause;
 
     @Override
     public void pushChangeSpawnCause(PlayerSpawnChangeEvent.Cause cause) {
@@ -452,7 +477,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
         if (worldserver.dimensionType().hasSkyLight() && worldserver.serverLevelData.getGameType() != GameType.ADVENTURE) {
             int i = Math.max(0, this.server.getSpawnRadius(worldserver));
-            int j = Mth.floor(worldserver.getWorldBorder().getDistanceToBorder((double) blockposition.getX(), (double) blockposition.getZ()));
+            int j = Mth.floor(worldserver.getWorldBorder().getDistanceToBorder(blockposition.getX(), blockposition.getZ()));
 
             if (j < i) {
                 i = j;
@@ -462,7 +487,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
                 i = 1;
             }
 
-            long k = (long) (i * 2 + 1);
+            long k = i * 2L + 1;
             long l = k * k;
             int i1 = l > 2147483647L ? Integer.MAX_VALUE : (int) l;
             int j1 = this.getCoprime(i1);
@@ -606,7 +631,34 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Redirect(method = "restoreFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/stats/ServerRecipeBook;copyOverData(Lnet/minecraft/stats/RecipeBook;)V"))
-    private void banner$copyOverData(ServerRecipeBook instance, RecipeBook recipeBook) {}
+    private void banner$copyOverData(ServerRecipeBook instance, RecipeBook recipeBook) {
+    }
+
+    // TODO fix me
+    /*
+    @Inject(method = "trackChunk",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+            shift = At.Shift.AFTER))
+    private void banner$chunkLoad(ChunkPos chunkPos, Packet<?> packet, CallbackInfo ci) {
+        // Paper start
+        if(io.papermc.paper.event.packet.PlayerChunkLoadEvent.getHandlerList().getRegisteredListeners().length > 0){
+            new io.papermc.paper.event.packet.PlayerChunkLoadEvent(this.getBukkitEntity().getWorld().getChunkAt(chunkPos.x, chunkPos.z), this.getBukkitEntity()).callEvent();
+        }
+        // Paper end
+    }
+
+    @Inject(method = "untrackChunk",
+            at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
+            shift = At.Shift.AFTER))
+    private void banner$chunkUnload(ChunkPos chunkPos, CallbackInfo ci) {
+        // Paper start
+        if(io.papermc.paper.event.packet.PlayerChunkUnloadEvent.getHandlerList().getRegisteredListeners().length > 0){
+            new io.papermc.paper.event.packet.PlayerChunkUnloadEvent(this.getBukkitEntity().getWorld().getChunkAt(chunkPos.x, chunkPos.z), this.getBukkitEntity()).callEvent();
+        }
+        // Paper end
+    }*/
 
     @Redirect(method = "awardStat", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/scores/Scoreboard;forAllObjectives(Lnet/minecraft/world/scores/criteria/ObjectiveCriteria;Lnet/minecraft/world/scores/ScoreHolder;Ljava/util/function/Consumer;)V"))
     private void banner$addStats(Scoreboard instance, ObjectiveCriteria criteria, ScoreHolder scoreHolder, Consumer<ScoreAccess> points) {
@@ -647,36 +699,10 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Inject(method = "setCamera",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FF)Z"))
+                    target = "Lnet/minecraft/server/level/ServerPlayer;teleportTo(Lnet/minecraft/server/level/ServerLevel;DDDLjava/util/Set;FF)Z"))
     private void banner$pushSpectiveTpReason(Entity entity, CallbackInfo ci) {
         this.connection.pushTeleportCause(PlayerTeleportEvent.TeleportCause.SPECTATE);
     }
-
-    // TODO fix me
-    /*
-    @Inject(method = "trackChunk",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-            shift = At.Shift.AFTER))
-    private void banner$chunkLoad(ChunkPos chunkPos, Packet<?> packet, CallbackInfo ci) {
-        // Paper start
-        if(io.papermc.paper.event.packet.PlayerChunkLoadEvent.getHandlerList().getRegisteredListeners().length > 0){
-            new io.papermc.paper.event.packet.PlayerChunkLoadEvent(this.getBukkitEntity().getWorld().getChunkAt(chunkPos.x, chunkPos.z), this.getBukkitEntity()).callEvent();
-        }
-        // Paper end
-    }
-
-    @Inject(method = "untrackChunk",
-            at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;send(Lnet/minecraft/network/protocol/Packet;)V",
-            shift = At.Shift.AFTER))
-    private void banner$chunkUnload(ChunkPos chunkPos, CallbackInfo ci) {
-        // Paper start
-        if(io.papermc.paper.event.packet.PlayerChunkUnloadEvent.getHandlerList().getRegisteredListeners().length > 0){
-            new io.papermc.paper.event.packet.PlayerChunkUnloadEvent(this.getBukkitEntity().getWorld().getChunkAt(chunkPos.x, chunkPos.z), this.getBukkitEntity()).callEvent();
-        }
-        // Paper end
-    }*/
 
     @Inject(method = "setCamera",
             at = @At(value = "INVOKE",
@@ -700,7 +726,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Override
     public CraftPlayer getBukkitEntity() {
-        return (CraftPlayer)super.getBukkitEntity();
+        return (CraftPlayer) super.getBukkitEntity();
     }
 
     @Override
@@ -762,8 +788,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
     }
 
-    private AtomicReference<HorseInventoryMenu> banner$horseMenu = new AtomicReference<>();
-
     @Inject(method = "openHorseInventory", at = @At("HEAD"), cancellable = true)
     private void banner$menuEvent(AbstractHorse abstractHorse, Container container, CallbackInfo ci) {
         // CraftBukkit start - Inventory open hook
@@ -779,7 +803,8 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     }
 
     @Redirect(method = "openHorseInventory", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;nextContainerCounter()V"))
-    private void banner$cancelNext(ServerPlayer instance) {}
+    private void banner$cancelNext(ServerPlayer instance) {
+    }
 
     @Redirect(method = "openHorseInventory", at = @At(value = "NEW", args = "class=net/minecraft/world/inventory/HorseInventoryMenu"))
     private HorseInventoryMenu banner$resetHorseMenu(int i, Inventory inventory, Container container, AbstractHorse abstractHorse, int j) {
@@ -795,11 +820,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
             BukkitSnapshotCaptures.captureContainerOwner(old);
         }
     }
-
-    private AtomicReference<String> banner$deathString = new AtomicReference<>("null");
-    private AtomicReference<String> banner$deathMsg = new AtomicReference<>("null");
-
-    private AtomicReference<PlayerDeathEvent> banner$deathEvent = new AtomicReference<>();
 
     @Inject(method = "die", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/level/GameRules;getBoolean(Lnet/minecraft/world/level/GameRules$Key;)Z",
@@ -878,7 +898,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Redirect(method = "die",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V"))
+                    target = "Lnet/minecraft/server/level/ServerPlayer;dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V"))
     private void banner$cancelDrop(ServerPlayer instance, ServerLevel serverLevel, DamageSource damageSource) {
     }
 
@@ -890,8 +910,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         // CraftBukkit - Get our scores instead
         this.level().getCraftServer().getScoreboardManager().forAllObjectives(ObjectiveCriteria.DEATH_COUNT, scoreHolder, ScoreAccess::increment);
     }
-
-    private AtomicReference<PlayerTeleportEvent.TeleportCause> banner$changeDimensionCause = new AtomicReference<>(PlayerTeleportEvent.TeleportCause.UNKNOWN);
 
     @Override
     public Entity changeDimension(ServerLevel worldserver, PlayerTeleportEvent.TeleportCause cause) {
@@ -925,7 +943,7 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Inject(method = "stopSleepInBed",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFF)V"))
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;teleport(DDDFF)V"))
     private void banner$tpCauseExitBed(boolean wakeImmediately, boolean updateLevelForSleepingPlayers, CallbackInfo ci) {
         this.connection.pushTeleportCause(PlayerTeleportEvent.TeleportCause.EXIT_BED);
     }
@@ -951,7 +969,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         }
         // CraftBukkit end
     }
-
 
     @Override
     public void pushChangeDimensionCause(PlayerTeleportEvent.TeleportCause cause) {
@@ -1010,31 +1027,29 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
         return Optional.empty();
     }
 
-    private transient BlockStateListPopulator banner$populator;
-
 
     // Banner TODO fix patches
+
     /**
-    @Inject(method = "createEndPlatform", at = @At("HEAD"))
-    private void banner$playerCreatePortalBegin(ServerLevel level, BlockPos pos, CallbackInfo ci) {
-        banner$populator = new BlockStateListPopulator(level);
-    }
-
-    @Redirect(method = "createEndPlatform", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
-    private boolean banner$playerCreatePortal(ServerLevel instance, BlockPos pos, BlockState blockState) {
-        return banner$populator.setBlock(pos, blockState, 3);
-    }
-
-    @Inject(method = "createEndPlatform", at = @At("RETURN"))
-    private void banner$playerCreatePortalEnd(ServerLevel level, BlockPos pos, CallbackInfo ci) {
-        var blockList = banner$populator;
-        banner$populator = null;
-        var portalEvent = new PortalCreateEvent((List<org.bukkit.block.BlockState>) (List) blockList.getList(), level.getWorld(), this.getBukkitEntity(), PortalCreateEvent.CreateReason.END_PLATFORM);
-        Bukkit.getPluginManager().callEvent(portalEvent);
-        if (!portalEvent.isCancelled()) {
-            blockList.updateList();
-        }
-    }*/
+     * @Inject(method = "createEndPlatform", at = @At("HEAD"))
+     * private void banner$playerCreatePortalBegin(ServerLevel level, BlockPos pos, CallbackInfo ci) {
+     * banner$populator = new BlockStateListPopulator(level);
+     * }
+     * @Redirect(method = "createEndPlatform", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+     * private boolean banner$playerCreatePortal(ServerLevel instance, BlockPos pos, BlockState blockState) {
+     * return banner$populator.setBlock(pos, blockState, 3);
+     * }
+     * @Inject(method = "createEndPlatform", at = @At("RETURN"))
+     * private void banner$playerCreatePortalEnd(ServerLevel level, BlockPos pos, CallbackInfo ci) {
+     * var blockList = banner$populator;
+     * banner$populator = null;
+     * var portalEvent = new PortalCreateEvent((List<org.bukkit.block.BlockState>) (List) blockList.getList(), level.getWorld(), this.getBukkitEntity(), PortalCreateEvent.CreateReason.END_PLATFORM);
+     * Bukkit.getPluginManager().callEvent(portalEvent);
+     * if (!portalEvent.isCancelled()) {
+     * blockList.updateList();
+     * }
+     * }
+     */
 
     @Override
     public Component bridge$listName() {
@@ -1188,6 +1203,6 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
 
     @Override
     public boolean banner$initialized() {
-        return  banner$initialized;
+        return banner$initialized;
     }
 }

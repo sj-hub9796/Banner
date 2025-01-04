@@ -29,7 +29,7 @@ public class MixinEndPortalBlock {
         }
         EntityPortalEnterEvent event = new EntityPortalEnterEvent(entity.getBukkitEntity(),
                 new org.bukkit.Location(level.getWorld(), pos.getX(), pos.getY(), pos.getZ()));
-                new Location(level.getWorld(), pos.getX(), pos.getY(), pos.getZ());
+        new Location(level.getWorld(), pos.getX(), pos.getY(), pos.getZ());
         Bukkit.getPluginManager().callEvent(event);
     }
 }

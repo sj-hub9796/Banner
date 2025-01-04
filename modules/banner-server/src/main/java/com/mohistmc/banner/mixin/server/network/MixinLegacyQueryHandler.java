@@ -17,15 +17,17 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(LegacyQueryHandler.class)
 public abstract class MixinLegacyQueryHandler {
 
-    @Shadow @Final private static Logger LOGGER;
-
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    @Final
+    private ServerInfo server;
 
     @Shadow
     private static String createVersion0Response(ServerInfo serverInfo) {
         return null;
     }
-
-    @Shadow @Final private ServerInfo server;
 
     @Shadow
     private static void sendFlushAndClose(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf) {
@@ -44,6 +46,18 @@ public abstract class MixinLegacyQueryHandler {
     @Shadow
     private static String createVersion1Response(ServerInfo serverInfo) {
         return null;
+    }
+
+    // CraftBukkit start
+    private static String createVersion0Response(ServerInfo serverinfo, org.bukkit.event.server.ServerListPingEvent event) {
+        return String.format(Locale.ROOT, "%s\u00a7%d\u00a7%d", event.getMotd(), event.getNumPlayers(), event.getMaxPlayers());
+        // CraftBukkit end
+    }
+
+    // CraftBukkit start
+    private static String createVersion1Response(ServerInfo serverinfo, org.bukkit.event.server.ServerListPingEvent event) {
+        return String.format(Locale.ROOT, "\u00a71\u0000%d\u0000%s\u0000%s\u0000%d\u0000%d", 127, serverinfo.getServerVersion(), event.getMotd(), event.getNumPlayers(), event.getMaxPlayers());
+        // CraftBukkit end
     }
 
     /**
@@ -94,7 +108,6 @@ public abstract class MixinLegacyQueryHandler {
                 bytebuf.release();
                 flag = false;
             } catch (RuntimeException runtimeexception) {
-                ;
             }
 
         } finally {
@@ -105,17 +118,5 @@ public abstract class MixinLegacyQueryHandler {
             }
 
         }
-    }
-
-    // CraftBukkit start
-    private static String createVersion0Response(ServerInfo serverinfo, org.bukkit.event.server.ServerListPingEvent event) {
-        return String.format(Locale.ROOT, "%s\u00a7%d\u00a7%d", event.getMotd(), event.getNumPlayers(), event.getMaxPlayers());
-        // CraftBukkit end
-    }
-
-    // CraftBukkit start
-    private static String createVersion1Response(ServerInfo serverinfo, org.bukkit.event.server.ServerListPingEvent event) {
-        return String.format(Locale.ROOT, "\u00a71\u0000%d\u0000%s\u0000%s\u0000%d\u0000%d", 127, serverinfo.getServerVersion(), event.getMotd(), event.getNumPlayers(), event.getMaxPlayers());
-        // CraftBukkit end
     }
 }

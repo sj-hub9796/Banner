@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(StatsCounter.class)
 public abstract class MixinStatsCounter {
 
-    @Shadow public abstract int getValue(Stat<?> stat);
+    @Shadow
+    public abstract int getValue(Stat<?> stat);
 
     @Inject(method = "increment", cancellable = true,
             at = @At(value = "INVOKE", target = "Lnet/minecraft/stats/StatsCounter;setValue(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/stats/Stat;I)V"))

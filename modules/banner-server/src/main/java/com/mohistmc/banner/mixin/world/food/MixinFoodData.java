@@ -29,16 +29,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(FoodData.class)
 public abstract class MixinFoodData implements InjectionFoodData {
 
-    @Shadow public int foodLevel;
-    @Shadow private int lastFoodLevel;
-    @Shadow public float saturationLevel;
-
-    @Shadow protected abstract void add(int i, float f);
-
-    private Player entityhuman;
+    @Shadow
+    public int foodLevel;
+    @Shadow
+    public float saturationLevel;
     public int saturatedRegenRate = 10;
     public int unsaturatedRegenRate = 80;
     public int starvationRate = 80;
+    @Shadow
+    private int lastFoodLevel;
+    private Player entityhuman;
+    private final AtomicBoolean duplicateCall = new AtomicBoolean(false);
+    private transient ItemStack banner$eatStack;
+
+    @Shadow
+    protected abstract void add(int i, float f);
 
     @ShadowConstructor
     public void banner$constructor() {
@@ -50,8 +55,6 @@ public abstract class MixinFoodData implements InjectionFoodData {
         Validate.notNull(entityhuman);
         this.entityhuman = entityhuman;
     }
-
-    private AtomicBoolean duplicateCall = new AtomicBoolean(false);
 
     @Inject(method = "eat(IF)V", at = @At("HEAD"), cancellable = true)
     private void banner$eatCake(int foodLevelModifier, float saturationLevelModifier, CallbackInfo ci) {
@@ -76,8 +79,6 @@ public abstract class MixinFoodData implements InjectionFoodData {
         }
         ((ServerPlayer) entityhuman).getBukkitEntity().sendHealthUpdate();
     }
-
-    private transient ItemStack banner$eatStack;
 
     @Decorate(method = "eat(Lnet/minecraft/world/food/FoodProperties;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/food/FoodData;add(IF)V"))
     private void banner$foodLevelChange(FoodData foodStats, int foodLevelIn, float foodSaturationModifier, FoodProperties food) throws Throwable {
@@ -117,8 +118,8 @@ public abstract class MixinFoodData implements InjectionFoodData {
         if (entityhuman == null) {
             entityhuman = player;
         }
-         player.pushHealReason(EntityRegainHealthEvent.RegainReason.SATIATED);
-         player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.REGEN);
+        player.pushHealReason(EntityRegainHealthEvent.RegainReason.SATIATED);
+        player.pushExhaustReason(EntityExhaustionEvent.ExhaustionReason.REGEN);
     }
 
     @ModifyConstant(method = "tick", constant = @Constant(intValue = 10))

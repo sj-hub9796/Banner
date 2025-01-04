@@ -43,6 +43,24 @@ public abstract class MixinZombie extends Monster {
         super(entityType, level);
     }
 
+    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
+    private static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
+        villager.level().pushAddEntityReason(spawnReason);
+        villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
+        ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
+        if (zombieVillager != null) {
+            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), MobSpawnType.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
+            zombieVillager.setVillagerData(villager.getVillagerData());
+            zombieVillager.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
+            zombieVillager.setTradeOffers(villager.getOffers().copy());
+            zombieVillager.setVillagerXp(villager.getVillagerXp());
+            if (!silent) {
+                level.levelEvent(null, 1026, blockPosition, 0);
+            }
+        }
+        return zombieVillager;
+    }
+
     @Inject(method = "convertToZombieType", at = @At("HEAD"))
     private void banner$transformReason(EntityType<? extends net.minecraft.world.entity.monster.Zombie> entityType, CallbackInfo ci) {
         this.bridge$pushTransformReason(EntityTransformEvent.TransformReason.DROWNED);
@@ -66,17 +84,17 @@ public abstract class MixinZombie extends Monster {
 
     @Redirect(method = "doHurtTarget", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;igniteForSeconds(F)V"))
     private void banner$entityCombust(Entity entity, float seconds) {
-        EntityCombustByEntityEvent event = new EntityCombustByEntityEvent(this.getBukkitEntity(),  entity.getBukkitEntity(), seconds);
+        EntityCombustByEntityEvent event = new EntityCombustByEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity(), seconds);
         Bukkit.getPluginManager().callEvent(event);
         if (!event.isCancelled()) {
-             entity.banner$setSecondsOnFire(event.getDuration(), false);
+            entity.banner$setSecondsOnFire(event.getDuration(), false);
         }
     }
 
     @Eject(method = "killedEntity(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/LivingEntity;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;convertTo(Lnet/minecraft/world/entity/EntityType;Z)Lnet/minecraft/world/entity/Mob;"))
     private <T extends Mob> T banner$transform(Villager villagerEntity, EntityType<T> entityType, boolean flag, CallbackInfoReturnable<Boolean> cir) {
-         villagerEntity.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.INFECTION);
-         villagerEntity.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
+        villagerEntity.level().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.INFECTION);
+        villagerEntity.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
         T t = villagerEntity.convertTo(entityType, flag);
         if (t == null) {
             cir.setReturnValue(false);
@@ -89,27 +107,9 @@ public abstract class MixinZombie extends Monster {
         serverLevelAccessor.getLevel().pushAddEntityReason(CreatureSpawnEvent.SpawnReason.MOUNT);
     }
 
-    @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)
-    private static ZombieVillager zombifyVillager(ServerLevel level, Villager villager, BlockPos blockPosition, boolean silent, CreatureSpawnEvent.SpawnReason spawnReason) {
-        villager.level().pushAddEntityReason(spawnReason);
-        villager.bridge$pushTransformReason(EntityTransformEvent.TransformReason.INFECTION);
-        ZombieVillager zombieVillager = villager.convertTo(EntityType.ZOMBIE_VILLAGER, false);
-        if (zombieVillager != null) {
-            zombieVillager.finalizeSpawn(level, level.getCurrentDifficultyAt(zombieVillager.blockPosition()), MobSpawnType.CONVERSION, new net.minecraft.world.entity.monster.Zombie.ZombieGroupData(false, true));
-            zombieVillager.setVillagerData(villager.getVillagerData());
-            zombieVillager.setGossips(villager.getGossips().store(NbtOps.INSTANCE));
-            zombieVillager.setTradeOffers(villager.getOffers().copy());
-            zombieVillager.setVillagerXp(villager.getVillagerXp());
-            if (!silent) {
-                level.levelEvent(null, 1026, blockPosition, 0);
-            }
-        }
-        return zombieVillager;
-    }
-
     @WrapWithCondition(method = "registerGoals",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/ai/goal/GoalSelector;addGoal(ILnet/minecraft/world/entity/ai/goal/Goal;)V",
+                    target = "Lnet/minecraft/world/entity/ai/goal/GoalSelector;addGoal(ILnet/minecraft/world/entity/ai/goal/Goal;)V",
                     ordinal = 0))
     private boolean banner$configTurtleEgg(GoalSelector instance, int priority, Goal goal) {
         return this.level().bridge$bannerConfig().zombiesTargetTurtleEggs;

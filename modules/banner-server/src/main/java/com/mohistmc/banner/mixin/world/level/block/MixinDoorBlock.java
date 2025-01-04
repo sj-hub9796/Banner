@@ -20,19 +20,26 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(DoorBlock.class)
-public abstract class MixinDoorBlock extends Block{
+public abstract class MixinDoorBlock extends Block {
 
-    @Shadow @Final public static EnumProperty<DoubleBlockHalf> HALF;
+    @Shadow
+    @Final
+    public static EnumProperty<DoubleBlockHalf> HALF;
 
-    @Shadow @Final public static BooleanProperty POWERED;
+    @Shadow
+    @Final
+    public static BooleanProperty POWERED;
 
-    @Shadow @Final public static BooleanProperty OPEN;
-
-    @Shadow protected abstract void playSound(@Nullable Entity source, Level level, BlockPos pos, boolean isOpening);
+    @Shadow
+    @Final
+    public static BooleanProperty OPEN;
 
     public MixinDoorBlock(Properties properties) {
         super(properties);
     }
+
+    @Shadow
+    protected abstract void playSound(@Nullable Entity source, Level level, BlockPos pos, boolean isOpening);
 
     /**
      * @author wdog5
@@ -49,17 +56,17 @@ public abstract class MixinDoorBlock extends Block{
         int power = bukkitBlock.getBlockPower();
         int powerTop = blockTop.getBlockPower();
         if (powerTop > power) power = powerTop;
-        int oldPower = (Boolean) state.getValue(POWERED) ? 15 : 0;
+        int oldPower = state.getValue(POWERED) ? 15 : 0;
 
         if (oldPower == 0 ^ power == 0) {
             BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(bukkitBlock, oldPower, power);
             level.getCraftServer().getPluginManager().callEvent(eventRedstone);
             boolean bl = eventRedstone.getNewCurrent() > 0;
-            if (bl != (Boolean) state.getValue(OPEN)) {
-                this.playSound((Entity) null, level, pos, bl);
-                level.gameEvent((Entity) null, bl ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
+            if (bl != state.getValue(OPEN)) {
+                this.playSound(null, level, pos, bl);
+                level.gameEvent(null, bl ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
             }
-            level.setBlock(pos, (BlockState) ((BlockState) state.setValue(POWERED, bl)).setValue(OPEN, bl), 2);
+            level.setBlock(pos, state.setValue(POWERED, bl).setValue(OPEN, bl), 2);
         }
     }
 }

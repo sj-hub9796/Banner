@@ -27,9 +27,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Raid.class)
 public class MixinRaid implements InjectionRaid {
 
-    @Shadow private Raid.RaidStatus status;
+    @Shadow
+    private Raid.RaidStatus status;
 
-    @Shadow @Final private Map<Integer, Set<Raider>> groupRaiderMap;
+    @Shadow
+    @Final
+    private Map<Integer, Set<Raider>> groupRaiderMap;
+    private transient List<Player> banner$winners;
+    private transient Raider banner$leader;
+    private transient List<Raider> banner$raiders;
 
     @Inject(method = "tick", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/raid/Raid;stop()V"),
             slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/world/Difficulty;PEACEFUL:Lnet/minecraft/world/Difficulty;")))
@@ -75,8 +81,6 @@ public class MixinRaid implements InjectionRaid {
         CraftEventFactory.callRaidFinishEvent((Raid) (Object) this, new ArrayList<>());
     }
 
-    private transient List<Player> banner$winners;
-
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancements/critereon/PlayerTrigger;trigger(Lnet/minecraft/server/level/ServerPlayer;)V"))
     public void banner$addWinner(PlayerTrigger trigger, ServerPlayer player) {
         trigger.trigger(player);
@@ -92,9 +96,6 @@ public class MixinRaid implements InjectionRaid {
         this.banner$winners = null;
         CraftEventFactory.callRaidFinishEvent((Raid) (Object) this, winners);
     }
-
-    private transient Raider banner$leader;
-    private transient List<Raider> banner$raiders;
 
     @Redirect(method = "spawnGroup", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/raid/Raid;setLeader(ILnet/minecraft/world/entity/raid/Raider;)V"))
     public void banner$captureLeader(Raid raid, int raidId, Raider entity) {

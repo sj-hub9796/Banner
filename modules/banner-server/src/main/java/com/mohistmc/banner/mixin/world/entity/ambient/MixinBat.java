@@ -21,17 +21,22 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(Bat.class)
 public abstract class MixinBat extends AmbientCreature {
 
+    @Shadow
+    @Final
+    private static TargetingConditions BAT_RESTING_TARGETING;
+    @Shadow
+    @Nullable
+    private BlockPos targetPosition;
+
     protected MixinBat(EntityType<? extends AmbientCreature> entityType, Level level) {
         super(entityType, level);
     }
 
-    @Shadow public abstract boolean isResting();
+    @Shadow
+    public abstract boolean isResting();
 
-    @Shadow @Final private static TargetingConditions BAT_RESTING_TARGETING;
-
-    @Shadow public abstract void setResting(boolean isResting);
-
-    @Shadow @Nullable private BlockPos targetPosition;
+    @Shadow
+    public abstract void setResting(boolean isResting);
 
     /**
      * @author wdog5
@@ -56,7 +61,7 @@ public abstract class MixinBat extends AmbientCreature {
                     if (CraftEventFactory.handleBatToggleSleepEvent(this, true)) {
                         this.setResting(false);
                         if (!flag) {
-                            this.level().levelEvent((Player) null, 1025, blockposition, 0);
+                            this.level().levelEvent(null, 1025, blockposition, 0);
                         }
                     }
                     // CraftBukkit End
@@ -66,7 +71,7 @@ public abstract class MixinBat extends AmbientCreature {
                 if (CraftEventFactory.handleBatToggleSleepEvent(this, true)) {
                     this.setResting(false);
                     if (!flag) {
-                        this.level().levelEvent((Player) null, 1025, blockposition, 0);
+                        this.level().levelEvent(null, 1025, blockposition, 0);
                     }
                 }
                 // CraftBukkit End - Call BatToggleSleepEvent

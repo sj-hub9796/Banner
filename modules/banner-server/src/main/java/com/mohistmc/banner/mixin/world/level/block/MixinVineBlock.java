@@ -20,6 +20,10 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(VineBlock.class)
 public abstract class MixinVineBlock extends Block {
 
+    @Shadow
+    @Final
+    public static BooleanProperty UP;
+
     public MixinVineBlock(Properties properties) {
         super(properties);
     }
@@ -29,20 +33,22 @@ public abstract class MixinVineBlock extends Block {
         return null;
     }
 
-    @Shadow protected abstract boolean canSpread(BlockGetter blockReader, BlockPos pos);
-
     @Shadow
     public static boolean isAcceptableNeighbour(BlockGetter blockReader, BlockPos neighborPos, Direction attachedFace) {
         return false;
     }
 
-    @Shadow @Final public static BooleanProperty UP;
+    @Shadow
+    protected abstract boolean canSpread(BlockGetter blockReader, BlockPos pos);
 
-    @Shadow protected abstract boolean canSupportAtFace(BlockGetter level, BlockPos pos, Direction direction);
+    @Shadow
+    protected abstract boolean canSupportAtFace(BlockGetter level, BlockPos pos, Direction direction);
 
-    @Shadow protected abstract boolean hasHorizontalConnection(BlockState state);
+    @Shadow
+    protected abstract boolean hasHorizontalConnection(BlockState state);
 
-    @Shadow protected abstract BlockState copyRandomFaces(BlockState blockState, BlockState blockState2, RandomSource random);
+    @Shadow
+    protected abstract BlockState copyRandomFaces(BlockState blockState, BlockState blockState2, RandomSource random);
 
     /**
      * @author wdog5
@@ -57,42 +63,42 @@ public abstract class MixinVineBlock extends Block {
                 BlockPos blockPos2;
                 BlockState blockState;
                 Direction direction2;
-                if (direction.getAxis().isHorizontal() && !(Boolean)state.getValue(getPropertyForFace(direction))) {
+                if (direction.getAxis().isHorizontal() && !(Boolean) state.getValue(getPropertyForFace(direction))) {
                     if (this.canSpread(level, pos)) {
                         blockPos2 = pos.relative(direction);
                         blockState = level.getBlockState(blockPos2);
                         if (blockState.isAir()) {
                             direction2 = direction.getClockWise();
                             Direction direction3 = direction.getCounterClockWise();
-                            boolean bl = (Boolean)state.getValue(getPropertyForFace(direction2));
-                            boolean bl2 = (Boolean)state.getValue(getPropertyForFace(direction3));
+                            boolean bl = state.getValue(getPropertyForFace(direction2));
+                            boolean bl2 = state.getValue(getPropertyForFace(direction3));
                             BlockPos blockPos3 = blockPos2.relative(direction2);
                             BlockPos blockPos4 = blockPos2.relative(direction3);
                             // CraftBukkit start - Call BlockSpreadEvent
                             BlockPos source = pos;
                             if (bl && isAcceptableNeighbour(level, blockPos3, direction2)) {
-                                CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos2, (BlockState) this.defaultBlockState().setValue(getPropertyForFace(direction2), true), 2);
+                                CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos2, this.defaultBlockState().setValue(getPropertyForFace(direction2), true), 2);
                             } else if (bl2 && isAcceptableNeighbour(level, blockPos4, direction3)) {
-                                CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos2, (BlockState) this.defaultBlockState().setValue(getPropertyForFace(direction3), true), 2);
+                                CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos2, this.defaultBlockState().setValue(getPropertyForFace(direction3), true), 2);
                             } else {
                                 Direction direction4 = direction.getOpposite();
                                 if (bl && level.isEmptyBlock(blockPos3) && isAcceptableNeighbour(level, pos.relative(direction2), direction4)) {
-                                    CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos3, (BlockState) this.defaultBlockState().setValue(getPropertyForFace(direction4), true), 2);
+                                    CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos3, this.defaultBlockState().setValue(getPropertyForFace(direction4), true), 2);
                                 } else if (bl2 && level.isEmptyBlock(blockPos4) && isAcceptableNeighbour(level, pos.relative(direction3), direction4)) {
-                                    CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos4, (BlockState) this.defaultBlockState().setValue(getPropertyForFace(direction4), true), 2);
-                                } else if ((double)random.nextFloat() < 0.05 && isAcceptableNeighbour(level, blockPos2.above(), Direction.UP)) {
-                                    CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos2, (BlockState) this.defaultBlockState().setValue(UP, true), 2);
+                                    CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos4, this.defaultBlockState().setValue(getPropertyForFace(direction4), true), 2);
+                                } else if ((double) random.nextFloat() < 0.05 && isAcceptableNeighbour(level, blockPos2.above(), Direction.UP)) {
+                                    CraftEventFactory.handleBlockSpreadEvent(level, source, blockPos2, this.defaultBlockState().setValue(UP, true), 2);
                                 }
                             }
                         } else if (isAcceptableNeighbour(level, blockPos2, direction)) {
-                            CraftEventFactory.handleBlockGrowEvent(level, pos, (BlockState) state.setValue(getPropertyForFace(direction), true), 2); // CraftBukkit
+                            CraftEventFactory.handleBlockGrowEvent(level, pos, state.setValue(getPropertyForFace(direction), true), 2); // CraftBukkit
                         }
 
                     }
                 } else {
                     if (direction == Direction.UP && pos.getY() < level.getMaxBuildHeight() - 1) {
                         if (this.canSupportAtFace(level, pos, direction)) {
-                            CraftEventFactory.handleBlockGrowEvent(level, pos, (BlockState) state.setValue(VineBlock.UP, true), 2); // CraftBukkit
+                            CraftEventFactory.handleBlockGrowEvent(level, pos, state.setValue(VineBlock.UP, true), 2); // CraftBukkit
                             return;
                         }
 
@@ -104,7 +110,7 @@ public abstract class MixinVineBlock extends Block {
                             BlockState blockState2 = state;
                             Iterator var17 = Direction.Plane.HORIZONTAL.iterator();
 
-                            while(true) {
+                            while (true) {
                                 do {
                                     if (!var17.hasNext()) {
                                         if (this.hasHorizontalConnection(blockState2)) {
@@ -114,10 +120,10 @@ public abstract class MixinVineBlock extends Block {
                                         return;
                                     }
 
-                                    direction2 = (Direction)var17.next();
-                                } while(!random.nextBoolean() && isAcceptableNeighbour(level, blockPos.relative(direction2), direction2));
+                                    direction2 = (Direction) var17.next();
+                                } while (!random.nextBoolean() && isAcceptableNeighbour(level, blockPos.relative(direction2), direction2));
 
-                                blockState2 = (BlockState)blockState2.setValue(getPropertyForFace(direction2), false);
+                                blockState2 = blockState2.setValue(getPropertyForFace(direction2), false);
                             }
                         }
                     }

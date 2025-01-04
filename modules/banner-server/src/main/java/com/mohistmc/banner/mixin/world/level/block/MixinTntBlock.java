@@ -26,9 +26,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(TntBlock.class)
 public class MixinTntBlock {
 
-    private AtomicReference<BlockPos> banner$fromPos = new AtomicReference<>();
-    private AtomicReference<BlockPos> banner$originPos = new AtomicReference<>();
-    private AtomicReference<Player> banner$useTntPlayer = new AtomicReference<>();
+    private final AtomicReference<BlockPos> banner$fromPos = new AtomicReference<>();
+    private final AtomicReference<BlockPos> banner$originPos = new AtomicReference<>();
+    private final AtomicReference<Player> banner$useTntPlayer = new AtomicReference<>();
 
     @WrapWithCondition(method = "onPlace", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/TntBlock;explode(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V"))
     private boolean banner$warpTntEvent(Level level, BlockPos pos) {

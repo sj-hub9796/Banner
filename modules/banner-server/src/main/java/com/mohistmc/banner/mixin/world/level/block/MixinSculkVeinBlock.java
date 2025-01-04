@@ -24,9 +24,11 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class MixinSculkVeinBlock {
 
 
-    @Shadow protected abstract boolean attemptPlaceSculk(SculkSpreader spreader, LevelAccessor level, BlockPos pos, RandomSource random);
+    private final AtomicReference<BlockPos> banner$source = new AtomicReference<>();
+    private final AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
 
-    private AtomicReference<BlockPos> banner$source = new AtomicReference<>();
+    @Shadow
+    protected abstract boolean attemptPlaceSculk(SculkSpreader spreader, LevelAccessor level, BlockPos pos, RandomSource random);
 
     @Inject(method = "attemptUseCharge", at = @At("HEAD"))
     private void banner$getSource(SculkSpreader.ChargeCursor cursor,
@@ -41,8 +43,6 @@ public abstract class MixinSculkVeinBlock {
     private boolean banner$attemptPlace(SculkVeinBlock instance, SculkSpreader spreader, LevelAccessor level, BlockPos pos, RandomSource random) {
         return attemptPlaceSculk(spreader, level, pos, random, banner$source.get());
     }
-
-    private AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
 
     private boolean attemptPlaceSculk(SculkSpreader spreader, LevelAccessor level, BlockPos pos, RandomSource random, BlockPos sourceBlock) {
         banner$pos.set(sourceBlock);

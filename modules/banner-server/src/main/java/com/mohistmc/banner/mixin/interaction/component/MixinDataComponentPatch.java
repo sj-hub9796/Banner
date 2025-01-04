@@ -12,7 +12,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(DataComponentPatch.class)
 public class MixinDataComponentPatch implements InjectionDataComponentPatch {
 
-    @Shadow @Final private Reference2ObjectMap<DataComponentType<?>, Optional<?>> map;
+    @Shadow
+    @Final
+    private Reference2ObjectMap<DataComponentType<?>, Optional<?>> map;
 
     @Override
     public void copy(DataComponentPatch orig) {

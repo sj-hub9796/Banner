@@ -16,9 +16,11 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(RconConsoleSource.class)
 public abstract class MixinRconConsoleSource implements InjectionRconConsoleSource {
 
-    @Shadow @Final private StringBuffer buffer;
     // CraftBukkit start
     public SocketAddress socketAddress;
+    @Shadow
+    @Final
+    private StringBuffer buffer;
     private CraftRemoteConsoleCommandSender remoteConsole = null;
 
     @ShadowConstructor

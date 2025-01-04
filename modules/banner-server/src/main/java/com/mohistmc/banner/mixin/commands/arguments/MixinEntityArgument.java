@@ -14,19 +14,19 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(EntityArgument.class)
 public abstract class MixinEntityArgument implements InjectionEntityArgument {
 
-    // @formatter:off
-    @Shadow @Final boolean single;
-    @Shadow @Final boolean playersOnly;
     @Final@Shadow public static SimpleCommandExceptionType ERROR_NOT_SINGLE_PLAYER;
     @Final@Shadow public static SimpleCommandExceptionType ERROR_NOT_SINGLE_ENTITY;
     @Final@Shadow public static SimpleCommandExceptionType ERROR_ONLY_PLAYERS_ALLOWED;
+    // @formatter:off
+    @Shadow @Final boolean single;
+    @Shadow @Final boolean playersOnly;
     // @formatter:on
 
     @Override
     public EntitySelector parse(StringReader stringReader, boolean bl, boolean overridePermissions) throws CommandSyntaxException {
         int i = 0;
         EntitySelectorParser entityselectorparser = new EntitySelectorParser(stringReader, bl);
-        EntitySelector entityselector =entityselectorparser.parse(overridePermissions);
+        EntitySelector entityselector = entityselectorparser.parse(overridePermissions);
         if (entityselector.getMaxResults() > 1 && this.single) {
             if (this.playersOnly) {
                 stringReader.setCursor(0);

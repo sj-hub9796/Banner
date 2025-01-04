@@ -17,11 +17,10 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(ChestBlockEntity.class)
 public abstract class MixinChestBlockEntity extends RandomizableContainerBlockEntity {
 
+    public List<HumanEntity> transaction = new ArrayList<>();
+    // @formatter:on
     // @formatter:off
     @Shadow private NonNullList<ItemStack> items;
-    // @formatter:on
-
-    public List<HumanEntity> transaction = new ArrayList<>();
     private int maxStack = MAX_STACK;
 
     protected MixinChestBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {

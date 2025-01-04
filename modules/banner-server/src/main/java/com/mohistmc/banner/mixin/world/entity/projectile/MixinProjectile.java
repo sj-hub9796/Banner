@@ -18,15 +18,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Projectile.class)
 public abstract class MixinProjectile extends Entity implements InjectionProjectile {
 
+    private boolean hitCancelled = false;
+
     public MixinProjectile(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
 
-    @Shadow protected abstract void onHit(HitResult result);
+    @Shadow
+    protected abstract void onHit(HitResult result);
 
-    @Shadow protected abstract ProjectileDeflection hitTargetOrDeflectSelf(HitResult hitResult);
-
-    private boolean hitCancelled = false;
+    @Shadow
+    protected abstract ProjectileDeflection hitTargetOrDeflectSelf(HitResult hitResult);
 
     @Inject(method = "setOwner", at = @At("RETURN"))
     private void banner$updateSource(Entity entityIn, CallbackInfo ci) {

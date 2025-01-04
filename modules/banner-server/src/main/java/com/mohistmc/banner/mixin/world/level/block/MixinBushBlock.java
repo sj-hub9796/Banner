@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(BushBlock.class)
-public abstract class MixinBushBlock extends Block{
+public abstract class MixinBushBlock extends Block {
 
     public MixinBushBlock(Properties properties) {
         super(properties);

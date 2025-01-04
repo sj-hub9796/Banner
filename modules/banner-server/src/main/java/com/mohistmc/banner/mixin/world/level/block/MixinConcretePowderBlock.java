@@ -23,7 +23,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 public abstract class MixinConcretePowderBlock extends Block {
 
-    @Shadow @Final private Block concrete;
+    @Shadow
+    @Final
+    private Block concrete;
 
     public MixinConcretePowderBlock(Properties properties) {
         super(properties);

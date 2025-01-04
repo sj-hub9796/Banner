@@ -18,7 +18,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinBlockStateParser {
 
     @Mutable
-    @Shadow @Final private Map<Property<?>, Comparable<?>> properties;
+    @Shadow
+    @Final
+    private Map<Property<?>, Comparable<?>> properties;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void banner$init(HolderLookup holderLookup, StringReader stringReader, boolean bl, boolean bl2, CallbackInfo ci) {

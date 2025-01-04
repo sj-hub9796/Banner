@@ -90,143 +90,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = LivingEntity.class, priority = 199)
 public abstract class MixinLivingEntity extends Entity implements Attackable, InjectionLivingEntity {
 
-    @Shadow @Final public static EntityDataAccessor<Float> DATA_HEALTH_ID;
-    @Shadow @Final private AttributeMap attributes;
-
-    @Shadow public abstract SoundEvent getEatingSound(net.minecraft.world.item.ItemStack stack);
-
-    @Shadow protected abstract SoundEvent getDrinkingSound(net.minecraft.world.item.ItemStack stack);
-
-    @Shadow protected abstract SoundEvent getFallDamageSound(int height);
-
-    @Shadow @Nullable protected abstract SoundEvent getDeathSound();
-
-    @Shadow public abstract void onEquipItem(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2);
-    @Shadow @Final public Map<Holder<MobEffect>, MobEffectInstance> activeEffects;
-
-    @Shadow protected abstract void onEffectUpdated(MobEffectInstance effectInstance, boolean forced, @Nullable Entity entity);
-
-    @Shadow protected abstract void onEffectRemoved(MobEffectInstance effectInstance);
-
-    @Shadow public abstract boolean checkTotemDeathProtection(DamageSource damageSource);
-
-    @Shadow protected abstract void updateInvisibilityStatus();
-    @Shadow @Final private static EntityDataAccessor<Boolean> DATA_EFFECT_AMBIENCE_ID;
-
-    @Shadow public abstract boolean canBeAffected(MobEffectInstance effectInstance);
-
-    @Shadow protected abstract void onEffectAdded(MobEffectInstance instance, @Nullable Entity entity);
-    @Shadow public abstract boolean wasExperienceConsumed();
-
-    @Shadow protected abstract boolean isAlwaysExperienceDropper();
-
-    @Shadow protected int lastHurtByPlayerTime;
-
-    @Shadow public abstract boolean shouldDropExperience();
-
-    @Shadow public abstract boolean removeAllEffects();
-
-    @Shadow public abstract ItemStack getItemBySlot(EquipmentSlot slot);
-
-    @Shadow public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
-
-    @Shadow protected abstract float getDamageAfterArmorAbsorb(DamageSource damageSource, float damageAmount);
-
-    @Shadow protected abstract float getDamageAfterMagicAbsorb(DamageSource damageSource, float damageAmount);
-
-    @Shadow public abstract float getAbsorptionAmount();
-
-    @Shadow public abstract void hurtHelmet(DamageSource damageSource, float damageAmount);
-
-    @Shadow public abstract void hurtArmor(DamageSource damageSource, float damageAmount);
-
-    @Shadow public abstract void hurtCurrentlyUsedShield(float damageAmount);
-
-    @Shadow protected abstract void blockUsingShield(LivingEntity attacker);
-
-    @Shadow public abstract void setAbsorptionAmount(float absorptionAmount);
-
-    @Shadow public abstract float getHealth();
-
-    @Shadow public abstract CombatTracker getCombatTracker();
-
-    @Shadow public abstract void setHealth(float health);
-
-    @Shadow public abstract void heal(float healAmount);
-    @Shadow public abstract ItemStack getItemInHand(InteractionHand hand);
-
-    @Shadow protected ItemStack useItem;
-
-    @Shadow public abstract InteractionHand getUsedItemHand();
-
-    @Shadow @Final public static EntityDataAccessor<Integer> DATA_ARROW_COUNT_ID;
-
-    @Shadow public abstract int getArrowCount();
-
-    @Shadow protected abstract boolean doesEmitEquipEvent(EquipmentSlot slot);
-
-    @Shadow @Final private static Logger LOGGER;
-
-    @Shadow public abstract void indicateDamage(double d, double e);
-
-    @Shadow public abstract ItemStack eat(Level level, ItemStack food);
-
-    @Shadow protected boolean dead;
-
-    @Shadow public abstract boolean isSleeping();
-
-    @Shadow public abstract void stopSleeping();
-
-    @Shadow @Final public WalkAnimationState walkAnimation;
-
-    @Shadow public int invulnerableDuration;
-
-    @Shadow public float lastHurt;
-
-    @Shadow protected abstract void actuallyHurt(DamageSource damageSource, float f);
-
-    @Shadow public abstract void die(DamageSource damageSource);
-
-    @Shadow protected abstract void playHurtSound(DamageSource damageSource);
-
-    @Shadow public abstract boolean isDeadOrDying();
-
-    @Shadow protected abstract float getSoundVolume();
-
-    @Shadow public abstract float getVoicePitch();
-
-    @Shadow @Nullable private DamageSource lastDamageSource;
-
-    @Shadow private long lastDamageStamp;
-
-    @Shadow public abstract void knockback(double d, double e, double f);
-
-    @Shadow @Nullable public Player lastHurtByPlayer;
-
-    @Shadow public abstract void setLastHurtByMob(@Nullable LivingEntity livingEntity);
-
-    @Shadow public int hurtDuration;
-
-    @Shadow public int hurtTime;
-
-    @Shadow protected int noActionTime;
-
-    @Shadow public abstract double getAttributeValue(Holder<Attribute> holder);
-
-    @Shadow @Nullable public abstract AttributeInstance getAttribute(Holder<Attribute> holder);
-
-    @Shadow public abstract boolean hasEffect(Holder<MobEffect> holder);
-
-    @Shadow public abstract int getExperienceReward(ServerLevel serverLevel, @Nullable Entity entity);
-
-    @Shadow protected abstract boolean trapdoorUsableAsLadder(BlockPos blockPos, BlockState blockState);
-
-    @Shadow public abstract void forceAddEffect(MobEffectInstance mobEffectInstance, @Nullable Entity entity);
-
-    public MixinLivingEntity(EntityType<?> entityType, Level level) {
-        super(entityType, level);
-    }
-
+    @Shadow
+    @Final
+    public static EntityDataAccessor<Float> DATA_HEALTH_ID;
+    @Shadow
+    @Final
+    public static EntityDataAccessor<Integer> DATA_ARROW_COUNT_ID;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    @Final
+    public Map<Holder<MobEffect>, MobEffectInstance> activeEffects;
+    @Shadow
+    @Final
+    public WalkAnimationState walkAnimation;
+    @Shadow
+    public int invulnerableDuration;
+    @Shadow
+    public float lastHurt;
+    @Shadow
+    @Nullable
+    public Player lastHurtByPlayer;
+    @Shadow
+    public int hurtDuration;
+    @Shadow
+    public int hurtTime;
     public int expToDrop;
     public boolean forceDrops;
     public ArrayList<org.bukkit.inventory.ItemStack> drops = new ArrayList<>();
@@ -234,90 +123,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     public boolean collides = true;
     public Set<UUID> collidableExemptions = new HashSet<>();
     public boolean bukkitPickUpLoot;
-    private boolean isTickingEffects = false;
-    private List<ProcessableEffect> effectsToProcess = Lists.newArrayList();
-
-    // Banner - add fields
-    private AtomicReference<BlockState> banner$FallState = new AtomicReference<>();
-    private AtomicBoolean banner$silent = new AtomicBoolean(false);
-    private transient EntityPotionEffectEvent.Cause banner$cause;
-
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
-    private void banner$muteHealth(LivingEntity entity, float health) {
-        // do nothing
-    }
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void banner$init(EntityType<? extends LivingEntity> type, Level worldIn, CallbackInfo ci) {
-        this.collides = true;
-        this.craftAttributes = new CraftAttributeMap(this.attributes);
-        this.entityData.set(DATA_HEALTH_ID, (float) this.getAttributeValue(Attributes.MAX_HEALTH));
-    }
-
-    @Inject(method = "checkFallDamage", at = @At("HEAD"))
-    private void banner$getFallInfo(double y, boolean onGround, BlockState state, BlockPos pos, CallbackInfo ci) {
-        this.banner$FallState.set(state);
-    }
-
-    @Redirect(method = "checkFallDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;sendParticles(Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I"))
-    private <T extends ParticleOptions>  int banner$addCheckFall(ServerLevel instance, T particleOptions, double d, double e, double f, int i, double g, double h, double j, double k) {
-        // CraftBukkit start - visiblity api
-        float banner$f = (float) Mth.ceil(this.fallDistance - 3.0F);
-        double banner$d = Math.min((double)(0.2F + banner$f / 15.0F), 2.5);
-        int banner$i = (int)(150.0 * banner$d);
-        if (((LivingEntity) (Object) this) instanceof ServerPlayer) {
-            return ((ServerLevel) this.level()).sendParticles((ServerPlayer) (Object) this, new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D, false);
-        } else {
-            return ((ServerLevel) this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D);
-        }
-    }
-
-
-    @Redirect(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
-    private boolean banner$addSilentCheck(Level instance) {
-        return !this.level().isClientSide() && !this.isSilent() && !banner$silent.getAndSet(false);
-    }
-
-    @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
-    public void banner$readMaxHealth(CompoundTag compound, CallbackInfo ci) {
-        if (compound.contains("Bukkit.MaxHealth")) {
-            Tag nbtbase = compound.get("Bukkit.MaxHealth");
-            if (nbtbase.getId() == 5) {
-                this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(((FloatTag) nbtbase).getAsDouble());
-            } else if (nbtbase.getId() == 3) {
-                this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(((IntTag) nbtbase).getAsDouble());
-            }
-        }
-    }
-
-
-    @Inject(method = "getHealth", cancellable = true, at = @At("HEAD"))
-    public void banner$scaledHealth(CallbackInfoReturnable<Float> cir) {
-        if (((LivingEntity) (Object) this) instanceof ServerPlayer && ((ServerPlayer) (Object) this).banner$initialized()) {
-            cir.setReturnValue((float) ((ServerPlayer) (Object) this).getBukkitEntity().getHealth());
-        }
-    }
-
-    @Inject(method = "setHealth", cancellable = true, at = @At("HEAD"))
-    public void banner$setScaled(float health, CallbackInfo ci) {
-        // CraftBukkit start - Handle scaled health
-        if (((LivingEntity) (Object) this) instanceof ServerPlayer && ((ServerPlayer) (Object) this).banner$initialized()) {
-            CraftPlayer player = ((ServerPlayer) (Object) this).getBukkitEntity();
-
-            // Squeeze
-            if (health < 0.0F) {
-                player.setRealHealth(0.0D);
-            } else if (health > player.getMaxHealth()) {
-                player.setRealHealth(player.getMaxHealth());
-            } else {
-                player.setRealHealth(health);
-            }
-            player.updateScaledHealth(false);
-            ci.cancel();
-        }
-        // CraftBukkit end
-    }
-
     /**
      * @author wdog5
      * @reason
@@ -399,6 +204,247 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     // Banner - fix mixin(locals = LocalCapture.CAPTURE_FAILHARD)
     public EntityPotionEffectEvent.Cause cause;
+    @Shadow
+    protected int lastHurtByPlayerTime;
+    @Shadow
+    protected ItemStack useItem;
+    @Shadow
+    protected int noActionTime;
+    @Shadow
+    @Final
+    private AttributeMap attributes;
+    @Shadow
+    @Nullable
+    private DamageSource lastDamageSource;
+    @Shadow
+    private long lastDamageStamp;
+    private boolean isTickingEffects = false;
+    private List<ProcessableEffect> effectsToProcess = Lists.newArrayList();
+    // Banner - add fields
+    private final AtomicReference<BlockState> banner$FallState = new AtomicReference<>();
+    private final AtomicBoolean banner$silent = new AtomicBoolean(false);
+    private transient EntityPotionEffectEvent.Cause banner$cause;
+    private transient boolean banner$damageResult;
+    private transient EntityRegainHealthEvent.RegainReason banner$regainReason;
+
+    public MixinLivingEntity(EntityType<?> entityType, Level level) {
+        super(entityType, level);
+    }
+
+    @Shadow
+    public abstract SoundEvent getEatingSound(net.minecraft.world.item.ItemStack stack);
+
+    @Shadow
+    protected abstract SoundEvent getDrinkingSound(net.minecraft.world.item.ItemStack stack);
+
+    @Shadow
+    protected abstract SoundEvent getFallDamageSound(int height);
+
+    @Shadow
+    @Nullable
+    protected abstract SoundEvent getDeathSound();
+
+    @Shadow
+    public abstract void onEquipItem(EquipmentSlot equipmentSlot, ItemStack itemStack, ItemStack itemStack2);
+
+    @Shadow
+    protected abstract void onEffectUpdated(MobEffectInstance effectInstance, boolean forced, @Nullable Entity entity);
+
+    @Shadow
+    public abstract boolean checkTotemDeathProtection(DamageSource damageSource);
+
+    @Shadow
+    public abstract boolean canBeAffected(MobEffectInstance effectInstance);
+
+    @Shadow
+    protected abstract void onEffectAdded(MobEffectInstance instance, @Nullable Entity entity);
+
+    @Shadow
+    public abstract boolean wasExperienceConsumed();
+
+    @Shadow
+    protected abstract boolean isAlwaysExperienceDropper();
+
+    @Shadow
+    public abstract boolean shouldDropExperience();
+
+    @Shadow
+    public abstract boolean removeAllEffects();
+
+    @Shadow
+    public abstract ItemStack getItemBySlot(EquipmentSlot slot);
+
+    @Shadow
+    public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
+
+    @Shadow
+    protected abstract float getDamageAfterArmorAbsorb(DamageSource damageSource, float damageAmount);
+
+    @Shadow
+    protected abstract float getDamageAfterMagicAbsorb(DamageSource damageSource, float damageAmount);
+
+    @Shadow
+    public abstract float getAbsorptionAmount();
+
+    @Shadow
+    public abstract void setAbsorptionAmount(float absorptionAmount);
+
+    @Shadow
+    public abstract void hurtHelmet(DamageSource damageSource, float damageAmount);
+
+    @Shadow
+    public abstract void hurtArmor(DamageSource damageSource, float damageAmount);
+
+    @Shadow
+    public abstract void hurtCurrentlyUsedShield(float damageAmount);
+
+    @Shadow
+    protected abstract void blockUsingShield(LivingEntity attacker);
+
+    @Shadow
+    public abstract float getHealth();
+
+    @Shadow
+    public abstract void setHealth(float health);
+
+    @Shadow
+    public abstract CombatTracker getCombatTracker();
+
+    @Shadow
+    public abstract void heal(float healAmount);
+
+    @Shadow
+    public abstract ItemStack getItemInHand(InteractionHand hand);
+
+    @Shadow
+    public abstract InteractionHand getUsedItemHand();
+
+    @Shadow
+    public abstract int getArrowCount();
+
+    @Shadow
+    protected abstract boolean doesEmitEquipEvent(EquipmentSlot slot);
+
+    @Shadow
+    public abstract void indicateDamage(double d, double e);
+
+    @Shadow
+    public abstract boolean isSleeping();
+
+    @Shadow
+    public abstract void stopSleeping();
+
+    @Shadow
+    protected abstract void actuallyHurt(DamageSource damageSource, float f);
+
+    @Shadow
+    public abstract void die(DamageSource damageSource);
+
+    @Shadow
+    protected abstract void playHurtSound(DamageSource damageSource);
+
+    @Shadow
+    public abstract boolean isDeadOrDying();
+
+    @Shadow
+    protected abstract float getSoundVolume();
+
+    @Shadow
+    public abstract float getVoicePitch();
+
+    @Shadow
+    public abstract void knockback(double d, double e, double f);
+
+    @Shadow
+    public abstract void setLastHurtByMob(@Nullable LivingEntity livingEntity);
+
+    @Shadow
+    public abstract double getAttributeValue(Holder<Attribute> holder);
+
+    @Shadow
+    @Nullable
+    public abstract AttributeInstance getAttribute(Holder<Attribute> holder);
+
+    @Shadow
+    public abstract boolean hasEffect(Holder<MobEffect> holder);
+
+    @Shadow
+    public abstract int getExperienceReward(ServerLevel serverLevel, @Nullable Entity entity);
+
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
+    private void banner$muteHealth(LivingEntity entity, float health) {
+        // do nothing
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void banner$init(EntityType<? extends LivingEntity> type, Level worldIn, CallbackInfo ci) {
+        this.collides = true;
+        this.craftAttributes = new CraftAttributeMap(this.attributes);
+        this.entityData.set(DATA_HEALTH_ID, (float) this.getAttributeValue(Attributes.MAX_HEALTH));
+    }
+
+    @Inject(method = "checkFallDamage", at = @At("HEAD"))
+    private void banner$getFallInfo(double y, boolean onGround, BlockState state, BlockPos pos, CallbackInfo ci) {
+        this.banner$FallState.set(state);
+    }
+
+    @Redirect(method = "checkFallDamage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;sendParticles(Lnet/minecraft/core/particles/ParticleOptions;DDDIDDDD)I"))
+    private <T extends ParticleOptions> int banner$addCheckFall(ServerLevel instance, T particleOptions, double d, double e, double f, int i, double g, double h, double j, double k) {
+        // CraftBukkit start - visiblity api
+        float banner$f = (float) Mth.ceil(this.fallDistance - 3.0F);
+        double banner$d = Math.min(0.2F + banner$f / 15.0F, 2.5);
+        int banner$i = (int) (150.0 * banner$d);
+        if (((LivingEntity) (Object) this) instanceof ServerPlayer) {
+            return ((ServerLevel) this.level()).sendParticles((ServerPlayer) (Object) this, new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D, false);
+        } else {
+            return ((ServerLevel) this.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, banner$FallState.get()), this.getX(), this.getY(), this.getZ(), banner$i, 0.0D, 0.0D, 0.0D, 0.15000000596046448D);
+        }
+    }
+
+    @Redirect(method = "onEquipItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;isClientSide()Z"))
+    private boolean banner$addSilentCheck(Level instance) {
+        return !this.level().isClientSide() && !this.isSilent() && !banner$silent.getAndSet(false);
+    }
+
+    @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
+    public void banner$readMaxHealth(CompoundTag compound, CallbackInfo ci) {
+        if (compound.contains("Bukkit.MaxHealth")) {
+            Tag nbtbase = compound.get("Bukkit.MaxHealth");
+            if (nbtbase.getId() == 5) {
+                this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(((FloatTag) nbtbase).getAsDouble());
+            } else if (nbtbase.getId() == 3) {
+                this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(((IntTag) nbtbase).getAsDouble());
+            }
+        }
+    }
+
+    @Inject(method = "getHealth", cancellable = true, at = @At("HEAD"))
+    public void banner$scaledHealth(CallbackInfoReturnable<Float> cir) {
+        if (((LivingEntity) (Object) this) instanceof ServerPlayer && ((ServerPlayer) (Object) this).banner$initialized()) {
+            cir.setReturnValue((float) ((ServerPlayer) (Object) this).getBukkitEntity().getHealth());
+        }
+    }
+
+    @Inject(method = "setHealth", cancellable = true, at = @At("HEAD"))
+    public void banner$setScaled(float health, CallbackInfo ci) {
+        // CraftBukkit start - Handle scaled health
+        if (((LivingEntity) (Object) this) instanceof ServerPlayer && ((ServerPlayer) (Object) this).banner$initialized()) {
+            CraftPlayer player = ((ServerPlayer) (Object) this).getBukkitEntity();
+
+            // Squeeze
+            if (health < 0.0F) {
+                player.setRealHealth(0.0D);
+            } else if (health > player.getMaxHealth()) {
+                player.setRealHealth(player.getMaxHealth());
+            } else {
+                player.setRealHealth(health);
+            }
+            player.updateScaledHealth(false);
+            ci.cancel();
+        }
+        // CraftBukkit end
+    }
+
     /**
      * @author wdog5
      * @reason
@@ -490,8 +536,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     public boolean isAlive() {
         return !this.isRemoved() && this.entityData.get(DATA_HEALTH_ID) > 0.0F;
     }
-
-    private transient boolean banner$damageResult;
 
     /**
      * @author wdog5
@@ -805,7 +849,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
             } else {
                 // Duplicate triggers if blocking
                 if (event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING) < 0) {
-                    if (((LivingEntity) (Object) this)instanceof ServerPlayer) {
+                    if (((LivingEntity) (Object) this) instanceof ServerPlayer) {
                         CriteriaTriggers.ENTITY_HURT_PLAYER.trigger(((ServerPlayer) (Object) this), damagesource, f, originalDamage, true);
                         f2 = (float) -event.getDamage(EntityDamageEvent.DamageModifier.BLOCKING);
                         if (f2 > 0.0F && f2 < 3.4028235E37F) {
@@ -826,8 +870,6 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         }
         return banner$damageResult = false; // CraftBukkit
     }
-
-    private transient EntityRegainHealthEvent.RegainReason banner$regainReason;
 
     @Override
     public void heal(float healAmount, EntityRegainHealthEvent.RegainReason regainReason) {
@@ -866,7 +908,8 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
                     target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V",
                     remap = false))
     private void banner$logNamedDeaths(Logger instance, String s, Object o1, Object o2) {
-        if (org.spigotmc.SpigotConfig.logNamedDeaths) LOGGER.info("Named entity {} died: {}", ((LivingEntity) (Object) this), this.getCombatTracker().getDeathMessage().getString()); // Spigot
+        if (org.spigotmc.SpigotConfig.logNamedDeaths)
+            LOGGER.info("Named entity {} died: {}", (Object) this, this.getCombatTracker().getDeathMessage().getString()); // Spigot
     }
 
     @Override
@@ -893,7 +936,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
 
     @Redirect(method = "createWitherRose", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     private boolean banner$fireWitherRoseForm(Level instance, BlockPos pPos, BlockState pNewState, int pFlags) {
-        return CraftEventFactory.handleBlockFormEvent(instance, pPos, pNewState, 3, (Entity) (Object) this);
+        return CraftEventFactory.handleBlockFormEvent(instance, pPos, pNewState, 3, (Entity) this);
     }
 
     @Inject(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setSharedFlag(IZ)V"))
@@ -920,13 +963,13 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
     @Eject(method = "completeUsingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack banner$itemConsume(ItemStack itemStack, Level worldIn, LivingEntity
             entityLiving, CallbackInfo ci) {
-        if (((LivingEntity)(Object) this) instanceof ServerPlayer entityPlayer) {
+        if (((LivingEntity) (Object) this) instanceof ServerPlayer entityPlayer) {
             final org.bukkit.inventory.ItemStack craftItem = CraftItemStack.asBukkitCopy(itemStack);
-            final PlayerItemConsumeEvent event = new PlayerItemConsumeEvent((org.bukkit.entity.Player)this.getBukkitEntity(), craftItem, CraftEquipmentSlot.getHand(this.getUsedItemHand()));
+            final PlayerItemConsumeEvent event = new PlayerItemConsumeEvent((org.bukkit.entity.Player) this.getBukkitEntity(), craftItem, CraftEquipmentSlot.getHand(this.getUsedItemHand()));
             Bukkit.getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 if (this.useItem.getItem() instanceof net.minecraft.world.item.SuspiciousStewItem itemSuspiciousStew) {
-                    ((InjectionSuspiciousStewItem)itemSuspiciousStew).cancelUsingItem(entityPlayer, this.useItem);
+                    ((InjectionSuspiciousStewItem) itemSuspiciousStew).cancelUsingItem(entityPlayer, this.useItem);
                 }
                 entityPlayer.getBukkitEntity().updateInventory();
                 entityPlayer.getBukkitEntity().updateScaledHealth();
@@ -976,7 +1019,7 @@ public abstract class MixinLivingEntity extends Entity implements Attackable, In
         if (((LivingEntity) (Object) this) instanceof ServerPlayer && equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
             final org.bukkit.inventory.ItemStack oldItem = CraftItemStack.asBukkitCopy(itemStack);
             final org.bukkit.inventory.ItemStack newItem = CraftItemStack.asBukkitCopy(itemStack2);
-            new PlayerArmorChangeEvent((org.bukkit.entity.Player)this.getBukkitEntity(), PlayerArmorChangeEvent.SlotType.valueOf(equipmentSlot.name()), oldItem, newItem).callEvent();
+            new PlayerArmorChangeEvent((org.bukkit.entity.Player) this.getBukkitEntity(), PlayerArmorChangeEvent.SlotType.valueOf(equipmentSlot.name()), oldItem, newItem).callEvent();
         }
     }
 

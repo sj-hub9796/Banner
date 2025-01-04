@@ -23,13 +23,16 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(TripWireBlock.class)
 public abstract class MixinTripWireBlock extends Block {
 
-    @Shadow @Final public static BooleanProperty POWERED;
-
-    @Shadow protected abstract void updateSource(Level level, BlockPos pos, BlockState state);
+    @Shadow
+    @Final
+    public static BooleanProperty POWERED;
 
     public MixinTripWireBlock(Properties properties) {
         super(properties);
     }
+
+    @Shadow
+    protected abstract void updateSource(Level level, BlockPos pos, BlockState state);
 
     /**
      * @author wdog5
@@ -87,7 +90,7 @@ public abstract class MixinTripWireBlock extends Block {
         }
 
         if (flag1) {
-            worldIn.scheduleTick(new BlockPos(pos), (Block) (Object) this, 10);
+            worldIn.scheduleTick(new BlockPos(pos), (Block) this, 10);
         }
 
     }

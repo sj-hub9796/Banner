@@ -10,7 +10,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(Raids.class)
 public class MixinRaids {
 
-    @Shadow @Final public Map<Integer, Raid> raidMap;
+    @Shadow
+    @Final
+    public Map<Integer, Raid> raidMap;
 
     /*
     @Inject(method = "createOrExtendRaid", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/raid/Raid;absorbBadOmen(Lnet/minecraft/world/entity/player/Player;)V"))

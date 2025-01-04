@@ -11,7 +11,8 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(SculkCatalystBlockEntity.CatalystListener.class)
 public class MixinSculkCatalystBlockEntity_CatalystListener implements InjectionCatalystListener {
 
-    @Shadow @Final
+    @Shadow
+    @Final
     SculkSpreader sculkSpreader;
 
     @Override

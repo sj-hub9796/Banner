@@ -29,7 +29,7 @@ public class MixinScheduleCommand {
 
     @Redirect(method = "schedule",
             at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/level/storage/ServerLevelData;getScheduledEvents()Lnet/minecraft/world/level/timers/TimerQueue;"))
+                    target = "Lnet/minecraft/world/level/storage/ServerLevelData;getScheduledEvents()Lnet/minecraft/world/level/timers/TimerQueue;"))
     private static TimerQueue<MinecraftServer> banner$resetTimer(ServerLevelData instance) {
         return banner$source.get().getLevel().bridge$serverLevelDataCB().overworldData().getScheduledEvents(); // CraftBukkit - SPIGOT-6667: Use world specific function timer;
     }

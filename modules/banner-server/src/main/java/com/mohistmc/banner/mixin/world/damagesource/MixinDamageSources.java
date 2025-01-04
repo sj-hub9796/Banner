@@ -1,7 +1,6 @@
 package com.mohistmc.banner.mixin.world.damagesource;
 
 import com.mohistmc.banner.injection.world.damagesource.InjectionDamageSources;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -11,7 +10,6 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,19 +19,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(DamageSources.class)
 public abstract class MixinDamageSources implements InjectionDamageSources {
 
+    // CraftBukkit start
+    public DamageSource melting;
+    public DamageSource poison;
+
     // @formatter:off
     @Shadow protected abstract DamageSource source(ResourceKey<DamageType> resourceKey);
     // @formatter:on
 
     @Shadow public abstract DamageSource source(ResourceKey<DamageType> resourceKey, @Nullable Entity entity, @Nullable Entity entity2);
 
-    @Shadow @Final public Registry<DamageType> damageTypes;
-
     @Shadow public abstract DamageSource badRespawnPointExplosion(Vec3 vec3);
-
-    // CraftBukkit start
-    public DamageSource melting;
-    public DamageSource poison;
 
     @Inject(method = "<init>", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/damagesource/DamageSources;" +
