@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import net.fabricmc.loader.impl.game.minecraft.MinecraftGameProvider;
@@ -56,6 +57,15 @@ public class BannerGameProvider extends MinecraftGameProvider {
     @Override
     public void unlockClassPath(FabricLauncher launcher) {
         super.unlockClassPath(launcher);
+        try {
+            var field = launcher.getClass().getDeclaredField("unlocked");
+            field.setAccessible(true);
+            field.set(launcher, true);
+            var ctor = launcher.loadIntoTarget("com.mohistmc.banner.boot.FabricBootstrap").getConstructor();
+            ((Consumer<FabricLauncher>) ctor.newInstance()).accept(launcher);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String getBannerVersion() throws Exception {

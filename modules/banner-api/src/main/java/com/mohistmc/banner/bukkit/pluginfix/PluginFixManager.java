@@ -18,7 +18,7 @@ import org.objectweb.asm.tree.MethodNode;
 public class PluginFixManager {
 
 
-    public static byte[] injectPluginFix(String className, byte[] clazz) {
+    public static byte[] injectPluginFix(String mainClass, String className, byte[] clazz) {
         if (className.endsWith("PaperLib")) {
             return patch(clazz, PluginFixManager::removePaper);
         }
