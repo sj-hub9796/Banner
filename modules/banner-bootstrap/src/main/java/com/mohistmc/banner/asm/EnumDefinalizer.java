@@ -11,7 +11,6 @@ public class EnumDefinalizer implements Implementer {
 
     static final Set<String> ENUM = Set.of(
             "org/bukkit/Material",
-            "org/bukkit/potion/PotionType",
             "org/bukkit/entity/EntityType",
             "org/bukkit/block/Biome",
             "org/bukkit/Art",

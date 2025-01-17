@@ -35,6 +35,7 @@ public class PluginFixManager {
             case "com.earth2me.essentials.utils.VersionUtil" -> node -> helloWorld(node, 110, 109);
             case "net.ess3.nms.refl.providers.ReflServerStateProvider" -> node -> helloWorld(node, "u", "U");
             case "net.Zrips.CMILib.Reflections" -> node -> helloWorld(node, "bR", "field_7512");
+            case "net.momirealms.customcrops.libraries.sparrow.impl.reobf_1_21_r1.Heart" -> node -> helloWorld(node, "net.minecraft.network.protocol.game.ClientboundBossEventPacket$OperationType", "net.minecraft.class_2629$class_5883");
             default -> null;
         };
         return patcher == null ? clazz : patch(clazz, patcher);
