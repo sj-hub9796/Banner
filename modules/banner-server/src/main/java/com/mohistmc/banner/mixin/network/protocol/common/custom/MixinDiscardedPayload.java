@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.network.protocol;
+package com.mohistmc.banner.mixin.network.protocol.common.custom;
 
 import com.mohistmc.banner.asm.annotation.CreateConstructor;
 import com.mohistmc.banner.asm.annotation.ShadowConstructor;

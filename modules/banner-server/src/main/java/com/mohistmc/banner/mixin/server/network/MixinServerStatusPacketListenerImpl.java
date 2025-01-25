@@ -13,6 +13,7 @@ import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerStatusPacketListenerImpl;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -27,7 +28,7 @@ public class MixinServerStatusPacketListenerImpl {
         MinecraftServer server = BukkitMethodHooks.getServer();
 
         BannerServerListPingEvent event = new BannerServerListPingEvent(networkManager, server);
-        server.bridge$server().getPluginManager().callEvent(event);
+        Bukkit.getPluginManager().callEvent(event);
 
         final Object[] players = event.getPlayers();
 

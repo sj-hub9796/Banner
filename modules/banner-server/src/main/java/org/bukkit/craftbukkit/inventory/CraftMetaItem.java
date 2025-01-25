@@ -960,6 +960,23 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
         return !(this.hasDisplayName() || this.hasItemName() || this.hasLocalizedName() || this.hasEnchants() || (this.lore != null) || this.hasCustomModelData() || this.hasBlockData() || this.hasRepairCost() || !this.unhandledTags.build().isEmpty() || !this.removedTags.isEmpty() || !this.persistentDataContainer.isEmpty() || this.hideFlag != 0 || this.isHideTooltip() || this.isUnbreakable() || this.hasEnchantmentGlintOverride() || this.isFireResistant() || this.hasMaxStackSize() || this.hasRarity() || this.hasFood() || this.hasTool() || hasJukeboxPlayable() || this.hasDamage() || this.hasMaxDamage() || this.hasAttributeModifiers() || this.customTag != null);
     }
 
+    // Paper start
+    @Override
+    public net.kyori.adventure.text.Component displayName() {
+        return displayName == null ? null : net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(CraftChatMessage.fromComponent(displayName));
+    }
+
+    @Override
+    public void displayName(final net.kyori.adventure.text.Component displayName) {
+        this.displayName = displayName == null ? null : CraftChatMessage.fromJSON(net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serialize(displayName));
+    }
+
+    @Override
+    public net.md_5.bungee.api.chat.BaseComponent[] getDisplayNameComponent() {
+        return displayName == null ? new net.md_5.bungee.api.chat.BaseComponent[0] : net.md_5.bungee.chat.ComponentSerializer.parse(CraftChatMessage.toJSON(displayName));
+    }
+    // Paper end
+
     @Override
     public String getDisplayName() {
         return CraftChatMessage.fromComponent(this.displayName);
@@ -969,6 +986,13 @@ class CraftMetaItem implements ItemMeta, Damageable, Repairable, BlockDataMeta {
     public final void setDisplayName(String name) {
         this.displayName = CraftChatMessage.fromStringOrNull(name);
     }
+
+    // Paper start
+    @Override
+    public void setDisplayNameComponent(net.md_5.bungee.api.chat.BaseComponent[] component) {
+        this.displayName = CraftChatMessage.fromJSON(net.md_5.bungee.chat.ComponentSerializer.toString(component));
+    }
+    // Paper end
 
     @Override
     public boolean hasDisplayName() {

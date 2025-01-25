@@ -37,6 +37,38 @@ public interface ItemMeta extends Cloneable, ConfigurationSerializable, Persiste
      */
     boolean hasDisplayName();
 
+    // Paper start
+    /**
+     * Gets the display name.
+     *
+     * <p>Plugins should check that {@link #hasDisplayName()} returns <code>true</code> before calling this method.</p>
+     *
+     * @return the display name
+     */
+    @Nullable
+    net.kyori.adventure.text.Component displayName();
+
+    /**
+     * Sets the display name.
+     *
+     * @param displayName the display name to set
+     */
+    void displayName(final @Nullable net.kyori.adventure.text.Component displayName);
+
+    /**
+     * Gets the display name that is set.
+     * <p>
+     * Plugins should check that hasDisplayName() returns <code>true</code>
+     * before calling this method.
+     *
+     * @return the display name that is set
+     * @deprecated use {@link #displayName()}
+     */
+    @NotNull
+    @Deprecated
+    net.md_5.bungee.api.chat.BaseComponent[] getDisplayNameComponent();
+    // Paper end
+
     /**
      * Gets the display name that is set.
      * <p>
@@ -54,6 +86,17 @@ public interface ItemMeta extends Cloneable, ConfigurationSerializable, Persiste
      * @param name the name to set
      */
     void setDisplayName(@Nullable String name);
+
+    // Paper start
+    /**
+     * Sets the display name.
+     *
+     * @param component the name component to set
+     * @deprecated use {@link #displayName(Component)}
+     */
+    @Deprecated
+    void setDisplayNameComponent(@Nullable net.md_5.bungee.api.chat.BaseComponent[] component);
+    // Paper end
 
     /**
      * Checks for existence of an item name.

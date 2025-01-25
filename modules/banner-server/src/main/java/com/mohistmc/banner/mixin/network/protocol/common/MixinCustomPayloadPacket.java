@@ -1,4 +1,4 @@
-package com.mohistmc.banner.mixin.network.protocol;
+package com.mohistmc.banner.mixin.network.protocol.common;
 
 import com.mohistmc.banner.bukkit.DiscardedPayloadCodec;
 import net.minecraft.network.FriendlyByteBuf;

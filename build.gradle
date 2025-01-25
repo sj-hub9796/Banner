@@ -3,11 +3,11 @@ plugins {
     id 'maven-publish'
 }
 
-version = project.minecraft_version
+version = project.minecraft_version + "-" + buildNumber()
 group = project.maven_group
 
 base {
-    archivesName = project.archives_base_name + "-launcher"
+    archivesName = project.archives_base_name + "-server"
 }
 
 allprojects {
@@ -159,7 +159,7 @@ def moduleDependencies(Project project, List<String> depNames) {
 }
 
 def getSubprojectVersion(project) {
-    return project.minecraft_version
+    return project.minecraft_version + "-" + buildNumber()
 }
 
 dependencies {
@@ -180,10 +180,18 @@ jar {
                 'Main-Class': 'com.mohistmc.banner.BannerLauncher',
                 'Specification-Title'   : 'Banner',
                 'Specification-Vendor'  : 'MohistMC',
-                'Specification-Version' : version,
+                'Specification-Version' : buildNumber(),
                 'Implementation-Title'  : 'Banner',
                 'Implementation-Version': version,
                 'Implementation-Vendor' : 'MohistMC'
         )
+    }
+}
+
+static String buildNumber() {
+    try {
+        return "git rev-list --count HEAD".execute().text.trim()
+    } catch (Exception ignored) {
+        return 'dev'
     }
 }

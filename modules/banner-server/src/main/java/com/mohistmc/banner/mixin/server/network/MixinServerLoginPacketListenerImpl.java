@@ -41,16 +41,15 @@ public abstract class MixinServerLoginPacketListenerImpl implements ServerLoginP
     private static AtomicInteger UNIQUE_THREAD_ID;
     @Shadow
     @Final
-    private static Logger LOGGER;
+    static Logger LOGGER;
     @Shadow
     @Final
     public Connection connection;
     @Shadow
     @Final
-    private MinecraftServer server;
+    MinecraftServer server;
     @Shadow
-    @Nullable
-    private String requestedUsername;
+    @Nullable String requestedUsername;
     private ServerPlayer player; // CraftBukkit
 
     @Shadow
