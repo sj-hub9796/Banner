@@ -2,6 +2,8 @@ accessWidener v2 named
 # Banner
 
 # public clazz
+transitive-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$Action
+transitive-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
 transitive-accessible class net/minecraft/world/level/biome/Biome$ClimateSettings
 transitive-accessible class net/minecraft/world/item/crafting/Ingredient$ItemValue
 transitive-accessible class net/minecraft/world/entity/monster/Guardian$GuardianAttackGoal
