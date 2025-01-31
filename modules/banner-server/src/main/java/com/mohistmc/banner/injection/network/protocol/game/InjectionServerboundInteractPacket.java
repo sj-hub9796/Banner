@@ -3,7 +3,11 @@ package com.mohistmc.banner.injection.network.protocol.game;
 public interface InjectionServerboundInteractPacket {
 
     // Paper start - PlayerUseUnknownEntityEvent
-    int getEntityId();
-    boolean isAttack();
+    default int getEntityId() {
+        throw new IllegalStateException("Not implemented");
+    }
+    default boolean isAttack() {
+        throw new IllegalStateException("Not implemented");
+    }
     // Paper end - PlayerUseUnknownEntityEvent
 }
