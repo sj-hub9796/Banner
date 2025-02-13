@@ -13,6 +13,7 @@
   },
   "mixinPriority": 400,
   "mixins": [
+    "MixinChatFormatting",
     "MixinCrashReport",
     "advancement.MixinAdvancementHolder",
     "commands.MixinCommandDispatcher",
@@ -37,9 +38,9 @@
     "network.chat.MixinComponent",
     "network.chat.MixinTextColor",
     "network.connection.MixinConnection",
+    "network.protocol.MixinPacketUtils",
     "network.protocol.common.MixinCustomPayloadPacket",
     "network.protocol.common.custom.MixinDiscardedPayload",
-    "network.protocol.MixinPacketUtils",
     "network.protocol.game.MixinClientboundCommandsPacket_ArgumentNodeStub",
     "network.protocol.game.MixinClientboundInitializeBorderPacket",
     "network.protocol.game.MixinClientboundSectionBlocksUpdatePacket",
