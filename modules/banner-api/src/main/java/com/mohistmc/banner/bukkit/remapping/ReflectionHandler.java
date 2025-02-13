@@ -33,6 +33,9 @@ import org.objectweb.asm.Type;
 @SuppressWarnings("unused")
 public class ReflectionHandler extends ClassLoader {
 
+
+    private static final String PREFIX = "net.minecraft.";
+
     public static ClassLoaderRemapper remapper;
 
     public static Method[] redirectGetDeclaredMethods(Class<?> cl) {
@@ -156,7 +159,11 @@ public class ReflectionHandler extends ClassLoader {
 
     // srg -> bukkit
     public static String handlePackageGetName(String name) {
-        return name;
+        if (name.startsWith(PREFIX)) {
+            return PREFIX + "server." + "v1_21_R1";
+        } else {
+            return name;
+        }
     }
 
     // srg -> bukkit
@@ -520,7 +527,11 @@ public class ReflectionHandler extends ClassLoader {
 
     public static Object[] handleMethodInvoke(Method method, Object src, Object[] param) throws Throwable {
         Object[] ret = RedirectAdapter.runHandle(remapper, method, src, param);
-        return Objects.requireNonNullElseGet(ret, () -> new Object[]{method, src, param});
+        if (ret != null) {
+            return ret;
+        } else {
+            return new Object[]{method, src, param};
+        }
     }
 
     public static Object redirectMethodInvoke(Method method, Object src, Object[] param) throws Throwable {

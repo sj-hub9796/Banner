@@ -3,14 +3,19 @@ package com.mohistmc.banner.bukkit.remapping;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+
 import net.md_5.specialsource.InheritanceMap;
 import net.md_5.specialsource.JarMapping;
 import net.md_5.specialsource.JarRemapper;
 import net.md_5.specialsource.provider.ClassLoaderProvider;
 import net.md_5.specialsource.provider.JointProvider;
+import org.apache.commons.io.FileUtils;
 
 /**
  * ArclightRemapper
@@ -22,10 +27,26 @@ import net.md_5.specialsource.provider.JointProvider;
 public class Remapper {
 
     public static final Remapper INSTANCE;
+    public static final File DUMP;
+    public static final Function<byte[], byte[]> SWITCH_TABLE_FIXER;
 
     static {
         try {
             INSTANCE = new Remapper();
+            String property = System.getProperty("banner.remapper.dump");
+            if (property != null) {
+                DUMP = new File(property);
+                if (!DUMP.exists()) {
+                    DUMP.mkdirs();
+                }
+                try {
+                    FileUtils.forceDelete(DUMP);
+                } catch (IOException ignored) {
+                }
+            } else {
+                DUMP = null;
+            }
+            SWITCH_TABLE_FIXER = (Function<byte[], byte[]>) Class.forName("com.mohistmc.banner.asm.SwitchTableFixer").getField("INSTANCE").get(null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -38,28 +59,20 @@ public class Remapper {
     private final JarRemapper toBukkitRemapper;
     private final JarRemapper toNmsRemapper;
 
-    public List<PluginTransformer> getTransformerList() {
-        return transformerList;
-    }
-
     public Remapper() throws Exception {
         this.toNmsMapping = new JarMapping();
-        // this.toNmsMapping.packages.put("org/yaml/snakeyaml/", "com/mohistmc/org/yaml/snakeyaml/");
-        // this.toNmsMapping.packages.put("javax/inject/", "com/mohistmc/javax/inject/");
-        // this.toNmsMapping.classes.put("io/netty/util/Version", "com/mohistmc/bukkit/pluginfix/ScriptBlockPlus");
-        this.toNmsMapping.packages.put("org/bukkit/craftbukkit/v1_21_R1/", "org/bukkit/craftbukkit/");
         this.toBukkitMapping = new JarMapping();
         this.inheritanceMap = new InheritanceMap();
         this.toNmsMapping.loadMappings(
-                new BufferedReader(new InputStreamReader(Remapper.class.getClassLoader().getResourceAsStream("mappings/spigot2srg.srg"))),
+                new BufferedReader(new InputStreamReader(Remapper.class.getResourceAsStream("mappings/spigot2srg.srg"))),
                 null, null, false
         );
         this.toBukkitMapping.loadMappings(
-                new BufferedReader(new InputStreamReader(Remapper.class.getClassLoader().getResourceAsStream("mappings/spigot2srg.srg"))),
+                new BufferedReader(new InputStreamReader(Remapper.class.getResourceAsStream("mappings/spigot2srg.srg"))),
                 null, null, true
         );
         BiMap<String, String> inverseClassMap = HashBiMap.create(toNmsMapping.classes).inverse();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Remapper.class.getClassLoader().getResourceAsStream("mappings/inheritanceMap.txt")))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Remapper.class.getResourceAsStream("mappings/inheritanceMap.txt")))) {
             inheritanceMap.load(reader, inverseClassMap);
         }
         JointProvider inheritanceProvider = new JointProvider();
@@ -86,6 +99,10 @@ public class Remapper {
 
     public static JarRemapper getNmsMapper() {
         return INSTANCE.toNmsRemapper;
+    }
+
+    public List<PluginTransformer> getTransformerList() {
+        return transformerList;
     }
 
     private static long pkgOffset, clOffset, mdOffset, fdOffset, mapOffset;

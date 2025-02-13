@@ -1,6 +1,7 @@
 package org.bukkit.plugin.java;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterators;
 import com.google.common.io.ByteStreams;
 import com.mohistmc.banner.bukkit.pluginfix.PluginFixManager;
 import com.mohistmc.banner.bukkit.remapping.ClassLoaderRemapper;
@@ -22,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,12 +119,26 @@ final class PluginClassLoader extends URLClassLoader implements RemappingClassLo
 
     @Override
     public URL getResource(String name) {
-        return findResource(name);
+        Objects.requireNonNull(name);
+        URL url = findResource(name);
+        if (url == null) {
+            if (getParent() != null) {
+                url = getParent().getResource(name);
+            }
+        }
+        return url;
     }
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        return findResources(name);
+        Objects.requireNonNull(name);
+        @SuppressWarnings("unchecked")
+        Enumeration<URL>[] tmp = (Enumeration<URL>[]) new Enumeration<?>[2];
+        if (getParent()!= null) {
+            tmp[1] = getParent().getResources(name);
+        }
+        tmp[0] = findResources(name);
+        return Iterators.asEnumeration(Iterators.concat(Iterators.forEnumeration(tmp[0]), Iterators.forEnumeration(tmp[1])));
     }
 
     @Override
@@ -199,8 +215,9 @@ final class PluginClassLoader extends URLClassLoader implements RemappingClassLo
                     byteSource = () -> {
                         try (InputStream is = connection.getInputStream()) {
                             byte[] classBytes = ByteStreams.toByteArray(is);
-                            classBytes = Bukkit.getUnsafe().processClass(description, path, classBytes);
+                            classBytes = Remapper.SWITCH_TABLE_FIXER.apply(classBytes);
                             classBytes = PluginFixManager.injectPluginFix(description.getMain(), name, classBytes); // Mohist - Inject plugin fix
+                            classBytes = Bukkit.getUnsafe().processClass(description, path, classBytes);
                             return classBytes;
                         }
                     };
@@ -210,14 +227,13 @@ final class PluginClassLoader extends URLClassLoader implements RemappingClassLo
 
                 Product2<byte[], CodeSource> classBytes = this.getRemapper().remapClass(name, byteSource, connection);
 
-
                 int dot = name.lastIndexOf('.');
                 if (dot != -1) {
                     String pkgName = name.substring(0, dot);
                     if (getPackage(pkgName) == null) {
                         try {
                             if (manifest != null) {
-                                definePackage(pkgName, manifest, url);
+                                definePackage(pkgName, manifest, this.url);
                             } else {
                                 definePackage(pkgName, null, null, null, null, null, null, null);
                             }

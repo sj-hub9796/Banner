@@ -59,7 +59,7 @@ public class PluginInheritanceProvider implements InheritanceProvider {
         return parents;
     }
 
-    public static class Remapping extends PluginInheritanceProvider {
+    static class Remapping extends PluginInheritanceProvider {
 
         private final PluginInheritanceProvider provider;
 
