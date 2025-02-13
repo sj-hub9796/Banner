@@ -64,11 +64,11 @@ public class Remapper {
         this.toBukkitMapping = new JarMapping();
         this.inheritanceMap = new InheritanceMap();
         this.toNmsMapping.loadMappings(
-                new BufferedReader(new InputStreamReader(Remapper.class.getResourceAsStream("mappings/spigot2srg.srg"))),
+                new BufferedReader(new InputStreamReader(Remapper.class.getClassLoader().getResourceAsStream("mappings/spigot2srg.srg"))),
                 null, null, false
         );
         this.toBukkitMapping.loadMappings(
-                new BufferedReader(new InputStreamReader(Remapper.class.getResourceAsStream("mappings/spigot2srg.srg"))),
+                new BufferedReader(new InputStreamReader(Remapper.class.getClassLoader().getResourceAsStream("mappings/spigot2srg.srg"))),
                 null, null, true
         );
         BiMap<String, String> inverseClassMap = HashBiMap.create(toNmsMapping.classes).inverse();
