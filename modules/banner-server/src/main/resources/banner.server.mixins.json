@@ -34,6 +34,7 @@
     "interaction.dispenser.MixinProjectileDispenseBehavior",
     "interaction.dispenser.MixinShearsDispenseItemBehavior",
     "interaction.dispenser.MixinShulkerBoxDispenseBehavior",
+    "nbt.MixinCompoundTag",
     "network.MixinVarint21LengthFieldPrepender",
     "network.chat.MixinComponent",
     "network.chat.MixinTextColor",
