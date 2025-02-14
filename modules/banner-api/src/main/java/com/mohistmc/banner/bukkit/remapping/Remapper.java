@@ -72,7 +72,7 @@ public class Remapper {
                 null, null, true
         );
         BiMap<String, String> inverseClassMap = HashBiMap.create(toNmsMapping.classes).inverse();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Remapper.class.getResourceAsStream("mappings/inheritanceMap.txt")))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Remapper.class.getClassLoader().getResourceAsStream("mappings/inheritanceMap.txt")))) {
             inheritanceMap.load(reader, inverseClassMap);
         }
         JointProvider inheritanceProvider = new JointProvider();
