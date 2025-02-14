@@ -108,7 +108,7 @@ public abstract class MixinServerChunkCache implements InjectionServerChunkCache
         this.clearCache();
     }
 
-    @Redirect(method = "chunkAbsent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ChunkHolder;getTicketLevel()I"))
+    @Redirect(method = "chunkAbsent", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ChunkHolder;getTicketLevel()I"), require = 0)
     public int banner$useOldTicketLevel(ChunkHolder chunkHolder) {
         return chunkHolder.oldTicketLevel;
     }
