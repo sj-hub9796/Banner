@@ -96,6 +96,9 @@ allprojects {
 
         // mohist lib
         implementation("com.mohistmc:librariesvault:1.20.2")
+
+        // Cursed Fabric/Mixin stuff
+        implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:${property("mixin_squared_version")}"))
     }
 
     loom.runs.configureEach {
