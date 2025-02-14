@@ -746,8 +746,7 @@ public abstract class MixinMinecraftServer extends ReentrantBlockableEventLoop<T
 
     @Override
     public double[] getTPS() {
-        return new double[]{
-        };
+        return recentTps;
     }
 
     @Override
