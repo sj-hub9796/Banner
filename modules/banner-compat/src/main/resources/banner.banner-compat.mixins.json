@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.mohistmc.banner.compat.mixin",
-  "plugin": "com.mohistmc.banner.mixin.BannerMixinPlugin",
+  "plugin": "com.mohistmc.banner.compat.mixin.BannerCompatMixinPlugin",
   "compatibilityLevel": "JAVA_21",
   "overwrites": {
     "conformVisibility": true
