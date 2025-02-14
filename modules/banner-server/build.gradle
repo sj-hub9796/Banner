@@ -14,9 +14,7 @@ dependencies {
 	include(rootProject.project("banner-api"))
 	include(rootProject.project("banner-translate"))
 	include(rootProject.project("banner-transitive-access-wideners"))
-	include(rootProject.project("banner-stackdeobf"))
 	include(rootProject.project("banner-bukkit-manager"))
-	include(rootProject.project("banner-compat"))
 	include("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.2.0")
 }
 

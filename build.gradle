@@ -170,7 +170,6 @@ dependencies {
     include(project("banner-server"))
     include(project("banner-plugin"))
     include(project("banner-bootstrap"))
-    //include("net.minecraft:server:${project.minecraft_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -185,7 +184,7 @@ jar {
                 'Main-Class': 'com.mohistmc.banner.BannerLauncher',
                 'Specification-Title'   : 'Banner',
                 'Specification-Vendor'  : 'MohistMC',
-                'Specification-Version' : '1.21.3',
+                'Specification-Version' : '1.21.4',
                 'Implementation-Title'  : 'Banner',
                 'Implementation-Version': version,
                 'Implementation-Vendor' : 'MohistMC'
