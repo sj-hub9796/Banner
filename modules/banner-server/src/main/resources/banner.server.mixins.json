@@ -15,6 +15,7 @@
   "mixins": [
     "MixinChatFormatting",
     "MixinCrashReport",
+    "MixinCrashReportCategory",
     "advancement.MixinAdvancementHolder",
     "commands.MixinCommandDispatcher",
     "commands.MixinCommandNode",

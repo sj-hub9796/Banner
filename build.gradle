@@ -92,7 +92,7 @@ allprojects {
         annotationProcessor("io.izzel.arclight:mixin-tools:1.2.4") { transitive = false }
 
         // mappings remapper
-        implementation("net.fabricmc:mapping-io:0.6.1")
+        implementation("net.minecraftforge:srgutils:0.4.13")
 
         // mohist lib
         implementation("com.mohistmc:librariesvault:1.20.2")
