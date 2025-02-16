@@ -11,14 +11,7 @@ base {
 }
 
 dependencies {
-	include(rootProject.project("banner-api"))
 	include(rootProject.project("banner-translate"))
-	include(rootProject.project("banner-transitive-access-wideners"))
 	include(rootProject.project("banner-bukkit-manager"))
 	include("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.2.0")
 }
-
-moduleDependencies(project, [
-		"banner-api",
-		"banner-transitive-access-wideners"
-])

@@ -2,7 +2,6 @@ archivesBaseName = project.archives_base_name + "-plugin"
 version = getSubprojectVersion(project)
 
 moduleDependencies(project, [
-		"banner-api",
 		"banner-server"
 ])
 

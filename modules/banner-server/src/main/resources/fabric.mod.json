@@ -30,10 +30,9 @@
   "depends": {
     "fabricloader": ">=0.16.7",
     "java": ">=21",
-    "banner-api": "*",
-    "banner-transitive-access-wideners": "*",
     "minecraft": "1.21.3"
   },
+  "accessWidener": "banner.accesswidener",
   "custom": {
     "loom:injected_interfaces": {
       "net/minecraft/class_1282": ["com/mohistmc/banner/injection/world/damagesource/InjectionDamageSource"],
