@@ -9310,7 +9310,6 @@ net/minecraft/network/NetworkManager net/minecraft/class_2535
 	b (Lnet/minecraft/network/DisconnectionDetails;)V method_60925
 	b (Lnet/minecraft/network/ProtocolInfo;Lnet/minecraft/network/PacketListener;)V method_56332
 	b (Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;Z)V method_10764
-	sendPacket (Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketSendListener;Z)V method_10764
 	b (Lorg/slf4j/Marker;)V method_40063
 	b (Z)Ljava/lang/String; method_56333
 	c ()V method_30615
@@ -24022,6 +24021,7 @@ net/minecraft/commands/arguments/ArgumentChat net/minecraft/class_2196
     com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType field_51482 -> b
 	a ()Lnet/minecraft/commands/arguments/ArgumentChat; method_9340
 	a (Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/commands/arguments/ArgumentChat$a; method_9338
+	a (Lcom/mojang/brigadier/StringReader;Ljava/lang/Object;)Lnet/minecraft/commands/arguments/ArgumentChat$a; method_61182
 	a (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;)Lnet/minecraft/network/chat/IChatBaseComponent; method_9339
 	a (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;Ljava/util/function/Consumer;)V method_45562
 	a (Ljava/lang/Object;Ljava/lang/Object;)Lcom/mojang/brigadier/Message; method_59836
@@ -28698,7 +28698,9 @@ net/minecraft/commands/arguments/ArgumentEntity net/minecraft/class_2186
     boolean field_9858 -> h
     boolean field_9857 -> i
 	a ()Lnet/minecraft/commands/arguments/ArgumentEntity; method_9309
-	a (Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/commands/arguments/selector/EntitySelector; method_9318
+	a (Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/commands/arguments/selector/EntitySelector; method_61178
+	a (Lcom/mojang/brigadier/StringReader;Ljava/lang/Object;)Lnet/minecraft/commands/arguments/selector/EntitySelector; method_61179
+	a (Lcom/mojang/brigadier/StringReader;Z)Lnet/minecraft/commands/arguments/selector/EntitySelector; method_9318
 	a (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;)Lnet/minecraft/world/entity/Entity; method_9313
 	a (Lnet/minecraft/commands/ICompletionProvider;Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;)V method_9311
 	b ()Lnet/minecraft/commands/arguments/ArgumentEntity; method_9306
@@ -31535,10 +31537,12 @@ net/minecraft/commands/arguments/ArgumentProfile net/minecraft/class_2191
     com.mojang.brigadier.exceptions.SimpleCommandExceptionType field_9869 -> a
     java.util.Collection field_9868 -> b
 	a ()Lnet/minecraft/commands/arguments/ArgumentProfile; method_9329
-	a (Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/commands/arguments/ArgumentProfile$a; method_9331
-	a (Lcom/mojang/brigadier/context/CommandContext;Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;)V method_9332
+	a (Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/commands/arguments/ArgumentProfile$a; method_61180
+	a (Lcom/mojang/brigadier/StringReader;Ljava/lang/Object;)Lnet/minecraft/commands/arguments/ArgumentProfile$a; method_61181
+	a (Lcom/mojang/brigadier/StringReader;Z)Lnet/minecraft/commands/arguments/ArgumentProfile$a; method_9331
 	a (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;)Ljava/util/Collection; method_9330
 	a (Ljava/lang/String;Lnet/minecraft/commands/CommandListenerWrapper;)Ljava/util/Collection; method_9328
+	a (Lnet/minecraft/commands/ICompletionProvider;Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;)V method_9332
 net/minecraft/commands/arguments/ArgumentProfile$a net/minecraft/class_2191$class_2192
 net/minecraft/commands/arguments/ArgumentProfile$b net/minecraft/class_2191$class_2193
     net.minecraft.commands.arguments.selector.EntitySelector field_9870 -> a
@@ -35160,6 +35164,7 @@ net/minecraft/world/level/block/entity/TileEntity net/minecraft/class_2586
 	a (Lnet/minecraft/world/level/World;)V method_31662
 	a (Lnet/minecraft/world/level/World;Lnet/minecraft/core/BlockPosition;Lnet/minecraft/world/level/block/state/IBlockData;)V method_31663
 	a (Lnet/minecraft/world/level/block/entity/TileEntity$b;)V method_57568
+	a (Lnet/minecraft/world/level/block/state/IBlockData;)V method_61175
 	aA_ ()V method_11012
 	aD_ ()Lnet/minecraft/core/BlockPosition; method_11016
 	a_ (II)Z method_11004
@@ -35169,11 +35174,12 @@ net/minecraft/world/level/block/entity/TileEntity net/minecraft/class_2586
 	b (Lnet/minecraft/core/component/DataComponentMap;)V method_58688
 	b (Lnet/minecraft/nbt/NBTTagCompound;)Lnet/minecraft/core/BlockPosition; method_38239
 	b (Lnet/minecraft/nbt/NBTTagCompound;Lnet/minecraft/core/HolderLookup$a;)V method_11007
-	b (Lnet/minecraft/world/level/block/state/IBlockData;)V method_31664
+	b (Lnet/minecraft/world/level/block/state/IBlockData;)Z method_61176
 	c (Ljava/lang/String;)V method_58689
 	c (Lnet/minecraft/core/HolderLookup$a;)Lnet/minecraft/nbt/NBTTagCompound; method_38243
 	c (Lnet/minecraft/nbt/NBTTagCompound;)V method_38241
 	c (Lnet/minecraft/nbt/NBTTagCompound;Lnet/minecraft/core/HolderLookup$a;)V method_58690
+	c (Lnet/minecraft/world/level/block/state/IBlockData;)V method_31664
 	d (Lnet/minecraft/core/HolderLookup$a;)Lnet/minecraft/nbt/NBTTagCompound; method_38244
 	d (Lnet/minecraft/nbt/NBTTagCompound;)V method_10999
 	d (Lnet/minecraft/nbt/NBTTagCompound;Lnet/minecraft/core/HolderLookup$a;)V method_58691
@@ -35181,7 +35187,7 @@ net/minecraft/world/level/block/entity/TileEntity net/minecraft/class_2586
 	e (Lnet/minecraft/core/HolderLookup$a;)Lnet/minecraft/nbt/NBTTagCompound; method_58692
 	f (Lnet/minecraft/core/HolderLookup$a;)Lnet/minecraft/nbt/NBTTagCompound; method_59535
 	i ()Lnet/minecraft/world/level/World; method_10997
-	k ()Ljava/lang/String; method_10995
+	k ()Ljava/lang/String; method_61177
 	m ()Z method_11002
 	n ()Lnet/minecraft/world/level/block/state/IBlockData; method_11010
 	o ()Z method_11015
@@ -39091,7 +39097,9 @@ net/minecraft/commands/arguments/ArgumentScoreholder net/minecraft/class_2233
     com.mojang.brigadier.exceptions.SimpleCommandExceptionType field_9950 -> c
     boolean field_9949 -> d
 	a ()Lnet/minecraft/commands/arguments/ArgumentScoreholder; method_9447
-	a (Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/commands/arguments/ArgumentScoreholder$b; method_9453
+	a (Lcom/mojang/brigadier/StringReader;)Lnet/minecraft/commands/arguments/ArgumentScoreholder$b; method_61183
+	a (Lcom/mojang/brigadier/StringReader;Ljava/lang/Object;)Lnet/minecraft/commands/arguments/ArgumentScoreholder$b; method_61184
+	a (Lcom/mojang/brigadier/StringReader;Z)Lnet/minecraft/commands/arguments/ArgumentScoreholder$b; method_9453
 	a (Lcom/mojang/brigadier/context/CommandContext;Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;)Ljava/util/concurrent/CompletableFuture; method_9455
 	a (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;)Lnet/minecraft/world/scores/ScoreHolder; method_9452
 	a (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;Ljava/util/function/Supplier;)Ljava/util/Collection; method_9450
@@ -40700,12 +40708,9 @@ net/minecraft/network/protocol/game/PacketPlayOutBoss$b net/minecraft/class_2629
 	a (Ljava/util/UUID;ZZZ)V method_34104
 net/minecraft/network/protocol/game/PacketPlayOutBoss$d net/minecraft/class_2629$class_5883
     net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29107 -> a
-    net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29107 -> ADD
     net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29108 -> b
     net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29109 -> c
-    net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29109 -> UPDATE_PROGRESS
     net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29110 -> d
-    net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29110 -> UPDATE_NAME
     net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29111 -> e
     net.minecraft.network.protocol.game.PacketPlayOutBoss$d field_29112 -> f
     net.minecraft.network.codec.StreamDecoder field_29113 -> g
@@ -44709,7 +44714,6 @@ net/minecraft/world/entity/projectile/EntityFishingHook net/minecraft/class_1536
     int field_30665 -> f
     net.minecraft.network.syncher.DataWatcherObject field_7170 -> g
     net.minecraft.network.syncher.DataWatcherObject field_23234 -> h
-    net.minecraft.network.syncher.DataWatcherObject field_23234 -> DATA_BITING
     int field_7167 -> i
     int field_7173 -> j
     int field_7174 -> k
@@ -55285,7 +55289,7 @@ net/minecraft/commands/arguments/selector/ArgumentParserSelector net/minecraft/c
 	a (I)V method_9900
 	a (Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;)V method_9896
 	a (Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;Ljava/util/function/Consumer;)Ljava/util/concurrent/CompletableFuture; method_9908
-	a (Ljava/lang/Object;)Lcom/mojang/brigadier/Message; method_9903
+	a (Ljava/lang/Object;)Z method_61185
 	a (Ljava/util/function/BiConsumer;)V method_9845
 	a (Ljava/util/function/BiFunction;)V method_9875
 	a (Ljava/util/function/Predicate;)V method_9916
@@ -55303,7 +55307,7 @@ net/minecraft/commands/arguments/selector/ArgumentParserSelector net/minecraft/c
 	b ()V method_9917
 	b (D)V method_9864
 	b (Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;Ljava/util/function/Consumer;)Ljava/util/concurrent/CompletableFuture; method_9880
-	b (Ljava/lang/Object;)Lcom/mojang/brigadier/Message; method_9863
+	b (Ljava/lang/Object;)Lcom/mojang/brigadier/Message; method_9903
 	b (Lnet/minecraft/advancements/critereon/CriterionConditionRange;)V method_9855
 	b (Lnet/minecraft/world/phys/Vec3D;)Lnet/minecraft/world/phys/Vec3D; method_9869
 	b (Lnet/minecraft/world/phys/Vec3D;Ljava/util/List;)V method_9901
@@ -55312,6 +55316,7 @@ net/minecraft/commands/arguments/selector/ArgumentParserSelector net/minecraft/c
 	c ()V method_9849
 	c (D)V method_9879
 	c (Lcom/mojang/brigadier/suggestion/SuggestionsBuilder;Ljava/util/function/Consumer;)Ljava/util/concurrent/CompletableFuture; method_9858
+	c (Ljava/lang/Object;)Lcom/mojang/brigadier/Message; method_9863
 	c (Lnet/minecraft/world/phys/Vec3D;Ljava/util/List;)V method_9888
 	c (Z)V method_9913
 	d ()V method_9874
