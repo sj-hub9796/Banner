@@ -40717,6 +40717,13 @@ net/minecraft/network/protocol/game/PacketPlayOutBoss$d net/minecraft/class_2629
     net.minecraft.network.protocol.game.PacketPlayOutBoss$d[] field_29114 -> h
 	a ()[Lnet/minecraft/network/protocol/game/PacketPlayOutBoss$d; method_36948
 	a (Lnet/minecraft/network/RegistryFriendlyByteBuf;)Lnet/minecraft/network/protocol/game/PacketPlayOutBoss$Action; method_34113
+net/minecraft/network/protocol/game/ClientboundBossEventPacket$OperationType net/minecraft/class_2629$class_5883
+    net/minecraft/network/protocol/game/ClientboundBossEventPacket$OperationType field_29107 -> ADD
+    net/minecraft/network/protocol/game/ClientboundBossEventPacket$OperationType field_29108 -> REMOVE
+    net/minecraft/network/protocol/game/ClientboundBossEventPacket$OperationType field_29109 -> UPDATE_PROGRESS
+    net/minecraft/network/protocol/game/ClientboundBossEventPacket$OperationType field_29110 -> UPDATE_NAME
+    net/minecraft/network/protocol/game/ClientboundBossEventPacket$OperationType field_29111 -> UPDATE_STYLE
+    net/minecraft/network/protocol/game/ClientboundBossEventPacket$OperationType field_29112 -> UPDATE_PROPERTIES
 net/minecraft/network/protocol/game/PacketPlayOutBoss$e net/minecraft/class_2629$class_5884
     net.minecraft.network.chat.IChatBaseComponent comp_2260 -> a
 	b ()Lnet/minecraft/network/chat/IChatBaseComponent; comp_2260
