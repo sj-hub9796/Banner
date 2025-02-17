@@ -197,11 +197,12 @@ public enum Particle implements Keyed {
     @Override
     public String toString() {
         // Banner start temporary fix CMI
-        if (super.toString() == null) {
+        if (toString() == null || toString().equals("one")) {
             return "banner_custom";
+        }else {
+            return super.toString();
         }
         // Banner end
-        return super.toString();
     }
 
 
