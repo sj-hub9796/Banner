@@ -196,15 +196,8 @@ public enum Particle implements Keyed {
 
     @Override
     public String toString() {
-        // Banner start temporary fix CMI
-        if (toString() == null || toString().equals("one")) {
-            return "banner_custom";
-        }else {
-            return super.toString();
-        }
-        // Banner end
+        return super.toString();
     }
-
 
     /**
      * Options which can be applied to redstone dust particles - a particle
