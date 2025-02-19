@@ -99,7 +99,7 @@ public class CraftMetaBlockState extends CraftMetaItem implements BlockStateMeta
             Set<DataComponentType<?>> applied = blockEntityTag.applyComponents(map, tag);
             // Mark applied components as handled
             for (DataComponentType<?> seen : applied) {
-                this.unhandledTags.build().clear(seen);
+                this.unhandledTags.clear(seen);
             }
             // Only set blockEntityTag if something was applied
             if (!applied.isEmpty()) {

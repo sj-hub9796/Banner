@@ -84,6 +84,7 @@
       "net/minecraft/class_2945": ["com/mohistmc/banner/injection/network/syncher/InjectionSynchedEntityData"],
       "net/minecraft/class_5251": ["com/mohistmc/banner/injection/network/chat/InjectionTextColor"],
       "net/minecraft/class_9326": ["com/mohistmc/banner/injection/network/chat/InjectionDataComponentPatch"],
+      "net/minecraft/class_9326$class_9327": ["com/mohistmc/banner/injection/network/chat/InjectionDataComponentPatch_Builder"],
       "net/minecraft/class_2561": ["com/mohistmc/banner/injection/network/chat/InjectionComponent"],
       "net/minecraft/class_3002": ["com/mohistmc/banner/injection/server/bossevents/InjectionCustomBossEvent"],
       "net/minecraft/class_5579": ["com/mohistmc/banner/injection/world/level/entity/InjectionPersistentEntitySectionManager"],
