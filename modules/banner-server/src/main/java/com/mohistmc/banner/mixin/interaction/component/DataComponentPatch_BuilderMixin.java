@@ -1,6 +1,6 @@
 package com.mohistmc.banner.mixin.interaction.component;
 
-import com.mohistmc.banner.injection.network.chat.InjectionDataComponentPatch_Builder;
+import com.mohistmc.banner.injection.network.chat.InjectionDataComponentPatch;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import java.util.Optional;
 import net.minecraft.core.component.DataComponentPatch;
@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(DataComponentPatch.Builder.class)
-public class DataComponentPatch_BuilderMixin implements InjectionDataComponentPatch_Builder {
+public class DataComponentPatch_BuilderMixin implements InjectionDataComponentPatch {
 
     @Shadow
     @Final
