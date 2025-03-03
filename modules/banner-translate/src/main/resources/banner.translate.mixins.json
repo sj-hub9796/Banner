@@ -17,6 +17,6 @@
     "MixinDedicatedServer",
     "MixinLoggerChunkProgressListener",
     "MixinMinecraftServer",
-    "MixinServerConnectionListener",
+    "MixinServerConnectionListener"
   ]
 }
