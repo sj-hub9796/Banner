@@ -1,6 +1,6 @@
 <div align="center">
 <img src="src/main/resources/assets/banner/logo.png">
-  <h1>Mohist Banner 1.21.4</h1>
+  <h1>Mohist Banner 1.21.5</h1>
 
 ### The Bukkit/Spigot/Paper API implementation for Fabric
 ### This project has nothing to do with cardboard and uses a completely different development structure
@@ -15,7 +15,7 @@
 
 | Version | Support     | Stability | Mod compatibility | Plugin compatibility |
 |---------|-------------|-----------|-------------------|----------------------| 
-| 1.21.4  | Active      | Poor      | Poor              | Poor                 |
+| 1.21.5  | Active      | Poor      | Poor              | Poor                 |
 | 1.20.1  | Active      | Good      | Good              | Good                 |
 | 1.19.4  | End Of Life | Poor      | Poor              | Poor                 |
 
@@ -24,7 +24,7 @@
 - Fabric API uses mixins to change minecraft indirectly
 - Banner also use mixins to hook Bukkit api as a fabric mod
 - There's a little breaking changes
-- This version of Banner 1.21.4, supports MC version 1.21.4
+- This version of Banner 1.21.5, supports MC version 1.21.5
 
 ## Tips
 - If you want to try a different Fabric + Bukkit hybrid server, you can try CardBoard
