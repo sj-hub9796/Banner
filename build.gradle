@@ -1,9 +1,10 @@
 plugins {
     id 'fabric-loom' version '1.10-SNAPSHOT'
     id 'maven-publish'
+    id 'net.minecraftforge.gradleutils' version '[2.2,2.3)'
 }
 
-version = project.minecraft_version + "-" + ci_version()
+version = project.minecraft_version + "-" + gradleutils.gitInfo.abbreviatedId
 group = project.maven_group
 
 base {
@@ -163,7 +164,7 @@ def moduleDependencies(Project project, List<String> depNames) {
 }
 
 def getSubprojectVersion(project) {
-    return project.minecraft_version + "-" + ci_version()
+    return project.minecraft_version + "-" + gradleutils.gitInfo.abbreviatedId
 }
 
 dependencies {
@@ -189,15 +190,5 @@ jar {
                 'Implementation-Version': version,
                 'Implementation-Vendor' : 'MohistMC'
         )
-    }
-}
-
-import groovy.json.JsonSlurper
-static String ci_version() {
-    try {
-        def data = new JsonSlurper().parseText(new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.21.4/api/json").getText("UTF-8"))
-        return data.builds["number"][0]
-    } catch (Exception ignored) {
-        return "1.21.4"
     }
 }
