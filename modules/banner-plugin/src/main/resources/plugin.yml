@@ -1,5 +1,0 @@
-name: BannerPlugin
-main: com.mohistmc.banner.plugin.BannerPlugin
-version: ${version}
-api-version: '1.21.2'
-description: A Plugin for Banner Server

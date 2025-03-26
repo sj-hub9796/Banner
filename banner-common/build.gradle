@@ -1,0 +1,37 @@
+architectury {
+    minecraft = minecraft_version
+    common rootProject.enabled_platforms.split(',')
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/banner.accesswidener")
+}
+
+apply plugin: com.mohistmc.banner.gradle.BannerGradlePlugin
+
+banner {
+    mcVersion = minecraft_version
+    bukkitVersion = 'v1_21_R1'
+    accessTransformer = project.file('bukkit.at')
+    extraMapping = project(':banner-common').file('extra_mapping.tsrg')
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+    compileOnly "com.mohistmc.banner.generated:spigot:${minecraft_version}:deobf"
+
+    implementation "org.spigotmc:spigot-api:$minecraft_version-R0.1-SNAPSHOT@jar"
+    implementation 'org.jetbrains:annotations:23.0.0'
+
+    implementation ("io.izzel.arclight:mixin-tools:$mixinToolsVersion") { transitive = false }
+    annotationProcessor ("io.izzel.arclight:mixin-tools:$mixinToolsVersion") { transitive = false }
+
+    implementation 'jline:jline:2.12.1'
+    implementation 'net.minecrell:terminalconsoleappender:1.2.0'
+    implementation 'net.md-5:SpecialSource:1.11.3'
+    implementation 'org.apache.logging.log4j:log4j-jul:2.22.1'
+    implementation 'net.md-5:bungeecord-chat:1.20-R0.2'
+    implementation 'com.mysql:mysql-connector-j:8.4.0'
+    implementation 'org.yaml:snakeyaml:2.0'
+    implementation "io.izzel:tools:$toolsVersion"
+}

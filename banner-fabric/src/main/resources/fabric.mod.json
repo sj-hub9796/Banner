@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "banner",
+  "version": "${version}",
+  "name": "Banner",
+  "description": "",
+  "authors": [
+    ""
+  ],
+  "contact": {
+    "homepage": ""
+  },
+  "license": "LGPL-3.0",
+  "icon": "assets/banner/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.mohistmc.banner.fabric.BannerFabric"
+    ],
+    "client": [
+      "com.mohistmc.banner.fabric.client.BannerFabricClient"
+    ]
+  },
+  "mixins": [
+    "banner.common.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.10",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "architectury": ">=13.0.8",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

@@ -1,194 +1,71 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT'
-    id 'maven-publish'
-    id 'net.minecraftforge.gradleutils' version '[2.2,2.3)'
+    id 'architectury-plugin' version '3.4-SNAPSHOT'
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
-version = project.minecraft_version + "-" + gradleutils.gitInfo.abbreviatedId
-group = project.maven_group
-
-base {
-    archivesName = project.archives_base_name + "-launcher"
+architectury {
+    minecraft = project.minecraft_version
 }
 
 allprojects {
+    group = rootProject.maven_group
+    version = rootProject.mod_version
+}
 
-    apply plugin: "fabric-loom"
+subprojects {
+    apply plugin: 'dev.architectury.loom'
+    apply plugin: 'architectury-plugin'
+    apply plugin: 'maven-publish'
+
+    base {
+        archivesName = "$rootProject.archives_name-$project.name"
+    }
 
     repositories {
-        maven {
-            name = 'spigot'
-            url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
-        }
-        maven {
-            name = 'mohist'
-            url = 'https://maven.mohistmc.com/'
-        }
-        maven {
-            name = 'mohist lib'
-            url = 'https://maven.mohistmc.com/libraries'
-        }
-        maven {
-            name = 'izzel'
-            url = 'https://maven.izzel.io/releases'
-        }
-        maven {
-            name = 'ParchmentMC'
-            url = 'https://maven.parchmentmc.org'
-        }
-        maven {
-            name = 'JitPack'
-            url = 'https://jitpack.io'
-        }
-        maven {
-            name = "Sponge"
-            url = 'https://repo.spongepowered.org/maven'
-        }
-        maven {
-            name = "Adventure"
-            url = 'https://jd.advntr.dev/'
-        }
-        maven {
-            name = "bawnorton"
-            url = "https://maven.bawnorton.com/releases"
-        }
+        maven { url = 'https://repo.spongepowered.org/maven' }
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+        maven { url = 'https://maven.neoforged.net/releases' }
+        maven { url = 'https://files.minecraftforge.net/maven/' }
+        maven { url = 'https://maven.izzel.io/releases' }
         mavenCentral()
+        mavenLocal()
     }
 
     dependencies {
-        implementation 'org.projectlombok:lombok:1.18.30'
-        annotationProcessor 'org.projectlombok:lombok:1.18.30'
-        minecraft "com.mojang:minecraft:${project.minecraft_version}"
-        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-        modImplementation "net.fabricmc.fabric-api:fabric-api:$project.fabric_version"
-        mappings loom.layered() {
-            officialMojangMappings()
-        }
-
-        implementation("org.yaml:snakeyaml:2.0")
-        implementation("com.mohistmc:i18n:0.6")
-        implementation('com.mohistmc:json:0.5')
-        implementation('com.mohistmc:tools:0.5.1')
-        implementation('com.mohistmc:dynamicenum:0.3.1')
-        // jansi support
-        implementation("org.jline:jline-terminal:3.21.0")
-        implementation("org.jline:jline-terminal-jansi:3.21.0")
-        implementation("net.minecrell:terminalconsoleappender:1.4.0")
-
-        // craftbukkit
-        implementation "org.fusesource.jansi:jansi:1.18"
-        implementation "jline:jline:2.14.6"
-        implementation "com.googlecode.json-simple:json-simple:1.1.1"
-        implementation "org.xerial:sqlite-jdbc:3.46.0.0"
-        implementation 'com.mysql:mysql-connector-j:8.4.0'
-
-        implementation "net.md-5:SpecialSource:1.11.2"
-
-        // spigot
-        implementation "net.md-5:bungeecord-chat:1.16-R0.4"
-        implementation "io.izzel:tools:1.3.0"
-
-        implementation("org.apache.logging.log4j:log4j-iostreams:2.20.0")
-
-        //class modify
-        implementation("io.izzel.arclight:mixin-tools:1.2.4") { transitive = false }
-        annotationProcessor("io.izzel.arclight:mixin-tools:1.2.4") { transitive = false }
-        implementation(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.2.0"))
-
-        // mappings remapper
-        implementation("net.fabricmc:mapping-io:0.6.1")
-
-        // mohist lib
-        implementation("com.mohistmc:librariesvault:1.20.2")
-    }
-
-    loom.runs.configureEach {
-        vmArgs([
-                "-enableassertions",
-                "-Dmixin.debug.verify=true",
-                "-Dmixin.debug.countInjections=true"
-        ])
-    }
-
-    processResources {
-        inputs.property "version", project.version
-
-        filesMatching("fabric.mod.json") {
-            expand "version": project.version
-        }
-
-        filesMatching("plugin.yml") {
-            expand "version": project.version
-        }
+        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
+        mappings loom.officialMojangMappings()
     }
 
     java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
+        // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+        // if it is present.
+        // If you remove this line, sources will not be generated.
+        withSourcesJar()
+
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
 
     tasks.withType(JavaCompile).configureEach {
-        options.encoding = 'UTF-8'
-        options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
+        it.options.release = 21
     }
 
-    tasks.register('cleanBuild') {
-        doFirst {
-            project.file("build/libs").deleteDir()
-        }
-        doFirst {
-            project.file("build/devlibs").deleteDir()
-        }
-    }
-}
-
-def moduleDependencies(Project project, List<String> depNames) {
-    def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: "namedElements") }
-
-    depNames.iterator().forEachRemaining {
-        Project dependProject = findProject(":$it")
-        project.loom {
-            interfaceInjection {
-                interfaceInjectionSourceSets.add(dependProject.sourceSets.main)
+    // Configure Maven publishing.
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId = base.archivesName.get()
+                from components.java
             }
         }
-    }
-    project.dependencies {
-        deps.each {
-            api(implementation(it))
+
+        // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+        repositories {
+            // Add repositories to publish to here.
+            // Notice: This block does NOT have the same function as the block in the top level.
+            // The repositories here will be used for publishing your artifact, not for
+            // retrieving dependencies.
         }
-    }
-}
-
-def getSubprojectVersion(project) {
-    return project.minecraft_version + "-" + gradleutils.gitInfo.abbreviatedId
-}
-
-dependencies {
-    include(project("banner-server"))
-    include(project("banner-plugin"))
-    include(project("banner-bootstrap"))
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-    options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
-}
-
-jar {
-    from("LICENSE")
-    manifest {
-        attributes(
-                'Main-Class': 'com.mohistmc.banner.BannerLauncher',
-                'Specification-Title'   : 'Banner',
-                'Specification-Vendor'  : 'MohistMC',
-                'Specification-Version' : '1.21.4',
-                'Implementation-Title'  : 'Banner',
-                'Implementation-Version': version,
-                'Implementation-Vendor' : 'MohistMC'
-        )
     }
 }
