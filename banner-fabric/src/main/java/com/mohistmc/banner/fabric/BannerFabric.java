@@ -1,6 +1,6 @@
 package com.mohistmc.banner.fabric;
 
-import com.mohistmc.banner.Banner;
+import com.mohistmc.banner.BannerMod;
 import net.fabricmc.api.ModInitializer;
 
 public final class BannerFabric implements ModInitializer {
@@ -11,6 +11,6 @@ public final class BannerFabric implements ModInitializer {
         // Proceed with mild caution.
 
         // Run our common setup.
-        Banner.init();
+        BannerMod.init();
     }
 }
