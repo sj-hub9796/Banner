@@ -1,10 +1,22 @@
+import com.mohistmc.banner.gradle.BannerGradlePluginFabric
+import com.mohistmc.banner.gradle.tasks.RenameJarTask
+
 plugins {
     id 'com.github.johnrengelman.shadow'
 }
 
+apply plugin: BannerGradlePluginFabric
+
 architectury {
     platformSetupLoomIde()
     fabric()
+}
+
+banner {
+    mcVersion = minecraft_version
+    bukkitVersion = 'v1_21_R4'
+    accessTransformer = project(':banner-common').file('bukkit.at')
+    extraMapping = project(':banner-common').file('extra_mapping.tsrg')
 }
 
 configurations {
@@ -41,11 +53,51 @@ processResources {
     }
 }
 
+jar {
+    manifest.attributes 'MixinConnector': 'com.mohistmc.banner.BannerConnector'
+    manifest.attributes 'Implementation-Title': 'Banner'
+    manifest.attributes 'Implementation-Version': "banner-$minecraft_version-${project.version}"
+    manifest.attributes 'Implementation-Vendor': 'Mohist Dev Team'
+    manifest.attributes 'Implementation-Timestamp': new Date().format("yyyy-MM-dd HH:mm:ss")
+}
+
+tasks.register('fabricMappings', Copy) {
+    destinationDir = file('build/fabric_mappings')
+    from(banner.mappingsConfiguration.bukkitToFabric) {
+        rename { name -> 'bukkit_srg.srg' }
+    }
+    from(banner.mappingsConfiguration.bukkitToFabricInheritance) {
+        rename { name -> 'inheritanceMap.txt' }
+    }
+}
+
+project.sourceSets.main.output.dir file('build/fabric_mappings'), builtBy: tasks.fabricMappings
+
 shadowJar {
+    exclude 'architectury.common.json'
     configurations = [project.configurations.shadowBundle]
     archiveClassifier = 'dev-shadow'
 }
 
 remapJar {
-    input.set shadowJar.archiveFile
+    injectAccessWidener.set true
+    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
 }
+
+tasks.register('reobfJar', RenameJarTask) {
+    inputJar.set remapJar.archiveFile
+    archiveClassifier.set 'reobf'
+    mappings = banner.mappingsConfiguration.reobfBukkitPackage
+}
+
+tasks.register('srgJar', Jar) {
+    from(tasks.remapJar.outputs.files.collect { it.isDirectory() ? it : zipTree(it) }) {
+        include 'com/mohistmc/**'
+        exclude 'com/mohistmc/banner/common/mixin/**'
+        exclude 'com/mohistmc/banner/forge/mixin/**'
+    }
+    archiveClassifier.set('srg')
+    dependsOn remapJar
+}
+

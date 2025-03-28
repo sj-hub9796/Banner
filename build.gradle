@@ -8,8 +8,16 @@ architectury {
 }
 
 allprojects {
-    group = rootProject.maven_group
-    version = rootProject.mod_version
+    ext {
+        minecraftVersion = project.minecraft_version
+        supportedPlatforms = ['fabric']
+        fabricLoaderVersion = project.fabric_loader_version
+        fabricApiVersion = project.fabric_api_version
+        toolsVersion = '1.3.0'
+        mixinVersion = '0.8.5'
+        mixinToolsVersion = '1.2.4'
+    }
+
 }
 
 subprojects {
@@ -18,7 +26,7 @@ subprojects {
     apply plugin: 'maven-publish'
 
     base {
-        archivesName = "$rootProject.archives_name-$project.name"
+        archivesName = "$project.name"
     }
 
     repositories {
@@ -68,4 +76,9 @@ subprojects {
             // retrieving dependencies.
         }
     }
+}
+
+tasks.register('collect', Copy) {
+    destinationDir = file('build/libs')
+    from project(':bootstrap').tasks.fabricJar.outputs
 }

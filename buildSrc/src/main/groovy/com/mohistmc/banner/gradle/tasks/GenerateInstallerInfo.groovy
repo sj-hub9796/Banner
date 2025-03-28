@@ -13,7 +13,7 @@ import java.nio.file.Files
 
 class GenerateInstallerInfo extends DefaultTask {
 
-    private String minecraftVersion, neoforgeVersion, fabricLoaderVersion
+    private String minecraftVersion, fabricLoaderVersion
     private Configuration configuration, fabricExtra
 
     @Classpath
@@ -41,15 +41,6 @@ class GenerateInstallerInfo extends DefaultTask {
 
     void setMinecraftVersion(String minecraftVersion) {
         this.minecraftVersion = minecraftVersion
-    }
-
-    @Input
-    String getNeoforgeVersion() {
-        return neoforgeVersion
-    }
-
-    void setNeoforgeVersion(String neoforgeVersion) {
-        this.neoforgeVersion = neoforgeVersion
     }
 
     @Input
@@ -110,17 +101,12 @@ class GenerateInstallerInfo extends DefaultTask {
             }
             return arts.collectEntries { [(it.toString()): ret.get(it.toString())] }
         }
-        def neoforgeUrl = "https://maven.neoforged.net/releases/net/neoforged/neoforge/$neoforgeVersion/neoforge-$neoforgeVersion-installer.jar"
-        def tmpNeoforge = Files.createTempFile("neoforge", "jar")
-        Utils.download(neoforgeUrl, tmpNeoforge.toFile())
         def fabricLoaderUrl = "https://maven.fabricmc.net/net/fabricmc/fabric-loader/$fabricLoaderVersion/fabric-loader-${fabricLoaderVersion}.jar"
         def tmpFabric = Files.createTempFile("fabric", "jar")
         Utils.download(fabricLoaderUrl, tmpFabric.toFile())
         def output = [
                 installer  : [
                         minecraft       : minecraftVersion,
-                        neoforge        : neoforgeVersion,
-                        neoforgeHash    : Utils.sha1(tmpNeoforge.toFile()),
                         fabricLoader    : fabricLoaderVersion,
                         fabricLoaderHash: Utils.sha1(tmpFabric.toFile()),
                 ],

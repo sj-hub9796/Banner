@@ -2,7 +2,7 @@ package com.mohistmc.banner.injection.world.inventory;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v.entity.CraftHumanEntity;
 import org.bukkit.inventory.InventoryView;
 
 public interface InjectionAbstractContainerMenu {

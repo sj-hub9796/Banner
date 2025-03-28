@@ -38,7 +38,7 @@ class BannerGradlePlugin implements Plugin<Project> {
         }
     }
 
-    private static def setupSpigot(Project project, File bannerRepo) {
+    static def setupSpigot(Project project, File bannerRepo) {
         def bannerExt = project.extensions.getByName('banner') as BannerExtension
         def buildTools = project.rootProject.file("${Project.DEFAULT_BUILD_DIR_NAME}/banner_cache/buildtools")
         def buildToolsFile = new File(buildTools, 'BuildTools.jar')

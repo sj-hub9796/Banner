@@ -2,7 +2,7 @@ package com.mohistmc.banner.injection.world.level.storage.loot;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.level.storage.loot.LootParams;
-import org.bukkit.craftbukkit.CraftLootTable;
+import org.bukkit.craftbukkit.v.CraftLootTable;
 
 public interface InjectionLootTable {
 

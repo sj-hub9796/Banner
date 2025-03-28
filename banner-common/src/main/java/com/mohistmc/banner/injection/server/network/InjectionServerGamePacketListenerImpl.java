@@ -4,8 +4,8 @@ import java.util.Set;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.world.entity.Relative;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v.CraftServer;
+import org.bukkit.craftbukkit.v.entity.CraftPlayer;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.slf4j.Logger;
 
