@@ -11,7 +11,7 @@ apply plugin: com.mohistmc.banner.gradle.BannerGradlePlugin
 
 banner {
     mcVersion = minecraft_version
-    bukkitVersion = 'v1_21_R1'
+    bukkitVersion = 'v1_21_R4'
     accessTransformer = project.file('bukkit.at')
     extraMapping = project(':banner-common').file('extra_mapping.tsrg')
 }
