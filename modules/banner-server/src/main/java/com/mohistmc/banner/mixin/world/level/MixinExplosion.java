@@ -149,7 +149,7 @@ public abstract class MixinExplosion implements InjectionExplosion {
         DecorationOps.callsite().invoke(instance, level, pos, explosion, biConsumer);
     }
 
-    @Redirect(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
+    @Decorate(method = "finalizeExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z"))
     private boolean banner$blockIgnite(Level instance, BlockPos blockPos, BlockState blockState) throws Throwable {
         BlockIgniteEvent event = CraftEventFactory.callBlockIgniteEvent(this.level, blockPos, (Explosion) (Object) this);
         if (event.isCancelled()) {
