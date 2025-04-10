@@ -74,7 +74,6 @@ tasks.register('fabricMappings', Copy) {
 project.sourceSets.main.output.dir file('build/fabric_mappings'), builtBy: tasks.fabricMappings
 
 shadowJar {
-    exclude 'architectury.common.json'
     configurations = [project.configurations.shadowBundle]
     archiveClassifier = 'dev-shadow'
 }
@@ -86,7 +85,7 @@ remapJar {
 }
 
 tasks.register('reobfJar', RenameJarTask) {
-    inputJar.set remapJar.archiveFile
+    setInputJar(remapJar.archiveFile)
     archiveClassifier.set 'reobf'
     mappings = banner.mappingsConfiguration.reobfBukkitPackage
 }
@@ -95,7 +94,6 @@ tasks.register('srgJar', Jar) {
     from(tasks.remapJar.outputs.files.collect { it.isDirectory() ? it : zipTree(it) }) {
         include 'com/mohistmc/**'
         exclude 'com/mohistmc/banner/common/mixin/**'
-        exclude 'com/mohistmc/banner/forge/mixin/**'
     }
     archiveClassifier.set('srg')
     dependsOn remapJar

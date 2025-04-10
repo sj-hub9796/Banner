@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v.CraftServer;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.event.player.PlayerRespawnEvent;
 
 import java.util.UUID;

@@ -6,7 +6,7 @@ public interface InjectionStructureStart {
         throw new IllegalStateException("Not implemented");
     }
 
-    default org.bukkit.craftbukkit.v.persistence.DirtyCraftPersistentDataContainer bridge$persistentDataContainer() {
+    default org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer bridge$persistentDataContainer() {
         throw new IllegalStateException("Not implemented");
     }
 
@@ -14,7 +14,7 @@ public interface InjectionStructureStart {
         throw new IllegalStateException("Not implemented");
     }
 
-    default void banner$setPersistentDataContainer(org.bukkit.craftbukkit.v.persistence.DirtyCraftPersistentDataContainer persistentDataContainer) {
+    default void banner$setPersistentDataContainer(org.bukkit.craftbukkit.persistence.DirtyCraftPersistentDataContainer persistentDataContainer) {
         throw new IllegalStateException("Not implemented");
     }
 }

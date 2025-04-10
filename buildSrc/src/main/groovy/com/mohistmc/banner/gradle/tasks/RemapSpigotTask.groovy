@@ -78,7 +78,7 @@ class RemapSpigotTask implements Runnable {
         Path tmpSrg
         if (bukkitVersion) {
             tmpSrg = Files.createTempFile("banner", "srg")
-            tmpSrg.text = "PK: org/bukkit/craftbukkit/$bukkitVersion org/bukkit/craftbukkit/v"
+            tmpSrg.text = "PK: org/bukkit/craftbukkit/$bukkitVersion org/bukkit/craftbukkit/"
             args.add('-m')
             args.add(tmpSrg.toFile().canonicalPath)
         }

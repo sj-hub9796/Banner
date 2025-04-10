@@ -3,7 +3,7 @@ package com.mohistmc.banner.injection.server.network;
 import net.minecraft.network.ConnectionProtocol;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
-import org.bukkit.craftbukkit.v.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 
 public interface InjectionServerCommonPacketListenerImpl {
 

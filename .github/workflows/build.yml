@@ -36,9 +36,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
-        run: ./gradlew cleaBuild build
-      - name: Upload API Lib
+        run: ./gradlew build
+      - name: Collect Jar
+        run: ./gradlew collect
+      - name: Upload final jar
         uses: actions/upload-artifact@v4
         with:
-          name: Banner API
-          path: ./banner-api/build/devlibs/*.jar
+          name: Banner 1.21.5
+          path: ./build/libs/*.jar

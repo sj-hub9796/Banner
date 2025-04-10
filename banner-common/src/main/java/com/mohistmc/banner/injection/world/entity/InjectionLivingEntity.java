@@ -14,7 +14,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.craftbukkit.v.attribute.CraftAttributeMap;
+import org.bukkit.craftbukkit.attribute.CraftAttributeMap;
 import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.jetbrains.annotations.Nullable;

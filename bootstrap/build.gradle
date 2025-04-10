@@ -120,8 +120,8 @@ tasks.register('fabricJar', Jar) {
     manifest.attributes 'Automatic-Module-Name': 'banner.boot'
     from(configurations.embedFabric.collect { it.isDirectory() ? it : zipTree(it) })
     into('/') {
-        it.from(project(':banner-fabric').tasks.reobfJar.outputs.files.collect())
-        it.rename { name -> 'common.reobfJar' }
+        it.from(project(':banner-fabric').tasks.remapJar.outputs.files.collect())
+        it.rename { name -> 'common.jar' }
     }
     into('/') {
         it.from(configurations.gson.collect())
@@ -130,7 +130,7 @@ tasks.register('fabricJar', Jar) {
     from sourceSets.applaunch.output
     from sourceSets.fabric.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn(project(':banner-fabric').tasks.reobfJar)
+    dependsOn(project(':banner-fabric').tasks.remapJar)
 }
 
 tasks.register("generateInstallerInfo", GenerateInstallerInfo) {

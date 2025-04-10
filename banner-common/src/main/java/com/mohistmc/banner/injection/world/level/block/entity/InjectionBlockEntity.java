@@ -5,7 +5,7 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
-import org.bukkit.craftbukkit.v.persistence.CraftPersistentDataContainer;
+import org.bukkit.craftbukkit.persistence.CraftPersistentDataContainer;
 import org.bukkit.inventory.InventoryHolder;
 
 public interface InjectionBlockEntity {
