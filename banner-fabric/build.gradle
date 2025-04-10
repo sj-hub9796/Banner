@@ -43,6 +43,11 @@ dependencies {
 
     common(project(path: ':banner-common', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':banner-common', configuration: 'transformProductionFabric')
+    common(project(':bootstrap')) { transitive = false }
+    shadowBundle (project(':bootstrap')) { transitive = false }
+
+    implementation "org.spigotmc:spigot-api:$minecraft_version-R0.1-SNAPSHOT@jar"
+    compileOnly "com.mohistmc.banner.generated:spigot:${minecraft_version}:deobf"
 }
 
 processResources {
