@@ -83,12 +83,6 @@ shadowJar {
     archiveClassifier = 'dev-shadow'
 }
 
-remapJar {
-    injectAccessWidener.set true
-    inputFile.set shadowJar.archiveFile
-    dependsOn shadowJar
-}
-
 tasks.register('reobfJar', RenameJarTask) {
     setInputJar(remapJar.archiveFile)
     archiveClassifier.set 'reobf'

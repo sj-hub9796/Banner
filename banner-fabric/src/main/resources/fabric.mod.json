@@ -17,12 +17,12 @@
     "main": [
       "com.mohistmc.banner.fabric.BannerFabric"
     ],
-    "client": [
-      "com.mohistmc.banner.fabric.client.BannerFabricClient"
+    "arclight_boot": [
+      "com.mohistmc.banner.fabric.boot.FabricBootstrap"
     ]
   },
   "mixins": [
-    "banner.common.mixins.json"
+    "mixins.banner.core.json"
   ],
   "depends": {
     "fabricloader": ">=0.16.10",
