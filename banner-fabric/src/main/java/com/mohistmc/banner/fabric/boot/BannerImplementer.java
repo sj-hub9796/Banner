@@ -34,7 +34,7 @@ public class BannerImplementer extends GameTransformer {
         Method method = knotCl.getClass().getDeclaredMethod("getRawClassByteArray", String.class, boolean.class);
         method.setAccessible(true);
         this.getRawClassByteArray = MethodHandles.lookup().unreflect(method).bindTo(knotCl);
-        this.implementers.put("inventory", new InventoryImplementer());
+        //this.implementers.put("inventory", new InventoryImplementer());
         this.implementers.put("switch", SwitchTableFixer.INSTANCE);
         this.implementers.put("enum", new EnumDefinalizer());
     }

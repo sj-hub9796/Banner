@@ -120,7 +120,7 @@ tasks.register('fabricJar', Jar) {
     manifest.attributes 'Automatic-Module-Name': 'banner.boot'
     from(configurations.embedFabric.collect { it.isDirectory() ? it : zipTree(it) })
     into('/') {
-        it.from(project(':banner-fabric').tasks.remapJar.outputs.files.collect())
+        it.from(project(':banner-fabric').tasks.shadowJar.outputs.files.collect())
         it.rename { name -> 'common.jar' }
     }
     into('/') {

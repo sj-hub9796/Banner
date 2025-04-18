@@ -1,5 +1,4 @@
 import com.mohistmc.banner.gradle.BannerGradlePluginFabric
-import com.mohistmc.banner.gradle.tasks.RenameJarTask
 
 plugins {
     id 'com.github.johnrengelman.shadow'
@@ -48,6 +47,9 @@ dependencies {
 
     implementation "org.spigotmc:spigot-api:$minecraft_version-R0.1-SNAPSHOT@jar"
     compileOnly "com.mohistmc.banner.generated:spigot:${minecraft_version}:deobf"
+
+    include "org.spigotmc:spigot-api:$minecraft_version-R0.1-SNAPSHOT@jar"
+    include "com.mohistmc.banner.generated:spigot:${minecraft_version}:deobf"
 }
 
 processResources {
@@ -81,12 +83,6 @@ project.sourceSets.main.output.dir file('build/fabric_mappings'), builtBy: tasks
 shadowJar {
     configurations = [project.configurations.shadowBundle]
     archiveClassifier = 'dev-shadow'
-}
-
-tasks.register('reobfJar', RenameJarTask) {
-    setInputJar(remapJar.archiveFile)
-    archiveClassifier.set 'reobf'
-    mappings = banner.mappingsConfiguration.reobfBukkitPackage
 }
 
 tasks.register('srgJar', Jar) {
