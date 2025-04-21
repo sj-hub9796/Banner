@@ -8,8 +8,3 @@ pluginManagement {
 }
 
 rootProject.name = 'banner'
-
-include 'banner-common'
-include 'banner-fabric'
-include 'installer'
-include 'bootstrap'
