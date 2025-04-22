@@ -1,10 +1,10 @@
-import com.mohistmc.banner.gradle.BannerGradlePluginFabric
+import com.mohistmc.banner.gradle.tasks.RenameJarTask
 
 plugins {
     id 'com.github.johnrengelman.shadow'
 }
 
-apply plugin: BannerGradlePluginFabric
+apply plugin:com.mohistmc.banner.gradle.BannerGradlePlugin
 
 architectury {
     platformSetupLoomIde()
@@ -33,6 +33,10 @@ configurations {
         canBeResolved = true
         canBeConsumed = false
     }
+
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
 }
 
 dependencies {
@@ -41,15 +45,15 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
 
     common(project(path: ':banner-common', configuration: 'namedElements')) { transitive false }
-    shadowBundle project(path: ':banner-common', configuration: 'transformProductionFabric')
+    shadowCommon project(path: ':banner-common', configuration: 'transformProductionFabric')
     common(project(':bootstrap')) { transitive = false }
-    shadowBundle (project(':bootstrap')) { transitive = false }
+    shadowCommon (project(':bootstrap')) { transitive = false }
+    shadowCommon("org.spigotmc:spigot-api:$minecraftVersion-R0.1-SNAPSHOT") { transitive = false }
+    shadowCommon "com.mohistmc.banner.generated:spigot:${minecraft_version}:deobf"
+    shadowCommon('net.md-5:bungeecord-chat:1.20-R0.2') { transitive = false }
 
     implementation "org.spigotmc:spigot-api:$minecraft_version-R0.1-SNAPSHOT@jar"
     compileOnly "com.mohistmc.banner.generated:spigot:${minecraft_version}:deobf"
-
-    include "org.spigotmc:spigot-api:$minecraft_version-R0.1-SNAPSHOT@jar"
-    include "com.mohistmc.banner.generated:spigot:${minecraft_version}:deobf"
 }
 
 processResources {
@@ -81,8 +85,20 @@ tasks.register('fabricMappings', Copy) {
 project.sourceSets.main.output.dir file('build/fabric_mappings'), builtBy: tasks.fabricMappings
 
 shadowJar {
-    configurations = [project.configurations.shadowBundle]
+    configurations = [project.configurations.shadowCommon]
     archiveClassifier = 'dev-shadow'
+}
+
+remapJar {
+    injectAccessWidener.set true
+    inputFile.set shadowJar.archiveFile
+    dependsOn shadowJar
+}
+
+tasks.register('reobfJar', RenameJarTask) {
+    inputJar.set remapJar.archiveFile
+    archiveClassifier.set 'reobf'
+    mappings = banner.mappingsConfiguration.reobfBukkitPackage
 }
 
 tasks.register('srgJar', Jar) {

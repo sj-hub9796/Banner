@@ -130,7 +130,7 @@ tasks.register('fabricJar', Jar) {
     from sourceSets.applaunch.output
     from sourceSets.fabric.output
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn(project(':banner-fabric').tasks.remapJar)
+    dependsOn(project(':banner-fabric').tasks.shadowJar)
 }
 
 tasks.register("generateInstallerInfo", GenerateInstallerInfo) {

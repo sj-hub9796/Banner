@@ -3,8 +3,6 @@
   "package": "com.mohistmc.banner.mixin.core",
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
-  "client": [
-  ],
   "mixins": [
     "advancement.MixinAdvancementHolder",
     "commands.MixinCommandDispatcher",
