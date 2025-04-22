@@ -1,0 +1,186 @@
+import com.mohistmc.banner.gradle.tasks.GenerateInstallerInfo
+import com.mohistmc.banner.gradle.tasks.RenameAsyncCatcherTask
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+
+sourceSets {
+    applaunch {}
+    forge {
+        java {
+            compileClasspath += main.output
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.output
+            runtimeClasspath += main.runtimeClasspath
+        }
+    }
+    fabric {}
+}
+
+configurations {
+    installer
+    installerFabric
+    embedCommon
+    embedFabric
+    embed
+    embed.extendsFrom(embedCommon, embedFabric)
+    gson
+    implementation.extendsFrom(embed, gson)
+}
+
+repositories {
+    maven {
+        name = 'sponge-repo'
+        url = 'https://repo.spongepowered.org/maven'
+    }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://maven.minecraftforge.net/' }
+    maven { url = 'https://maven.neoforged.net/releases/' }
+    maven { url = 'https://maven.izzel.io/releases' }
+    maven { url = 'https://jitpack.io/' }
+    mavenCentral()
+}
+
+def installerLibs = [/*"org.spongepowered:mixin:$mixinVersion", */ 'org.yaml:snakeyaml:2.2',
+                 'org.xerial:sqlite-jdbc:3.42.0.1', 'com.mysql:mysql-connector-j:8.1.0',
+                 /*'commons-lang:commons-lang:2.6',*/ 'com.googlecode.json-simple:json-simple:1.1.1',
+                 'org.apache.logging.log4j:log4j-jul:2.19.0', 'net.md-5:SpecialSource:1.11.3',
+                 'org.jline:jline-terminal-jansi:3.12.1',/* 'org.fusesource.jansi:jansi:1.18',*/
+                 /*'org.jline:jline-terminal:3.12.1', 'org.jline:jline-reader:3.12.1',*/
+                 'jline:jline:2.12.1', 'org.apache.maven:maven-resolver-provider:3.8.5',
+                 'org.apache.maven.resolver:maven-resolver-connector-basic:1.7.3', 'org.apache.maven.resolver:maven-resolver-transport-http:1.7.3',
+                 'org.apache.maven:maven-model:3.8.5', 'org.codehaus.plexus:plexus-utils:3.3.0',
+                 'org.apache.maven:maven-model-builder:3.8.5', 'org.codehaus.plexus:plexus-interpolation:1.26',
+                 'org.eclipse.sisu:org.eclipse.sisu.inject:0.3.4', 'org.apache.maven:maven-builder-support:3.8.5',
+                 'org.apache.maven:maven-repository-metadata:3.8.5', 'org.apache.maven.resolver:maven-resolver-api:1.6.3',
+                 'org.apache.maven.resolver:maven-resolver-spi:1.6.3', 'org.apache.maven.resolver:maven-resolver-util:1.6.3',
+                 'org.apache.maven.resolver:maven-resolver-impl:1.6.3', 'org.apache.httpcomponents:httpclient:4.5.13',
+                 'org.apache.httpcomponents:httpcore:4.4.14', 'commons-codec:commons-codec:1.15',
+                 'org.slf4j:jcl-over-slf4j:1.7.30', /*'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1',*/
+                 'org.spongepowered:configurate-hocon:3.6.1', 'org.spongepowered:configurate-core:3.6.1',
+                 'com.typesafe:config:1.3.1', 'javax.inject:javax.inject:1']
+
+def installerLibsFabric = [
+        'net.minecrell:terminalconsoleappender:1.2.0',
+        'org.jline:jline-terminal:3.12.1',
+        'org.jline:jline-reader:3.12.1',
+        'org.fusesource.jansi:jansi:1.18',
+        'org.apache.maven:maven-artifact:3.8.5',
+        "net.fabricmc:intermediary:$minecraft_version",
+        "net.fabricmc.fabric-api:fabric-api:$fabric_api_version"
+]
+
+dependencies {
+    implementation 'com.google.guava:guava:32.1.2-jre'
+    implementation 'org.ow2.asm:asm:9.7.1'
+    implementation 'org.ow2.asm:asm-tree:9.7.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.22.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.22.1'
+    implementation 'org.jetbrains:annotations:23.0.0'
+    implementation 'org.spongepowered:mixin:0.8.5'
+    implementation 'org.apache.logging.log4j:log4j-jul:2.22.1'
+
+    fabricImplementation "net.fabricmc:fabric-loader:$fabric_loader_version"
+
+    for (def lib : installerLibs) {
+        installer lib
+    }
+    for (def lib : installerLibsFabric) {
+        installerFabric lib
+    }
+
+    gson 'com.google.code.gson:gson:2.10.1'
+    embedCommon "io.izzel:tools:$toolsVersion"
+    embedCommon 'commons-lang:commons-lang:2.6@jar'
+    embedFabric("io.izzel.arclight:mixin-tools:$mixinToolsVersion") { transitive = false }
+    embedFabric(project(':installer')) { transitive = false }
+}
+
+jar {
+    from(configurations.embedCommon.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude "META-INF/MANIFEST.MF"
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
+        exclude "LICENSE.txt"
+        exclude "META-INF/services/**"
+        exclude "org/apache/commons/lang/enum/**"
+    }
+}
+
+tasks.register('fabricJar', Jar) {
+    archiveBaseName.set 'banner-fabric-' + minecraft_version
+    manifest.attributes 'Main-Class': 'com.mohistmc.banner.server.Launcher'
+    manifest.attributes 'Implementation-Title': 'Banner'
+    manifest.attributes 'Implementation-Version': "banner-$fabric_loader_version-${project.version}"
+    manifest.attributes 'Implementation-Vendor': 'MohistMC Dev Team'
+    manifest.attributes 'Implementation-Timestamp': new Date().format("yyyy-MM-dd HH:mm:ss")
+    manifest.attributes 'Automatic-Module-Name': 'banner.boot'
+    from(configurations.embedFabric.collect { it.isDirectory() ? it : zipTree(it) })
+    into('/') {
+        it.from(project(':banner-fabric').tasks.shadowJar.outputs.files.collect())
+        it.rename { name -> 'common.jar' }
+    }
+    into('/') {
+        it.from(configurations.gson.collect())
+        it.rename { name -> 'gson.jar' }
+    }
+    from sourceSets.applaunch.output
+    from sourceSets.fabric.output
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    dependsOn(project(':banner-fabric').tasks.remapJar)
+}
+
+tasks.register("generateInstallerInfo", GenerateInstallerInfo) {
+    minecraftVersion = project.minecraft_version
+    fabricLoaderVersion = project.fabric_loader_version
+    def installer = file("build/banner_installer/META-INF/installer.json")
+    outputs.file(installer)
+    configuration = project.configurations.installer
+    fabricExtra = project.configurations.installerFabric
+}
+
+project.sourceSets.main.output.dir file("build/banner_installer"), builtBy: tasks.generateInstallerInfo
+project.sourceSets.fabric.output.dir file("build/banner_installer"), builtBy: tasks.generateInstallerInfo
+
+project.sourceSets.fabric.output.dir file("build/fabric_async_catcher"), builtBy: tasks.register('fabricAsyncCatcher', RenameAsyncCatcherTask) {
+    inputFile.set project.file("async_catcher.json")
+    mapping.set "intermediary"
+    outputs.file("build/fabric_async_catcher/async_catcher.json")
+}
+
+compileJava {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+    options.compilerArgs << '-XDignore.symbol.file' << '-XDenableSunApiLintControl'
+    options.encoding = 'UTF-8'
+}
+
+compileApplaunchJava {
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks.register('runProdFabric', JavaExec) {
+    classpath = files(tasks.fabricJar)
+    // systemProperties 'bsl.debug': 'true'
+    systemProperties 'terminal.ansi': 'true'
+    systemProperties 'mixin.debug.export': 'true'
+    systemProperties 'mixin.dumpTargetOnFailure': 'true'
+    systemProperties 'banner.alwaysExtract': 'true'
+    systemProperties 'banner.remapper.dump': './.mixin.out/plugin_classes'
+    systemProperties 'sun.stdout.encoding': 'UTF-8'
+    systemProperties 'sun.stderr.encoding': 'UTF-8'
+    workingDir System.env.BANNER_PROD_DIR ?: file('run_prod/fabric')
+    maxHeapSize '4G'
+    args 'nogui'
+    standardInput System.in
+    javaLauncher.convention(javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+    })
+    dependsOn project.tasks.fabricJar
+}
+
+if ('true'.equalsIgnoreCase(System.getenv('APPVEYOR_REPO_TAG'))) {
+    tasks.build.dependsOn(tasks.publish)
+}
