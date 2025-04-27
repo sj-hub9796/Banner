@@ -235,10 +235,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
     @Shadow public abstract ServerPlayer getPlayer();
 
     @Unique
-    private static final int SURVIVAL_PLACE_DISTANCE_SQUARED = 6 * 6;
-    @Unique
-    private static final int CREATIVE_PLACE_DISTANCE_SQUARED = 7 * 7;
-    @Unique
     private CraftServer cserver;
     @Unique
     public boolean processedDisconnect;
@@ -363,7 +359,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 double d9 = entity.getDeltaMovement().lengthSqr();
                 double d10 = d6 * d6 + d7 * d7 + d8 * d8;
 
-
                 // CraftBukkit start - handle custom speeds and skipped ticks
                 this.allowedPlayerTicks += (System.currentTimeMillis() / 50) - this.lastTick;
                 this.allowedPlayerTicks = Math.max(this.allowedPlayerTicks, 1);
@@ -402,9 +397,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                 d7 = d4 - this.vehicleLastGoodY - 1.0E-6D;
                 d8 = d5 - this.vehicleLastGoodZ;
                 boolean flag1 = entity.verticalCollisionBelow;
-
                 if (entity instanceof LivingEntity entityliving) {
-
                     if (entityliving.onClimbable()) {
                         entityliving.resetFallDistance();
                     }
@@ -429,13 +422,11 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
 
                 Location curPos = this.getCraftPlayer().getLocation(); // Spigot
 
-                entity.absMoveTo(d3, d4, d5, f, f1);
-                player.absMoveTo(d3, d4, d5, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
+                entity.absMoveTo(d3, d4, d5, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
                 boolean flag3 = worldserver.noCollision(entity, entity.getBoundingBox().deflate(0.0625D));
 
                 if (flag && (flag2 || !flag3)) {
-                    entity.absMoveTo(d0, d1, d2, f, f1);
-                    player.absMoveTo(d0, d1, d2, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
+                    entity.absMoveTo(d0, d1, d2, this.player.getYRot(), this.player.getXRot()); // CraftBukkit
                     this.connection.send(new ClientboundMoveVehiclePacket(entity));
                     return;
                 }
@@ -522,9 +513,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             at = @At(value = "FIELD", shift = At.Shift.AFTER, target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingPositionFromClient:Lnet/minecraft/world/phys/Vec3;"),
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;isChangingDimension()Z")))
     private void banner$updateLoc(ServerboundAcceptTeleportationPacket packetIn, CallbackInfo ci) {
-        if (this.player.bridge$valid()) {
-            this.player.serverLevel().getChunkSource().move(this.player);
-        }
+        this.player.serverLevel().getChunkSource().move(this.player);
     }
 
     @Inject(method = "handleAcceptTeleportPacket", cancellable = true, at = @At(value = "FIELD", target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;awaitingTeleport:I"))
@@ -1913,13 +1902,6 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
             d2 = to.getZ();
             f = to.getYaw();
             f1 = to.getPitch();
-        }
-
-        if (Float.isNaN(yaw)) {
-            f = 0.0f;
-        }
-        if (Float.isNaN(pitch)) {
-            f1 = 0.0f;
         }
 
         this.internalTeleport(d0, d1, d2, f, f1, set);

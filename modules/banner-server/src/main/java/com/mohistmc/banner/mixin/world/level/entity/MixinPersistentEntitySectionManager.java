@@ -67,7 +67,7 @@ public abstract class MixinPersistentEntitySectionManager<T extends EntityAccess
         if (chunkLoadStatus == PersistentEntitySectionManager.ChunkLoadStatus.PENDING) {
             return false;
         } else {
-            List<T> list = (List) this.sectionStorage.getExistingSectionsInChunk(chunkPosValue).flatMap((entitySection) -> {
+            List<T> list = this.sectionStorage.getExistingSectionsInChunk(chunkPosValue).flatMap((entitySection) -> {
                 return entitySection.getEntities().filter(EntityAccess::shouldBeSaved);
             }).collect(Collectors.toList());
             if (list.isEmpty()) {

@@ -34,6 +34,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.BorderChangeListener;
@@ -397,6 +398,9 @@ public abstract class MixinLevel implements LevelAccessor, AutoCloseable, Inject
 
     @Inject(method = "getBlockState", at = @At("HEAD"), cancellable = true)
     private void banner$addCaptureCheck(BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
+        if (pos == null) {
+            cir.setReturnValue(Blocks.AIR.defaultBlockState());
+        }
         // CraftBukkit start - tree generation
         if (captureTreeGeneration) {
             CapturedBlockState previous = capturedBlockStates.get(pos);

@@ -16,6 +16,7 @@ import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.PositionImpl;
+import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -40,9 +41,12 @@ import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.entity.EntityAccess;
+import net.minecraft.world.level.entity.EntityInLevelCallback;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -82,6 +86,7 @@ import org.objectweb.asm.Opcodes;
 import org.spigotmc.ActivationRange;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -660,11 +665,11 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         // Spigot end
     }
 
-    private final AtomicBoolean banner$dismountCancelled = new AtomicBoolean(false);
+    private final AtomicBoolean banner$dismountCancelled = new AtomicBoolean(true);
 
     @Inject(method = "removeVehicle", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/Entity;removePassenger(Lnet/minecraft/world/entity/Entity;)V"))
     private void banner$stopRiding(CallbackInfo ci, Entity entity) {
-        if (banner$dismountCancelled.getAndSet(false)) {
+        if (!banner$dismountCancelled.getAndSet(true)) {
             this.vehicle = entity;
         }
     }
@@ -689,8 +694,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             CraftEntity craftn = (CraftEntity) (passenger.getBukkitEntity().getVehicle());
             Entity n = craftn == null ? null : craftn.getHandle();
             if (event.isCancelled() || n != orig) {
+                banner$dismountCancelled.set(false);
                 ci.cancel();
-                banner$dismountCancelled.set(true);
                 return;
             }
         }
@@ -702,8 +707,8 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
             Bukkit.getPluginManager().callEvent(event);
         }
         if (event.isCancelled()) {
+            banner$dismountCancelled.set(false);
             ci.cancel();
-            banner$dismountCancelled.set(true);
         }
     }
 
@@ -823,32 +828,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
     @Unique
     protected Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel serverWorld, BlockPos pos, boolean flag, WorldBorder worldborder, int searchRadius, boolean canCreatePortal, int createRadius) {
         return serverWorld.getPortalForcer().findPortalAround(pos, worldborder, searchRadius);
-    }
-
-    @Redirect(method = "setBoundingBox",
-            at = @At(value = "FIELD",
-                    target = "Lnet/minecraft/world/entity/Entity;bb:Lnet/minecraft/world/phys/AABB;"))
-    private void banner$resetBBox(Entity instance, AABB axisalignedbb) {
-        // CraftBukkit start - block invalid bounding boxes
-        double minX = axisalignedbb.minX,
-                minY = axisalignedbb.minY,
-                minZ = axisalignedbb.minZ,
-                maxX = axisalignedbb.maxX,
-                maxY = axisalignedbb.maxY,
-                maxZ = axisalignedbb.maxZ;
-        double len = axisalignedbb.maxX - axisalignedbb.minX;
-        if (len < 0) maxX = minX;
-        if (len > 64) maxX = minX + 64.0;
-
-        len = axisalignedbb.maxY - axisalignedbb.minY;
-        if (len < 0) maxY = minY;
-        if (len > 64) maxY = minY + 64.0;
-
-        len = axisalignedbb.maxZ - axisalignedbb.minZ;
-        if (len < 0) maxZ = minZ;
-        if (len > 64) maxZ = minZ + 64.0;
-        this.bb = new AABB(minX, minY, minZ, maxX, maxY, maxZ);
-        // CraftBukkit end
     }
 
     @Override
