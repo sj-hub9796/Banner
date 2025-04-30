@@ -1,19 +1,16 @@
 package com.mohistmc.banner.mixin.server.commands;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import java.util.List;
 import java.util.function.Function;
-
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.commands.ListPlayersCommand;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ListPlayersCommand.class)
 public class MixinListPlayersCommand {

@@ -4,6 +4,8 @@ import com.mojang.datafixers.util.Pair;
 import io.izzel.arclight.mixin.Decorate;
 import io.izzel.arclight.mixin.DecorationOps;
 import io.izzel.arclight.mixin.Local;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket;
@@ -31,9 +33,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Mixin(targets = "net/minecraft/server/network/ServerGamePacketListenerImpl$1")
 public class MixinServerGamePacketListenerImpl1 {

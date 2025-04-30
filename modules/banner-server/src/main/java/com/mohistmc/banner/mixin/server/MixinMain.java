@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.server;
 
 import com.google.common.base.Charsets;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.BannerMod;
 import java.io.File;
 import java.io.IOException;
@@ -32,9 +33,9 @@ public abstract class MixinMain {
     @Inject(method = "main", at = @At(value = "INVOKE",
             target = "Ljoptsimple/OptionParser;nonOptions()Ljoptsimple/NonOptionArgumentSpec;",
             shift = At.Shift.AFTER),
-            remap = false,
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void banner$initMain(String[] strings, CallbackInfo ci, OptionParser optionParser, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, OptionSpec optionSpec7, OptionSpec optionSpec8, OptionSpec optionSpec9, OptionSpec optionSpec10, OptionSpec optionSpec11, OptionSpec optionSpec12, OptionSpec optionSpec13, OptionSpec optionSpec14, OptionSpec optionSpec15) {
+            remap = false
+    )
+    private static void banner$initMain(String[] strings, CallbackInfo ci, @Local OptionParser optionParser) {
         optionParser.acceptsAll(Arrays.asList("b", "bukkit-settings"), "File for bukkit settings")
                 .withRequiredArg()
                 .ofType(File.class)
@@ -72,10 +73,10 @@ public abstract class MixinMain {
 
     @Inject(method = "main", at = @At(value = "INVOKE",
             target = "Lorg/slf4j/Logger;info(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V",
-            shift = At.Shift.BEFORE),
-            remap = false,
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void banner$addYmlInfo(String[] strings, CallbackInfo ci, OptionParser optionParser, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, OptionSpec optionSpec7, OptionSpec optionSpec8, OptionSpec optionSpec9, OptionSpec optionSpec10, OptionSpec optionSpec11, OptionSpec optionSpec12, OptionSpec optionSpec13, OptionSpec optionSpec14, OptionSpec optionSpec15, OptionSpec optionSpec16, OptionSet optionSet, Path path, Path path2, DedicatedServerSettings dedicatedServerSettings, Path path3, Eula eula) throws IOException {
+            ordinal = 0),
+            remap = false
+    )
+    private static void banner$addYmlInfo(String[] strings, CallbackInfo ci, @Local OptionSet optionSet) throws IOException {
         // CraftBukkit start - SPIGOT-5761: Create bukkit.yml and commands.yml if not present
         File configFile = (File) optionSet.valueOf("bukkit-settings");
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(configFile);
@@ -92,9 +93,9 @@ public abstract class MixinMain {
     }
 
     @Inject(method = "main", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/packs/repository/ServerPacksSource;createPackRepository(Ljava/nio/file/Path;)Lnet/minecraft/server/packs/repository/PackRepository;"),
-            locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-    private static void banner$createBukkitDatapack(String[] strings, CallbackInfo ci, OptionParser optionParser, OptionSpec optionSpec, OptionSpec optionSpec2, OptionSpec optionSpec3, OptionSpec optionSpec4, OptionSpec optionSpec5, OptionSpec optionSpec6, OptionSpec optionSpec7, OptionSpec optionSpec8, OptionSpec optionSpec9, OptionSpec optionSpec10, OptionSpec optionSpec11, OptionSpec optionSpec12, OptionSpec optionSpec13, OptionSpec optionSpec14, OptionSpec optionSpec15, OptionSpec optionSpec16, OptionSet optionSet, Path path, Path path2, DedicatedServerSettings dedicatedServerSettings, Path path3, Eula eula, File file, Services services, String string, LevelStorageSource levelStorageSource, LevelStorageSource.LevelStorageAccess levelStorageAccess, LevelSummary levelSummary, boolean bl) {
+            target = "Lnet/minecraft/server/packs/repository/ServerPacksSource;createPackRepository(Ljava/nio/file/Path;)Lnet/minecraft/server/packs/repository/PackRepository;")
+    )
+    private static void banner$createBukkitDatapack(String[] strings, CallbackInfo ci, @Local LevelStorageSource.LevelStorageAccess levelStorageAccess) {
         // CraftBukkit start
         File bukkitDataPackFolder = new File(levelStorageAccess.getLevelPath(LevelResource.DATAPACK_DIR).toFile(), "bukkit");
         if (!bukkitDataPackFolder.exists()) {

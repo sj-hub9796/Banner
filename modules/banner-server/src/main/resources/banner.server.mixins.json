@@ -32,6 +32,7 @@
     "core.dispenser.MixinDefaultDispenseItemBehavior",
     "core.dispenser.MixinShearsDispenseItemBehavior",
     "core.dispenser.MixinShulkerBoxDispenseBehavior",
+    "nbt.MixinCompoundTag",
     "network.MixinFriendlyByteBuf",
     "network.chat.MixinComponent",
     "network.chat.MixinTextColor",
@@ -171,6 +172,7 @@
     "world.entity.animal.MixinFox_BreedGoal",
     "world.entity.animal.MixinFox_EatBerriesGoal",
     "world.entity.animal.MixinIronGolem",
+    "world.entity.animal.MixinMushroomCow",
     "world.entity.animal.MixinOcelot",
     "world.entity.animal.MixinPanda",
     "world.entity.animal.MixinPanda_HurtByTargetGoal",
@@ -183,7 +185,6 @@
     "world.entity.animal.MixinSheep1",
     "world.entity.animal.MixinSniffer",
     "world.entity.animal.MixinSnowGolem",
-    "world.entity.animal.MixinMushroomCow",
     "world.entity.animal.MixinTurtle",
     "world.entity.animal.MixinTurtle_LayEggGoal",
     "world.entity.animal.MixinWolf",
@@ -502,6 +503,7 @@
     "world.level.block.entity.MixinSculkCatalystBlockEntity_CatalystListener",
     "world.level.block.entity.MixinShulkerBoxBlockEntity",
     "world.level.block.entity.MixinSignBlockEntity",
+    "world.level.block.entity.MixinSkullBlockEntity",
     "world.level.block.entity.MixinTheEndGatewayBlockEntity",
     "world.level.block.grower.MixinAbstractMegaTreeGrower",
     "world.level.block.grower.MixinAbstractTreeGrower",
@@ -526,6 +528,7 @@
     "world.level.levelgen.structure.templatesystem.MixinStructurePlaceSettings",
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplate",
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplateManager",
+    "world.level.lighting.MixinSkyLightSectionStorage",
     "world.level.material.MixinFlowingFluid",
     "world.level.material.MixinLavaFluid",
     "world.level.portal.MixinPortalForcer",
@@ -547,7 +550,6 @@
     "world.level.storage.loot.functions.MixinLootingEnchantFunction",
     "world.level.storage.loot.parameters.LootParametersMixin",
     "world.level.storage.loot.predicates.MixinExplosionCondition",
-    "world.level.storage.loot.predicates.MixinRandomChanceWithLootingCondition",
-    "world.level.lighting.MixinSkyLightSectionStorage"
+    "world.level.storage.loot.predicates.MixinRandomChanceWithLootingCondition"
   ]
 }

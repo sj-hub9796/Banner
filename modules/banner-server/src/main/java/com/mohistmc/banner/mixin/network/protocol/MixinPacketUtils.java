@@ -10,7 +10,6 @@ import net.minecraft.util.thread.BlockableEventLoop;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-
 import static com.mohistmc.banner.BannerMod.LOGGER;
 
 @Mixin(PacketUtils.class)

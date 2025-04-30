@@ -144,6 +144,7 @@ public class BannerConfig {
     public static boolean spawnForNatural;
     public static boolean NoRaining;
     public static boolean SkyLight15;
+    public static boolean disable_skullblock_skin;
 
     public static boolean networkmanager_debug;
     public static List<String> networkmanager_intercept;
@@ -182,5 +183,6 @@ public class BannerConfig {
         networkmanager_intercept = getList("networkmanager.intercept", Collections.emptyList());
         Watchdogtimetodo = getString("Watchdogtimetodo", "restart");
         SkyLight15 = getBoolean("SkyLight15", false);
+        disable_skullblock_skin = getBoolean("disable_skullblock_skin", false);
     }
 }

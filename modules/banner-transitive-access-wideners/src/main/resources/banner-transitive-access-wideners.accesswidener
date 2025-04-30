@@ -648,3 +648,4 @@ transitive-mutable field net/minecraft/world/level/chunk/LevelChunkSection state
 transitive-accessible field net/minecraft/world/level/chunk/LevelChunkSection states Lnet/minecraft/world/level/chunk/PalettedContainer;
 transitive-accessible field net/minecraft/world/level/Level blockEntityTickers Ljava/util/List;
 transitive-accessible method net/minecraft/server/level/ChunkMap getChunks ()Ljava/lang/Iterable;
+transitive-accessible method net/minecraft/nbt/CompoundTag <init> (Ljava/util/Map;)V

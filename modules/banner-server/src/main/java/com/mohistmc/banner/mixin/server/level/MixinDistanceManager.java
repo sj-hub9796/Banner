@@ -1,11 +1,15 @@
 package com.mohistmc.banner.mixin.server.level;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.injection.server.level.InjectionDistanceManager;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.function.Consumer;
 import net.minecraft.core.SectionPos;
+import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.DistanceManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.Ticket;
@@ -18,8 +22,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 // TODO fix inject method
 @Mixin(DistanceManager.class)
@@ -28,16 +32,15 @@ public abstract class MixinDistanceManager implements InjectionDistanceManager {
 
     // @formatter:off
     @Shadow @Final private DistanceManager.ChunkTicketTracker ticketTracker;
+    @Shadow private long ticketTickCounter;
     @Shadow protected abstract SortedArraySet<Ticket<?>> getTickets(long p_229848_1_);
     @Shadow private static int getTicketLevelAt(SortedArraySet<Ticket<?>> p_229844_0_) { return 0; }
     @Shadow @Final public Long2ObjectOpenHashMap<SortedArraySet<Ticket<?>>> tickets;
     @Shadow abstract TickingTracker tickingTracker();
     // @formatter:on
 
-    @Shadow private long ticketTickCounter;
-
-    @Inject(method = "removePlayer", cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", remap = false, target = "Lit/unimi/dsi/fastutil/objects/ObjectSet;remove(Ljava/lang/Object;)Z"))
-    private void banner$remove(SectionPos p_140829_, ServerPlayer p_140830_, CallbackInfo ci, ChunkPos pos, long l, ObjectSet<?> set) {
+    @Inject(method = "removePlayer", cancellable = true, at = @At(value = "INVOKE", remap = false, target = "Lit/unimi/dsi/fastutil/objects/ObjectSet;remove(Ljava/lang/Object;)Z"))
+    private void banner$remove(SectionPos p_140829_, ServerPlayer p_140830_, CallbackInfo ci, @Local ObjectSet<?> set) {
         if (set == null) {
             ci.cancel();
         }
@@ -101,6 +104,14 @@ public abstract class MixinDistanceManager implements InjectionDistanceManager {
                     iterator.remove();
                 }
             }
+        }
+    }
+
+    @Redirect(method = "runAllUpdates", at = @At(value = "INVOKE", target = "Ljava/util/Set;forEach(Ljava/util/function/Consumer;)V"))
+    private void banner$wrapForEachWithTryCatch(Set<ChunkHolder> chunks, Consumer<ChunkHolder> action) {
+        try {
+            chunks.forEach(action);
+        } catch (Exception ignored) {
         }
     }
 }
