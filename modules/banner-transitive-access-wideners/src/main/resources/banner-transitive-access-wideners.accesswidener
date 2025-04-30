@@ -649,3 +649,6 @@ transitive-accessible field net/minecraft/world/level/chunk/LevelChunkSection st
 transitive-accessible field net/minecraft/world/level/Level blockEntityTickers Ljava/util/List;
 transitive-accessible method net/minecraft/server/level/ChunkMap getChunks ()Ljava/lang/Iterable;
 transitive-accessible method net/minecraft/nbt/CompoundTag <init> (Ljava/util/Map;)V
+transitive-accessible class net/minecraft/server/level/DistanceManager$FixedPlayerDistanceChunkTracker
+transitive-accessible class net/minecraft/server/level/DistanceManager$PlayerTicketTracker
+transitive-accessible method net/minecraft/server/level/ChunkHolder updateFutures (Lnet/minecraft/server/level/ChunkMap;Ljava/util/concurrent/Executor;)V
