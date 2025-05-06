@@ -749,7 +749,7 @@ public abstract class MixinServerGamePacketListenerImpl implements InjectionServ
                                 LOGGER.warn("{} moved wrongly!", this.player.getName().getString());
                             }
 
-                            if (this.player.noPhysics || this.player.isSleeping() || (!flag2 || !worldserver.noCollision(this.player, axisalignedbb) && !this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb, d0, d1, d2))) {
+                            if (this.player.noPhysics || this.player.isSleeping() || (!flag2 || !worldserver.noCollision(this.player, axisalignedbb)) && !this.isPlayerCollidingWithAnythingNew(worldserver, axisalignedbb, d0, d1, d2)) {
 
                                 // CraftBukkit start - fire PlayerMoveEvent
                                 // Reset to old location first
