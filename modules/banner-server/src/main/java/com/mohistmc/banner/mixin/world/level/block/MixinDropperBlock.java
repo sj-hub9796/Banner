@@ -13,10 +13,12 @@ import net.minecraft.world.level.block.DropperBlock;
 import net.minecraft.world.level.block.entity.DispenserBlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventoryDoubleChest;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -50,13 +52,14 @@ public class MixinDropperBlock {
                     ItemStack split = itemstack.copy().split(1);
                     CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(split);
                     Inventory destinationInventory;
+                    InventoryHolder owner = iinventory.getOwner();
                     // Have to special case large chests as they work oddly
                     if (iinventory instanceof CompoundContainer) {
                         destinationInventory = new CraftInventoryDoubleChest((CompoundContainer) iinventory);
                     } else {
-                        destinationInventory = iinventory.getOwner().getInventory();
+                        destinationInventory = (owner == null ? new CraftInventory(iinventory) : owner.getInventory());
                     }
-                    InventoryMoveItemEvent event = new InventoryMoveItemEvent(iinventory.getOwner().getInventory(), craftItemStack, destinationInventory, true);
+                    InventoryMoveItemEvent event = new InventoryMoveItemEvent(dispensertileentity.getOwnerInventory(), craftItemStack, destinationInventory, true);
                     Bukkit.getPluginManager().callEvent(event);
                     if (event.isCancelled()) {
                         return;
