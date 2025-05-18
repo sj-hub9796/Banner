@@ -375,6 +375,12 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     public InteractionHand interactHand;
     @Unique
     public ItemStack interactItemStack;
+    @Unique
+    public InteractionResult enuminteractionresult = InteractionResult.PASS;
+    @Unique
+    public PlayerInteractEvent event;
+    @Unique
+    boolean cancelledBlock = false;
 
     /**
      * @author wdog4
@@ -384,8 +390,6 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
     public InteractionResult useItemOn(ServerPlayer player, Level level, ItemStack stack, InteractionHand hand, BlockHitResult hitResult) {
         BlockPos blockPos = hitResult.getBlockPos();
         BlockState blockState = level.getBlockState(blockPos);
-        InteractionResult enuminteractionresult = InteractionResult.PASS;
-        boolean cancelledBlock = false;
         if (!blockState.getBlock().isEnabled(level.enabledFeatures())) {
             return InteractionResult.FAIL;
         } else if (this.gameModeForPlayer == GameType.SPECTATOR) {
@@ -396,7 +400,7 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             cancelledBlock = true;
         }
 
-        PlayerInteractEvent event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, blockPos, hitResult.getDirection(), stack, cancelledBlock, hand, hitResult.getLocation());
+        event = CraftEventFactory.callPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, blockPos, hitResult.getDirection(), stack, cancelledBlock, hand, hitResult.getLocation());
         firedInteract = true;
         interactResult = event.useItemInHand() == Event.Result.DENY;
         interactPosition = blockPos.immutable();
@@ -432,10 +436,11 @@ public abstract class MixinServerPlayerGameMode implements InjectionServerPlayer
             boolean bl2 = player.isSecondaryUseActive() && bl;
             ItemStack itemStack = stack.copy();
             if (!bl2) {
-                enuminteractionresult = blockState.use(level, player, hand, hitResult);
-                if (enuminteractionresult.consumesAction()) {
+                InteractionResult interactionResult = blockState.use(level, player, hand, hitResult);
+                enuminteractionresult = interactionResult; // Fix mixin
+                if (interactionResult.consumesAction()) {
                     CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, blockPos, itemStack);
-                    return enuminteractionresult;
+                    return interactionResult;
                 }
             }
 
