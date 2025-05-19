@@ -191,3 +191,36 @@ jar {
         )
     }
 }
+
+tasks.register('countPatchProgress') {
+    group = 'reporting'
+    description = 'Counts the total patch progress'
+
+    doLast {
+        def countFiles = { dir ->
+            def count = 0
+            dir.eachFileRecurse { file ->
+                if (file.isFile()) count++
+            }
+            return count
+        }
+
+        def patchesDir = file("$projectDir/nms-patches")
+        def injectsDir = file("$projectDir/modules/banner-server/src/main/java/com/mohistmc/banner/mixin")
+
+        if (!patchesDir.exists() || !injectsDir.exists()) {
+            throw new GradleException("Can not found the dir!")
+        }
+
+        def totalPatches = countFiles(patchesDir)
+        def implemented = countFiles(injectsDir)
+        def percentage = (implemented / totalPatches) * 100
+
+        println "================================="
+        println "The Report of Patching Progress"
+        println "All Patches: $totalPatches"
+        println "Implemented Patches: $implemented"
+        println "Implemented Progress: ${String.format("%.2f", percentage)}%"
+        println "================================="
+    }
+}
