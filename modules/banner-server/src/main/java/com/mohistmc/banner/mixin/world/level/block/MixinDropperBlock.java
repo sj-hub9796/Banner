@@ -59,12 +59,12 @@ public class MixinDropperBlock {
                     } else {
                         destinationInventory = (owner == null ? new CraftInventory(iinventory) : owner.getInventory());
                     }
-                    InventoryMoveItemEvent event = new InventoryMoveItemEvent(dispensertileentity.getOwnerInventory(), craftItemStack, destinationInventory, true);
+                    InventoryMoveItemEvent event = new InventoryMoveItemEvent(owner, craftItemStack, destinationInventory, true);
                     Bukkit.getPluginManager().callEvent(event);
                     if (event.isCancelled()) {
                         return;
                     }
-                    itemstack1 = HopperBlockEntity.addItem(dispensertileentity, iinventory, CraftItemStack.asNMSCopy(event.getItem()), direction.getOpposite());
+                    itemstack1 = HopperBlockEntity.addItem(dispensertileentity, owner.getInventory(), CraftItemStack.asNMSCopy(event.getItem()), direction.getOpposite());
                     if (event.getItem().equals(craftItemStack) && itemstack1.isEmpty()) {
                         itemstack1 = itemstack.copy();
                         itemstack1.shrink(1);
