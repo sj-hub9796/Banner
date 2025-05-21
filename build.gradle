@@ -154,7 +154,7 @@ jar {
 				'Specification-Vendor'  : 'MohistMC',
 				'Specification-Version' : bannerVersion,
 				'Implementation-Title'  : 'Banner',
-				'Implementation-Version': minecraft_version + "-" +bannerVersion,
+				'Implementation-Version': minecraft_version + "-" + bannerVersion,
 				'Implementation-Vendor' : 'MohistMC'
 		)
 	}
