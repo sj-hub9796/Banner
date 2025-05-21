@@ -4,11 +4,12 @@ plugins {
 	id 'net.minecraftforge.gradleutils' version '[2.2,2.3)'
 }
 
-version = project.minecraft_version + "-" + gradleutils.gitInfo.abbreviatedId
+version = gradleutils.gitInfo.abbreviatedId + "-server"
+var bannerVersion = minecraft_version + "-" + gradleutils.gitInfo.abbreviatedId
 group = project.maven_group
 
 base {
-	archivesName = project.archives_base_name + "-server"
+	archivesName = project.archives_base_name.toLowerCase() + "-" + minecraft_version
 }
 
 allprojects {
@@ -150,14 +151,14 @@ allprojects {
 	}
 
 	processResources {
-		inputs.property "version", project.version
+		inputs.property "version", bannerVersion
 
 		filesMatching("fabric.mod.json") {
-			expand "version": project.version
+			expand "version": bannerVersion
 		}
 
 		filesMatching("plugin.yml") {
-			expand "version": project.version
+			expand "version": bannerVersion
 		}
 	}
 
@@ -171,7 +172,7 @@ allprojects {
 
 	tasks.withType(JavaCompile).configureEach {
 		options.encoding = 'UTF-8'
-		options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
+		options.warnings = false
 	}
 
 	tasks.register('cleanBuild') {
@@ -215,7 +216,7 @@ dependencies {
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
-	options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal' << '-Xdiags:verbose'
+	options.warnings = false
 }
 
 jar {
@@ -227,7 +228,7 @@ jar {
 				'Specification-Vendor'  : 'MohistMC',
 				'Specification-Version' : gradleutils.gitInfo.abbreviatedId,
 				'Implementation-Title'  : 'Banner',
-				'Implementation-Version': version,
+				'Implementation-Version': bannerVersion,
 				'Implementation-Vendor' : 'MohistMC'
 		)
 	}
