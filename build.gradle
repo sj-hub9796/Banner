@@ -1,20 +1,15 @@
 plugins {
-	id 'fabric-loom' version '1.2-SNAPSHOT'
-	id 'maven-publish'
-	id 'org.ajoberstar.grgit' version '5.2.0'
-	id "com.peterabeles.gversion" version "1.10.2"
+	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'net.minecraftforge.gradleutils' version '[2.2,2.3)'
 }
 
-project.compileJava.dependsOn(createVersionFile)
-
-gversion {
-	srcDir = "src/main/java/"
-	classPackage = "com.mohistmc.banner"
-	className = "VersionInfo"
-}
-
-version = ci_version()
+version = gradleutils.gitInfo.abbreviatedId + "-mod"
+var bannerVersion = gradleutils.gitInfo.abbreviatedId
 group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name.toLowerCase() + "-" + minecraft_version
+}
 
 repositories {
 	maven {
@@ -24,10 +19,6 @@ repositories {
 	maven {
 		name = 'mohist'
 		url = 'https://maven.mohistmc.com/'
-	}
-	maven {
-		name = 'izzel'
-		url = 'https://maven.izzel.io/releases'
 	}
 	maven {
 		name = 'ParchmentMC'
@@ -68,7 +59,7 @@ dependencies {
 	implementation "org.apache.maven:maven-repository-metadata:3.8.5"
 	compileOnly "org.jetbrains:annotations:21.0.1"
 	implementation(include("com.mohistmc:i18n:0.6"))
-	implementation(include("com.mohistmc:dynamicenum:0.3"))
+	implementation(include("com.mohistmc:dynamicenum:0.3.1"))
 
 	// craftbukkit
 	implementation "org.fusesource.jansi:jansi:1.18"
@@ -131,26 +122,23 @@ dependencies {
 	implementation(include("net.fabricmc:mapping-io:0.3.0"))
 }
 
-base {
-	archivesName = project.archives_base_name
-}
-
 loom {
 	accessWidenerPath = file("src/main/resources/banner.accesswidener")
 	log4jConfigs.from(file("src/main/resources/log4j2_banner.xml"))
 }
 
 processResources {
-	inputs.property "version", project.version
+	inputs.property "version", bannerVersion
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": bannerVersion
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
 	it.options.release = 17
-	options.compilerArgs << '-Xlint:-dep-ann' << '-Xlint:-removal'
+	options.warnings = false
 }
 
 java {
@@ -164,43 +152,10 @@ jar {
 		attributes(
 				'Specification-Title'   : 'Banner',
 				'Specification-Vendor'  : 'MohistMC',
-				'Specification-Version' : ci_version(),
+				'Specification-Version' : bannerVersion,
 				'Implementation-Title'  : 'Banner',
-				'Implementation-Version': '1.19.4-' + ci_version(),
+				'Implementation-Version': minecraft_version + "-" +bannerVersion,
 				'Implementation-Vendor' : 'MohistMC'
 		)
-	}
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
-	}
-
-	repositories {
-
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	options.encoding = 'UTF-8'
-}
-
-import groovy.json.JsonSlurper
-static String ci_version() {
-	try {
-		def conn = new URL("https://ci.codemc.io/job/MohistMC/job/Banner-1.19.4/api/json").openConnection()
-		conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36")
-		conn.connect()
-		def root = conn.content.text
-		def jsonSluper = new JsonSlurper()
-
-		String data = jsonSluper.parseText(root)
-		def number = data.substring(data.indexOf("number")).split(",")
-		return Integer.valueOf(number[0].replace("number=", "")).intValue()
-	} catch (Exception ignored) {
-		return '1.19.4'
 	}
 }

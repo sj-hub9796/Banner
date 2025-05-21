@@ -32,7 +32,11 @@ public class BannerMCStart {
             LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
             LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
             LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
-            LOGGER.info(I18N.as("banner.launch.welcomemessage") + " - " + getVersion() + ", Java " + javaVersion);
+            LOGGER.info("{} - {}, Java {}", I18N.as("banner.launch.welcomemessage"), getVersion(), javaVersion);
+        }
+        if(I18N.isCN()) {
+            LOGGER.info("MohistMC官方反馈群: 570870451");
+            LOGGER.info("Banner专属交流群: 211128424");
         }
         if (System.getProperty("log4j.configurationFile") == null) {
             System.setProperty("log4j.configurationFile", "log4j2_banner.xml");
@@ -52,13 +56,9 @@ public class BannerMCStart {
     }
 
     public static String getVersion() {
-        try {
-            Class<?> version = Class.forName("com.mohistmc.banner.VersionInfo");
-            return (String) version.getField("VERSION").get(null);
-        } catch (ClassNotFoundException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            return "unknown";
-        }
+        return (BannerMCStart.class.getPackage().getImplementationVersion() != null) ? BannerMCStart.class.getPackage().getImplementationVersion() : "unknown";
     }
+
 
     private static void injectDeobfStack() {
         CompatUtil.LOGGER.info(BannerMCStart.I18N.as("stackdeobf.inject.logger"));
