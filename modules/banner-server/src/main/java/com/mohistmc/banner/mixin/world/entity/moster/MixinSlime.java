@@ -53,7 +53,7 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
     public void remove(Entity.RemovalReason reason) {
         int i = this.getSize();
         if (!this.level().isClientSide && i > 1 && this.isDeadOrDying()) {
-            Component itextcomponent = this.getCustomName();
+            Component component = this.getCustomName();
             boolean flag = this.isNoAi();
             float f = (float) i / 4.0F;
             int j = i / 2;
@@ -79,7 +79,7 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
                     slimeentity.setPersistenceRequired();
                 }
 
-                slimeentity.setCustomName(itextcomponent);
+                slimeentity.setCustomName(component);
                 slimeentity.setNoAi(flag);
                 slimeentity.setInvulnerable(this.isInvulnerable());
                 slimeentity.setSize(j, true);

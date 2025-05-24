@@ -16,6 +16,7 @@ import net.minecraft.world.inventory.ResultContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AnvilBlock;
+import net.minecraft.world.level.block.RootedDirtBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
@@ -42,8 +43,6 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
     // CraftBukkit start
     @Unique
     private static final int DEFAULT_DENIED_COST = -1;
-    @Unique
-    public int maximumRepairCost = Math.min(Short.MAX_VALUE, Math.max(41, BannerConfig.maximumRepairCost));
     @Unique
     private CraftInventoryView bukkitEntity;
     // CraftBukkit end
@@ -147,26 +146,10 @@ public abstract class MixinAnvilMenu extends ItemCombinerMenu implements Injecti
         sendAllDataToRemote(); // CraftBukkit - SPIGOT-6686: Always send completed inventory to stay in sync with client
     }
 
-    @ModifyConstant(method = "createResult", constant = @Constant(intValue = 40))
-    private int banner$maxRepairCost(int constant) {
-        return maximumRepairCost;
-    }
-
     @Override
     public int bridge$getDeniedCost() {
         return DEFAULT_DENIED_COST;
     }
-
-    @Override
-    public int bridge$maximumRepairCost() {
-        return maximumRepairCost;
-    }
-
-    @Override
-    public void banner$setMaximumRepairCost(int maximumRepairCost) {
-        this.maximumRepairCost = maximumRepairCost;
-    }
-
     // CraftBukkit start
     @Override
     public CraftInventoryView getBukkitView() {

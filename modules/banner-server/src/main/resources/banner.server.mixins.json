@@ -286,6 +286,7 @@
     "world.inventory.MixinAbstractContainerMenu",
     "world.inventory.MixinAbstractFurnaceMenu",
     "world.inventory.MixinAnvilMenu",
+    "world.inventory.MixinAnvilMenuMinFix",
     "world.inventory.MixinBeaconMenu",
     "world.inventory.MixinBrewingStandMenu",
     "world.inventory.MixinCartographyTableMenu",

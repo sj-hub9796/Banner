@@ -70,6 +70,9 @@ public class BannerMixinPlugin implements IMixinConfigPlugin, IEnvironmentTokenP
         if (mixinClassName.equals("com.mohistmc.banner.mixin.world.level.block.MixinMagmaBlock")) {
             return !FabricLoader.getInstance().isModLoaded("quad");
         }
+        if (mixinClassName.equals("com.mohistmc.banner.mixin.world.inventory.MixinAnvilMenuMinFix")) {
+            return !FabricLoader.getInstance().isModLoaded("zenith");
+        }
         return true;
     }
 
