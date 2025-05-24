@@ -45,11 +45,13 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
      * @author wdog5
      * @reason bukkit
      */
-    //@Overwrite
-    public void removeo(Entity.RemovalReason reason) {
+    @Overwrite(remap = false)
+    @Override
+    public void remove(Entity.RemovalReason reason) {
         int i = this.getSize();
         if (!this.level().isClientSide && i > 1 && this.isDeadOrDying()) {
             Component component = this.getCustomName();
+            Component component0 = this.getCustomName(); // Mixin ?
             boolean flag = this.isNoAi();
             float f = (float) i / 4.0F;
             int j = i / 2;
