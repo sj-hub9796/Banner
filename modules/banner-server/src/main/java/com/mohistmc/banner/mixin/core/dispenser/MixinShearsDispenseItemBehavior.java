@@ -2,6 +2,7 @@ package com.mohistmc.banner.mixin.core.dispenser;
 
 import com.mohistmc.banner.bukkit.BukkitFieldHooks;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
@@ -20,6 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
 import org.bukkit.event.block.BlockDispenseEvent;
@@ -32,9 +34,9 @@ import org.spongepowered.asm.mixin.Unique;
 public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseItemBehavior {
 
     @Unique
-    private static transient org.bukkit.block.Block banner$bukkitBlock;
+    private static AtomicReference<Block> banner$bukkitBlock = new AtomicReference<>();
     @Unique
-    private static transient CraftItemStack banner$craftItem;
+    private static AtomicReference<CraftItemStack> banner$craftItem = new AtomicReference<>();
     @Shadow
     private static boolean tryShearBeehive(ServerLevel level, BlockPos pos) {
         return false;
@@ -72,7 +74,8 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
         // CraftBukkit end
         if (!level.isClientSide()) {
             BlockPos blockPos = source.getPos().relative((Direction)source.getBlockState().getValue(DispenserBlock.FACING));
-            this.setSuccess(tryShearBeehive((ServerLevel)level, blockPos) || tryShearLivingEntity((ServerLevel)level, blockPos, bukkitBlock, craftItem)); // CraftBukkit
+            bukkitBlockAndcraftItem(bukkitBlock, craftItem);
+            this.setSuccess(tryShearBeehive((ServerLevel)level, blockPos) || tryShearLivingEntity((ServerLevel)level, blockPos));
             if (this.isSuccess() && stack.hurt(1, level.getRandom(), (ServerPlayer)null)) {
                 stack.setCount(0);
             }
@@ -81,12 +84,17 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
         return stack;
     }
 
-    @Unique
-    private static boolean tryShearLivingEntity(ServerLevel worldserver, BlockPos blockposition, org.bukkit.block.Block bukkitBlock, CraftItemStack craftItem) { // CraftBukkit - add args
-        banner$bukkitBlock = bukkitBlock;
-        banner$craftItem = craftItem;
-        return tryShearLivingEntity(worldserver, blockposition);
+    private static void bukkitBlockAndcraftItem(org.bukkit.block.Block bukkitBlock, CraftItemStack craftItem) {
+        banner$bukkitBlock.set(bukkitBlock);
+        banner$craftItem.set(craftItem);
     }
+
+    // CraftBukkit - add args
+    private static boolean tryShearLivingEntityCB(ServerLevel pLevel, BlockPos pPos, org.bukkit.block.Block bukkitBlock, CraftItemStack craftItem) {
+        bukkitBlockAndcraftItem(bukkitBlock, craftItem);
+        return tryShearLivingEntity(pLevel, pPos);
+    }
+    // Mohist end
 
     /**
      * @author wdog5
@@ -100,7 +108,7 @@ public abstract class MixinShearsDispenseItemBehavior extends OptionalDispenseIt
             if (livingEntity instanceof Shearable shearable) {
                 if (shearable.readyForShearing()) {
                     // CraftBukkit start
-                    if (CraftEventFactory.callBlockShearEntityEvent(livingEntity, banner$bukkitBlock, banner$craftItem).isCancelled()) {
+                    if (CraftEventFactory.callBlockShearEntityEvent(livingEntity, banner$bukkitBlock.getAndSet(null), banner$craftItem.getAndSet(null)).isCancelled()) {
                         shearable.shear(SoundSource.BLOCKS);
                         level.gameEvent((Entity) null, GameEvent.SHEAR, pos);
                         return true;

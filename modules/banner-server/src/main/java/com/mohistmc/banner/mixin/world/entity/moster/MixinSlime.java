@@ -41,16 +41,12 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
     @Unique
     private transient List<LivingEntity> banner$slimes;
 
-    // Banner start - fix mixin(locals = LocalCapture.CAPTURE_FAILHARD)
-    @Unique
-    public SlimeSplitEvent event;
-
     /**
      * @author wdog5
      * @reason bukkit
      */
-    @Overwrite(remap = false)
-    public void remove(Entity.RemovalReason reason) {
+    //@Overwrite
+    public void removeo(Entity.RemovalReason reason) {
         int i = this.getSize();
         if (!this.level().isClientSide && i > 1 && this.isDeadOrDying()) {
             Component component = this.getCustomName();
@@ -60,7 +56,7 @@ public abstract class MixinSlime extends Mob implements InjectionSlime {
             int k = 2 + this.random.nextInt(3);
 
             {
-                event = new SlimeSplitEvent((org.bukkit.entity.Slime) this.getBukkitEntity(), k);
+                SlimeSplitEvent event = new SlimeSplitEvent((org.bukkit.entity.Slime) this.getBukkitEntity(), k);
                 Bukkit.getPluginManager().callEvent(event);
                 if (event.isCancelled() || event.getCount() <= 0) {
                     super.remove(reason);
