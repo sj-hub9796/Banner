@@ -1,6 +1,8 @@
 package com.mohistmc.banner.mixin.world.entity.vehicle;
 
 import com.mohistmc.banner.injection.world.entity.vehicle.InjectionAbstractMinecart;
+import io.izzel.arclight.mixin.Decorate;
+import io.izzel.arclight.mixin.DecorationOps;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
@@ -27,6 +29,8 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.event.vehicle.VehicleUpdateEvent;
 import org.bukkit.util.Vector;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -150,175 +154,60 @@ public abstract class MixinAbstractMinecart extends Entity implements InjectionA
         }
     }
 
-    // Banner start - fix mixin by Spelunkery mod
     @Unique
-    private double prevX;
-    @Unique
-    private double prevY;
-    @Unique
-    private double prevZ;
-    @Unique
-    private float prevYaw;
-    @Unique
-    private float prevPitch;
-    // Banner end
+    private transient Location banner$prevLocation;
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    public void tick() {
-        // CraftBukkit start
-        this.prevX = this.getX();
-        this.prevY = this.getY();
-        this.prevZ = this.getZ();
-        this.prevYaw = this.getYRot();
-        this.prevPitch = this.getXRot();
-        // CraftBukkit end
+    @Decorate(method = "tick", inject = true, at = @At("HEAD"))
+    private void banner$storePreviousLocation() {
+        this.banner$prevLocation = new Location(null, this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+    }
 
-        if (this.getHurtTime() > 0) {
-            this.setHurtTime(this.getHurtTime() - 1);
-        }
-
-        if (this.getDamage() > 0.0F) {
-            this.setDamage(this.getDamage() - 1.0F);
-        }
-
-        this.checkBelowWorld();
-        // this.handleNetherPortal(); // CraftBukkit - handled in postTick
-        if (this.level().isClientSide) {
-            if (this.lSteps > 0) {
-                double d = this.getX() + (this.lx - this.getX()) / (double) this.lSteps;
-                double e = this.getY() + (this.ly - this.getY()) / (double)this.lSteps;
-                double f = this.getZ() + (this.lz - this.getZ()) / (double)this.lSteps;
-                double g = Mth.wrapDegrees(this.lyr - (double)this.getYRot());
-                this.setYRot(this.getYRot() + (float)g / (float)this.lSteps);
-                this.setXRot(this.getXRot() + (float)(this.lxr - (double)this.getXRot()) / (float)this.lSteps);
-                --this.lSteps;
-                this.setPos(d, e, f);
-                this.setRot(this.getYRot(), this.getXRot());
-            } else {
-                this.reapplyPosition();
-                this.setRot(this.getYRot(), this.getXRot());
-            }
-
-        } else {
-            if (!this.isNoGravity()) {
-                double d = this.isInWater() ? -0.005D : -0.04D;
-                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, d, 0.0D));
-            }
-
-            int i = Mth.floor(this.getX());
-            int j = Mth.floor(this.getY());
-            int k = Mth.floor(this.getZ());
-            if (this.level().getBlockState(new BlockPos(i, j - 1, k)).is(BlockTags.RAILS)) {
-                --j;
-            }
-
-            BlockPos blockposition = new BlockPos(i, j, k);
-            BlockState iblockdata = this.level().getBlockState(blockposition);
-            this.onRails = BaseRailBlock.isRail(iblockdata);
-            if (this.onRails) {
-                this.moveAlongTrack(blockposition, iblockdata);
-                if (iblockdata.is(Blocks.ACTIVATOR_RAIL)) {
-                    this.activateMinecart(i, j, k, (Boolean) iblockdata.getValue(PoweredRailBlock.POWERED));
-                }
-            } else {
-                this.comeOffTrack();
-            }
-
-            this.checkInsideBlocks();
-            this.setXRot(0.0F);
-            double d4 = this.xo - this.getX();
-            double d5 = this.zo - this.getZ();
-
-            if (d4 * d4 + d5 * d5 > 0.001D) {
-                this.setYRot((float) (Mth.atan2(d5, d4) * 180.0D / 3.141592653589793D));
-                if (this.flipped) {
-                    this.setYRot(this.getYRot() + 180.0F);
-                }
-            }
-
-            double d6 = (double) Mth.wrapDegrees(this.getYRot() - this.yRotO);
-
-            if (d6 < -170.0D || d6 >= 170.0D) {
-                this.setYRot(this.getYRot() + 180.0F);
-                this.flipped = !this.flipped;
-            }
-
-            this.setRot(this.getYRot(), this.getXRot());
-            // CraftBukkit start
-            org.bukkit.World bworld = this.level().getWorld();
-            Location from = new Location(bworld, prevX, prevY, prevZ, prevYaw, prevPitch);
-            Location to = CraftLocation.toBukkit(this.position(), bworld, this.getYRot(), this.getXRot());
-            Vehicle vehicle = (Vehicle) this.getBukkitEntity();
-
-            this.level().getCraftServer().getPluginManager().callEvent(new org.bukkit.event.vehicle.VehicleUpdateEvent(vehicle));
-
+    @Inject(method = "tick", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;setRot(FF)V"))
+    private void banner$vehicleUpdateEvent(CallbackInfo ci) {
+        org.bukkit.World bworld = this.level().getWorld();
+        Location to = new Location(bworld, this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
+        Vehicle vehicle = (Vehicle) this.getBukkitEntity();
+        Bukkit.getPluginManager().callEvent(new VehicleUpdateEvent(vehicle));
+        Location from = this.banner$prevLocation;
+        if (from != null) {
+            from.setWorld(bworld);
             if (!from.equals(to)) {
-                this.level().getCraftServer().getPluginManager().callEvent(new org.bukkit.event.vehicle.VehicleMoveEvent(vehicle, from, to));
+                Bukkit.getPluginManager().callEvent(new VehicleMoveEvent(vehicle, from, to));
             }
-            // CraftBukkit end
-            if (this.getMinecartType() == AbstractMinecart.Type.RIDEABLE && this.getDeltaMovement().horizontalDistanceSqr() > 0.01D) {
-                List<Entity> list = this.level().getEntities((Entity) this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D), EntitySelector.pushableBy(this));
-
-                if (!list.isEmpty()) {
-                    for (Entity value : list) {
-                        Entity entity = (Entity) value;
-
-                        if (!(entity instanceof Player) && !(entity instanceof IronGolem) && !(entity instanceof AbstractMinecart) && !this.isVehicle() && !entity.isPassenger()) {
-                            // CraftBukkit start
-                            VehicleEntityCollisionEvent collisionEvent = new VehicleEntityCollisionEvent(vehicle, entity.getBukkitEntity());
-                            this.level().getCraftServer().getPluginManager().callEvent(collisionEvent);
-
-                            if (collisionEvent.isCancelled()) {
-                                continue;
-                            }
-                            // CraftBukkit end
-                            entity.startRiding(this);
-                        } else {
-                            // CraftBukkit start
-                            if (!this.isPassengerOfSameVehicle(entity)) {
-                                VehicleEntityCollisionEvent collisionEvent = new VehicleEntityCollisionEvent(vehicle, entity.getBukkitEntity());
-                                this.level().getCraftServer().getPluginManager().callEvent(collisionEvent);
-
-                                if (collisionEvent.isCancelled()) {
-                                    continue;
-                                }
-                            }
-                            // CraftBukkit end
-                            entity.push(this);
-                        }
-                    }
-                }
-            } else {
-
-                for (Entity entity1 : this.level().getEntities(this, this.getBoundingBox().inflate(0.20000000298023224D, 0.0D, 0.20000000298023224D))) {
-                    if (!this.hasPassenger(entity1) && entity1.isPushable() && entity1 instanceof AbstractMinecart) {
-                        // CraftBukkit start
-                        VehicleEntityCollisionEvent collisionEvent = new VehicleEntityCollisionEvent(vehicle, entity1.getBukkitEntity());
-                        this.level().getCraftServer().getPluginManager().callEvent(collisionEvent);
-
-                        if (collisionEvent.isCancelled()) {
-                            continue;
-                        }
-                        // CraftBukkit end
-                        entity1.push(this);
-                    }
-                }
-            }
-
-            this.updateInWaterStateAndDoFluidPushing();
-            if (this.isInLava()) {
-                this.lavaHurt();
-                this.fallDistance *= 0.5F;
-            }
-
-            this.firstTick = false;
         }
     }
 
+    @Decorate(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;startRiding(Lnet/minecraft/world/entity/Entity;)Z"))
+    private boolean banner$ridingCollide(Entity instance, Entity entity) throws Throwable {
+        VehicleEntityCollisionEvent collisionEvent = new VehicleEntityCollisionEvent((Vehicle) this.getBukkitEntity(), instance.getBukkitEntity());
+        Bukkit.getPluginManager().callEvent(collisionEvent);
+        if (collisionEvent.isCancelled()) {
+            return false;
+        }
+        return (boolean) DecorationOps.callsite().invoke(instance, entity);
+    }
+
+    @Decorate(method = "tick", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/world/entity/Entity;push(Lnet/minecraft/world/entity/Entity;)V"))
+    private void banner$pushCollide(Entity instance, Entity entity) throws Throwable {
+        if (!this.isPassengerOfSameVehicle(instance)) {
+            VehicleEntityCollisionEvent collisionEvent = new VehicleEntityCollisionEvent((Vehicle) this.getBukkitEntity(), instance.getBukkitEntity());
+            Bukkit.getPluginManager().callEvent(collisionEvent);
+            if (collisionEvent.isCancelled()) {
+                return;
+            }
+        }
+        DecorationOps.callsite().invoke(instance, entity);
+    }
+
+    @Decorate(method = "tick", at = @At(value = "INVOKE", ordinal = 1, target = "Lnet/minecraft/world/entity/Entity;push(Lnet/minecraft/world/entity/Entity;)V"))
+    private void banner$pushCollide2(Entity instance, Entity entity) throws Throwable {
+        VehicleEntityCollisionEvent collisionEvent = new VehicleEntityCollisionEvent((Vehicle) this.getBukkitEntity(), instance.getBukkitEntity());
+        Bukkit.getPluginManager().callEvent(collisionEvent);
+        if (collisionEvent.isCancelled()) {
+            return;
+        }
+        DecorationOps.callsite().invoke(instance, entity);
+    }
     /**
      * @author wdog5
      * @reason
