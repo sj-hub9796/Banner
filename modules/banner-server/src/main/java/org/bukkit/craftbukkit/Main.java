@@ -10,7 +10,6 @@ import joptsimple.OptionSet;
 import joptsimple.util.PathConverter;
 import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
 
-
 import static java.util.Arrays.asList;
 
 public class Main extends OptionParser {

@@ -1,11 +1,10 @@
 package org.bukkit.craftbukkit.v1_20_R1.potion;
 
+import java.util.Objects;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import org.bukkit.Color;
 import org.bukkit.potion.PotionEffectType;
-
-import java.util.Objects;
 
 public class CraftPotionEffectType extends PotionEffectType {
     private final MobEffect handle;

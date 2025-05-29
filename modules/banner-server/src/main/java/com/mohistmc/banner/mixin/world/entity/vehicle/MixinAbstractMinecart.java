@@ -43,7 +43,6 @@ public abstract class MixinAbstractMinecart extends Entity implements InjectionA
     @Shadow public abstract void destroy(DamageSource source);
     // @formatter:on
 
-    @Shadow private boolean onRails;
     @Unique
     public boolean slowWhenEmpty = true;
     @Unique

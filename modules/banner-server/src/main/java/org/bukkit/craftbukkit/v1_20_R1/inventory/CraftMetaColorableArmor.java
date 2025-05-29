@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.serialization.DelegateDeserialization;
 import org.bukkit.inventory.meta.ColorableArmorMeta;
 
-
 import static org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemFactory.DEFAULT_LEATHER_COLOR;
 
 @DelegateDeserialization(CraftMetaItem.SerializableMeta.class)

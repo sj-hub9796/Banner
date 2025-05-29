@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 
-
 import static org.bukkit.Bukkit.shutdown;
 
 public class WatchdogThread extends Thread
