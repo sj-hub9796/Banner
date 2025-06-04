@@ -634,6 +634,12 @@ public abstract class MixinServerPlayer extends Player implements InjectionServe
     private void banner$copyOverData(ServerRecipeBook instance, RecipeBook recipeBook) {
     }
 
+    @Inject(method = "restoreFrom", at = @At("HEAD"))
+    private void banner$handlePlayer(ServerPlayer serverPlayer, boolean bl, CallbackInfo ci) {
+        serverPlayer.getBukkitEntity().setHandle(((ServerPlayer) (Object) this));
+        serverPlayer.banner$setBukkitEntity(serverPlayer.getBukkitEntity());
+    }
+
     // TODO fix me
     /*
     @Inject(method = "trackChunk",
