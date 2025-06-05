@@ -558,6 +558,7 @@
     "world.level.levelgen.structure.templatesystem.MixinStructureTemplateManager",
     "world.level.material.MixinFlowingFluid",
     "world.level.material.MixinLavaFluid",
+    "world.level.portal.MixinDimensionTransition",
     "world.level.portal.MixinPortalForcer",
     "world.level.redstone.MixinNeighborUpdater",
     "world.level.saveddata.maps.MixinMapItemSavedData",

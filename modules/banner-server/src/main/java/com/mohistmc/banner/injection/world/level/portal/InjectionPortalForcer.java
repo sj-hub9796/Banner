@@ -9,11 +9,11 @@ import net.minecraft.world.level.border.WorldBorder;
 
 public interface InjectionPortalForcer {
 
-    default Optional<BlockUtil.FoundRectangle> findPortalAround(BlockPos pos, WorldBorder worldBorder, int searchRadius) {
-        return Optional.empty();
+    default void pushPortalCreate(Entity entity, int createRadius) {
+
     }
 
-    default Optional<BlockUtil.FoundRectangle> createPortal(BlockPos pos, Direction.Axis axis, Entity entity, int createRadius) {
-        return Optional.empty();
+    default void pushSearchRadius(int searchRadius) {
+
     }
 }

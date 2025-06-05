@@ -4,9 +4,11 @@ import com.mohistmc.banner.asm.annotation.TransformAccess;
 import com.mohistmc.banner.injection.world.level.block.entity.InjectionBeaconBlockEntity;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
@@ -15,6 +17,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.craftbukkit.block.CraftBlock;
+import org.bukkit.craftbukkit.potion.CraftPotionUtil;
+import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,72 +29,52 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-// Banner TODO fix patches
 @Mixin(BeaconBlockEntity.class)
 public abstract class MixinBeaconBlockEntity extends BlockEntity implements InjectionBeaconBlockEntity {
-
-    @Shadow
-    public int levels;
 
     public MixinBeaconBlockEntity(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
     }
 
-    @Inject(method = "tick",
-            at = @At(value = "FIELD",
-                    target = "Lnet/minecraft/world/level/block/entity/BeaconBlockEntity;lastCheckY:I", ordinal = 5),
-            locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void banner$activationEvent(Level level, BlockPos pos, BlockState state,
-                                               BeaconBlockEntity blockEntity, CallbackInfo ci,
-                                               int i, int j, int k, BlockPos blockPos,
-                                               BeaconBlockEntity.BeaconBeamSection beaconBeamSection,
-                                               int l, int m) {
-        // Paper start - beacon activation/deactivation events
-        if (m <= 0 && blockEntity.levels > 0) {
-            org.bukkit.block.Block block = CraftBlock.at(level, pos);
-            new io.papermc.paper.event.block.BeaconActivatedEvent(block).callEvent();
-        } else if (m > 0 && blockEntity.levels <= 0) {
-            org.bukkit.block.Block block = CraftBlock.at(level, pos);
-            new io.papermc.paper.event.block.BeaconDeactivatedEvent(block).callEvent();
-        }
-        // Paper end
+    // @formatter:off
+    @Shadow public int levels;
+    @Shadow @Nullable public Holder<MobEffect> primaryPower;
+    @Shadow @Nullable public Holder<MobEffect> secondaryPower;
+    // @formatter:on
+
+    @Inject(method = "loadAdditional", at = @At("RETURN"))
+    public void arclight$level(CompoundTag compoundTag, HolderLookup.Provider provider, CallbackInfo ci) {
+        this.levels = compoundTag.getInt("Levels");
     }
 
-    private static boolean hasSecondaryEffect(int i, @Nullable MobEffect mobeffectlist, @Nullable MobEffect mobeffectlist1) {
-        {
-            return i >= 4 && mobeffectlist != mobeffectlist1 && mobeffectlist1 != null;
-        }
-    }
-
-    // CraftBukkit start - split into components
-    private static byte getAmplification(int i, @Nullable MobEffect mobeffectlist, @Nullable MobEffect mobeffectlist1) {
-        {
-            byte b0 = 0;
-
-            if (i >= 4 && mobeffectlist == mobeffectlist1) {
-                b0 = 1;
-            }
-
-            return b0;
-        }
-    }
-
-    /*
     @Override
     public PotionEffect getPrimaryEffect() {
-        return (this.primaryPower != null) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.primaryPower, getLevel(this.levels), getAmplification(levels, primaryPower, secondaryPower), true, true)) : null;
+        return (this.primaryPower != null) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.primaryPower, this.getEffectLevel(), this.getAmplification(), true, true)) : null;
     }
 
     @Override
     public PotionEffect getSecondaryEffect() {
-        return (hasSecondaryEffect(levels, primaryPower, secondaryPower)) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.secondaryPower, getLevel(this.levels), getAmplification(levels, primaryPower, secondaryPower), true, true)) : null;
-    }*/
+        return (this.hasSecondaryEffect()) ? CraftPotionUtil.toBukkit(new MobEffectInstance(this.secondaryPower, getEffectLevel(), getAmplification(), true, true)) : null;
+    }
 
-    private static int getLevel(int i) {
-        {
-            int j = (9 + i * 2) * 20;
-            return j;
+    private byte getAmplification() {
+        byte b0 = 0;
+        if (this.levels >= 4 && this.primaryPower == this.secondaryPower) {
+            b0 = 1;
         }
+        return b0;
+    }
+
+    private int getEffectLevel() {
+        int i = (9 + this.levels * 2) * 20;
+        return i;
+    }
+
+    private boolean hasSecondaryEffect() {
+        if (this.levels >= 4 && this.primaryPower != this.secondaryPower && this.secondaryPower != null) {
+            return true;
+        }
+        return false;
     }
 
     @TransformAccess(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC)

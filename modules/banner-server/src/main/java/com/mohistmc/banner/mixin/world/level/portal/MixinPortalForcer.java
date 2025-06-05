@@ -4,14 +4,13 @@ import com.mohistmc.banner.injection.world.level.portal.InjectionPortalForcer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
+
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.portal.PortalForcer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftWorld;
@@ -23,33 +22,25 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(PortalForcer.class)
+@Mixin(value = PortalForcer.class, priority = 1500)
 public abstract class MixinPortalForcer implements InjectionPortalForcer {
 
     @Shadow @Final protected ServerLevel level;
-    private final AtomicReference<Integer> banner$searchRadius = new AtomicReference<>();
-    // @formatter:on
-    private transient BlockStateListPopulator banner$populator;
-    private transient Entity banner$entity;
-    private transient int banner$createRadius = -1;
 
-    // @formatter:off
-    @Shadow public abstract Optional<BlockUtil.FoundRectangle> createPortal(BlockPos pos, Direction.Axis axis);
+    private transient int banner$searchRadius = -1;
 
-    // Banner TODO fix patches
     @Override
-    public Optional<BlockUtil.FoundRectangle> findPortalAround(BlockPos pos, WorldBorder worldBorder, int searchRadius) {
-       /*
-        this.banner$searchRadius.set(searchRadius);
-        try {
-            return this.findPortalAround(pos, false, worldBorder);
-        } finally {
-            this.banner$searchRadius.set(-1);
-        }*/
-        return Optional.empty();
+    public void pushSearchRadius(int searchRadius) {
+        this.banner$searchRadius = searchRadius;
+    }
+
+    @ModifyVariable(method = "findClosestPortalPosition", ordinal = 0, at = @At(value = "STORE", ordinal = 0))
+    private int banner$useSearchRadius(int i) {
+        return this.banner$searchRadius == -1 ? i : this.banner$searchRadius;
     }
 
     @ModifyArg(method = "createPortal", index = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;spiralAround(Lnet/minecraft/core/BlockPos;ILnet/minecraft/core/Direction;Lnet/minecraft/core/Direction;)Ljava/lang/Iterable;"))
@@ -95,15 +86,13 @@ public abstract class MixinPortalForcer implements InjectionPortalForcer {
         }
     }
 
+    private transient BlockStateListPopulator banner$populator;
+    private transient Entity banner$entity;
+    private transient int banner$createRadius = -1;
+
     @Override
-    public Optional<BlockUtil.FoundRectangle> createPortal(BlockPos pos, Direction.Axis axis, Entity entity, int createRadius) {
+    public void pushPortalCreate(Entity entity, int createRadius) {
         this.banner$entity = entity;
         this.banner$createRadius = createRadius;
-        try {
-            return this.createPortal(pos, axis);
-        } finally {
-            this.banner$entity = null;
-            this.banner$createRadius = -1;
-        }
     }
 }
