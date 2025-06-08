@@ -871,10 +871,6 @@ public abstract class MixinEntity implements Nameable, EntityAccess, CommandSour
         return new CraftPortalEvent(event);
     }
 
-    protected Optional<BlockUtil.FoundRectangle> getExitPortal(ServerLevel serverWorld, BlockPos pos, boolean flag, WorldBorder worldborder, int searchRadius, boolean canCreatePortal, int createRadius) {
-        return serverWorld.getPortalForcer().findPortalAround(pos, worldborder, searchRadius);
-    }
-
     @Redirect(method = "setBoundingBox",
             at = @At(value = "FIELD",
                     target = "Lnet/minecraft/world/entity/Entity;bb:Lnet/minecraft/world/phys/AABB;"))
