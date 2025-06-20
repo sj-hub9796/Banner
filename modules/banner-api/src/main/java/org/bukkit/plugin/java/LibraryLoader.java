@@ -129,7 +129,7 @@ class LibraryLoader {
     public List<Dependency> initDependencies(URL url) {
         List<Dependency> list = new ArrayList<>();
         Json json2Json = Json.readXml(url).at("project");
-        if (json2Json.isNull()) return list;
+        if (json2Json == null) return list;
         String version = json2Json.has("parent") ? json2Json.at("parent").asString("version") : json2Json.asString("version");
         String groupId = json2Json.has("parent") ? json2Json.at("parent").asString("groupId") : json2Json.asString("groupId");
 
