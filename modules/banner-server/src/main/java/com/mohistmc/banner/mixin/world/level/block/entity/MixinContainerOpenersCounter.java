@@ -28,14 +28,17 @@ public abstract class MixinContainerOpenersCounter implements InjectionContainer
 
     @Shadow protected abstract void openerCountChanged(Level p_155463_, BlockPos p_155464_, BlockState p_155465_, int p_155466_, int p_155467_);
 
+    @Override
     public void onAPIOpen(Level world, BlockPos blockposition, BlockState iblockdata) {
         onOpen(world, blockposition, iblockdata);
     }
 
+    @Override
     public void onAPIClose(Level world, BlockPos blockposition, BlockState iblockdata) {
         onClose(world, blockposition, iblockdata);
     }
 
+    @Override
     public void openerAPICountChanged(Level world, BlockPos blockposition, BlockState iblockdata, int i, int j) {
         openerCountChanged(world, blockposition, iblockdata, i, j);
     }

@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.event.CraftPortalEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityRemoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.Nullable;
@@ -209,6 +210,10 @@ public interface InjectionEntity {
     }
 
     default void pushRemoveCause(EntityRemoveEvent.Cause cause) {
+        throw new IllegalStateException("Not implemented");
+    }
+
+    default void pushSpawnCause(CreatureSpawnEvent.SpawnReason reason) {
         throw new IllegalStateException("Not implemented");
     }
 
