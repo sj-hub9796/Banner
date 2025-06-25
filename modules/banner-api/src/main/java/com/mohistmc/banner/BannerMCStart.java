@@ -31,6 +31,7 @@ public class BannerMCStart {
         }
         if(I18N.isCN()) {
             System.out.printf("官方交流QQ群: 211128424%n");
+            System.out.printf("如果控制台出现中文乱码请添加启动参数: -Dfile.encoding=GBK%n");
         }
         if (!EulaUtil.hasAcceptedEULA()) {
             System.out.println(I18n.as("eula"));
