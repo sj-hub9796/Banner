@@ -35,6 +35,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.advancements.AdvancementProgress;
@@ -1815,10 +1816,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
     }
 
     private void sendCustomPayload(ResourceLocation id, byte[] message) {
+        /* TODO Banner
         var payload = new DiscardedPayload(id);
         payload.bridge$setData(Unpooled.wrappedBuffer(message));
-        ClientboundCustomPayloadPacket packet = new ClientboundCustomPayloadPacket(payload);
-        this.getHandle().connection.send(packet);
+        ServerPlayNetworking.send(this.getHandle(), payload);
+         */
     }
 
     @Override
