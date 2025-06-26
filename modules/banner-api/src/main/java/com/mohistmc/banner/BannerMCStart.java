@@ -27,7 +27,7 @@ public class BannerMCStart {
             LOGGER.info("|  _  {   / / | | | |\\   | | |\\   | |  __|  |  _  /  ");
             LOGGER.info("| |_| |  / /  | | | | \\  | | | \\  | | |___  | | \\ \\  ");
             LOGGER.info("|_____/ /_/   |_| |_|  \\_| |_|  \\_| |_____| |_|  \\_\\ ");
-            LOGGER.info("{} - {}, Java {}", I18n.as("banner.launch.welcomemessage"), getVersion(), javaVersion);
+            LOGGER.info("{} {}, Java {}", I18n.as("banner.launch.welcomemessage"), getVersion(), javaVersion);
         }
         if(I18N.isCN()) {
             System.out.printf("官方交流QQ群: 211128424%n");

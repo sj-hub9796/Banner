@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
@@ -100,13 +101,13 @@ public abstract class MixinCampfireBlockEntity extends BlockEntity {
     }
 
     @Shadow
-    public abstract Optional<CampfireCookingRecipe> getCookableRecipe(ItemStack p_59052_);
+    public abstract Optional<RecipeHolder<CampfireCookingRecipe>> getCookableRecipe(ItemStack itemStack);
 
-    @Inject(method = "placeFood", locals = LocalCapture.CAPTURE_FAILHARD,
+    @Inject(method = "placeFood",
             at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/block/entity/CampfireBlockEntity;cookingProgress:[I"))
-    private void banner$cookStart(LivingEntity livingEntity, ItemStack itemStack, int i, CallbackInfoReturnable<Boolean> cir, int j, ItemStack itemStack2) {
-        var event = new CampfireStartEvent(CraftBlock.at(this.level, this.worldPosition), CraftItemStack.asCraftMirror(itemStack), (CampfireRecipe) ((RecipeHolder) (Object) getCookableRecipe(itemStack).get()).toBukkitRecipe());
+    private void banner$cookStart(LivingEntity livingEntity, ItemStack itemStack, int i, CallbackInfoReturnable<Boolean> cir, @Local(ordinal = 1) int j) {
+        var event = new CampfireStartEvent(CraftBlock.at(this.level, this.worldPosition), CraftItemStack.asCraftMirror(itemStack), (CampfireRecipe)getCookableRecipe(itemStack).get().toBukkitRecipe());
         Bukkit.getPluginManager().callEvent(event);
-        this.cookingTime[i] = event.getTotalCookTime();
+        this.cookingTime[j] = event.getTotalCookTime();
     }
 }
