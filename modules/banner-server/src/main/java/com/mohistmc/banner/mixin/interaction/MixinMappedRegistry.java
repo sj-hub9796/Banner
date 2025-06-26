@@ -1,5 +1,7 @@
 package com.mohistmc.banner.mixin.interaction;
 
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistrationInfo;
@@ -10,9 +12,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Mixin(MappedRegistry.class)
 public abstract class MixinMappedRegistry<T> implements WritableRegistry<T> {

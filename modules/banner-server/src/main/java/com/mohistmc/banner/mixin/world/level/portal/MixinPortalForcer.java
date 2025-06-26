@@ -4,7 +4,6 @@ import com.mohistmc.banner.injection.world.level.portal.InjectionPortalForcer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import net.minecraft.BlockUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

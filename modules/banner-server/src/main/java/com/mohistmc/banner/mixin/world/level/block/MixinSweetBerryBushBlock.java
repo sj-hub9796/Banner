@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import java.util.Collections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -17,8 +18,6 @@ import org.bukkit.event.player.PlayerHarvestBlockEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-
-import java.util.Collections;
 
 @Mixin(SweetBerryBushBlock.class)
 public class MixinSweetBerryBushBlock {

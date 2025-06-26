@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.level.block.entity;
 
-import java.util.Arrays;
 import java.util.Collections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

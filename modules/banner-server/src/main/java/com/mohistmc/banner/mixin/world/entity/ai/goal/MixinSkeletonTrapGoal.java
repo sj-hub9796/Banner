@@ -2,7 +2,6 @@ package com.mohistmc.banner.mixin.world.entity.ai.goal;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.animal.horse.SkeletonHorse;
 import net.minecraft.world.entity.animal.horse.SkeletonTrapGoal;
 import org.bukkit.event.entity.CreatureSpawnEvent;

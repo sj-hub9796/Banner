@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.entity.ai.goal;
 
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.PanicGoal;

@@ -1,6 +1,7 @@
 package com.mohistmc.banner.mixin.world.level.block.entity.valut;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -19,8 +20,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 @Mixin(VaultBlockEntity.Server.class)
 public class MixinVaultBlockEntity_Server {

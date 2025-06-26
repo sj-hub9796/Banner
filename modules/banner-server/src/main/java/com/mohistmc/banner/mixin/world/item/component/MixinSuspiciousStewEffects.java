@@ -1,5 +1,6 @@
 package com.mohistmc.banner.mixin.world.item.component;
 
+import java.util.List;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.item.ItemStack;
@@ -7,8 +8,6 @@ import net.minecraft.world.item.component.SuspiciousStewEffects;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import java.util.List;
 
 @Mixin(SuspiciousStewEffects.class)
 public class MixinSuspiciousStewEffects {

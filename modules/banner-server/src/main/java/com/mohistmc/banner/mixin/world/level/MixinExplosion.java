@@ -1,6 +1,5 @@
 package com.mohistmc.banner.mixin.world.level;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import com.mohistmc.banner.injection.world.level.InjectionExplosion;
 import com.mojang.datafixers.util.Pair;
 import io.izzel.arclight.mixin.Decorate;
@@ -33,7 +32,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Explosion.class)
