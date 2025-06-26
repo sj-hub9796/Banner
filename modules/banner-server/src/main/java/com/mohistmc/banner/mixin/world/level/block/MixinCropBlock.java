@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -20,7 +21,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(CropBlock.class)
-public class MixinCropBlock {
+public abstract class MixinCropBlock {
+
+    @Shadow
+    public abstract BlockState getStateForAge(int i);
 
     private final AtomicReference<Entity> banner$entity = new AtomicReference<>();
     private final AtomicReference<BlockPos> banner$pos = new AtomicReference<>();
@@ -47,8 +51,8 @@ public class MixinCropBlock {
 
     @Redirect(method = "growCrops(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
-    public boolean banner$blockGrowGrow(Level world, BlockPos pos, BlockState newState, int flags) {
-        return CraftEventFactory.handleBlockGrowEvent(world, pos, newState, flags);
+    public boolean banner$blockGrowGrow(Level instance, BlockPos blockPos, BlockState blockState, int i) {
+        return CraftEventFactory.handleBlockGrowEvent(instance, blockPos, blockState, i); // CraftBukkit
     }
 
     @Inject(method = "entityInside", at = @At("HEAD"))
@@ -65,6 +69,6 @@ public class MixinCropBlock {
 
     @Redirect(method = "randomTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     public boolean banner$blockGrowTick(ServerLevel world, BlockPos pos, BlockState newState, int flags) {
-        return CraftEventFactory.handleBlockGrowEvent(world, pos, newState, flags);
+        return CraftEventFactory.handleBlockGrowEvent(world, pos, newState, flags); // CraftBukkit
     }
 }

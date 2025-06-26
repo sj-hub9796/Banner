@@ -42,13 +42,6 @@ public class MixinStemBlock {
         }
     }
 
-    @Redirect(method = "randomTick", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerLevel;setBlockAndUpdate(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z",
-            ordinal = 0))
-    private boolean banner$growEvent(ServerLevel instance, BlockPos pos, BlockState state) {
-        return false;
-    }
-
     @Redirect(method = "performBonemeal", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
     public boolean banner$cropGrow(ServerLevel world, BlockPos pos, BlockState newState, int flags) {
         return CraftEventFactory.handleBlockGrowEvent(world, pos, newState, flags);
