@@ -54,7 +54,7 @@ public abstract class MixinWitch extends Raider {
     private void banner$callWitchPotionEvent(LivingEntity livingEntity, float f, CallbackInfo ci, Vec3 vec3, double d, double e, double g, double h, Holder holder) {
         // Paper start
         paperPotion.set(PotionContents.createItemStack(Items.SPLASH_POTION, holder));
-        com.destroystokyo.paper.event.entity.WitchThrowPotionEvent event = new com.destroystokyo.paper.event.entity.WitchThrowPotionEvent((org.bukkit.entity.Witch) this.getBukkitEntity(), (org.bukkit.entity.LivingEntity) getTarget().getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(paperPotion.get()));
+        com.destroystokyo.paper.event.entity.WitchThrowPotionEvent event = new com.destroystokyo.paper.event.entity.WitchThrowPotionEvent((org.bukkit.entity.Witch) this.getBukkitEntity(), (org.bukkit.entity.LivingEntity) livingEntity.getBukkitEntity(), org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(paperPotion.get()));
         if (!event.callEvent()) {
             ci.cancel();
         }
