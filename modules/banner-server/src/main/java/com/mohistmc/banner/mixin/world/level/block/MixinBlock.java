@@ -1,16 +1,16 @@
 package com.mohistmc.banner.mixin.world.level.block;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mohistmc.banner.asm.annotation.TransformAccess;
 import com.mohistmc.banner.injection.world.level.block.InjectionBlock;
-import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.event.entity.EntityExhaustionEvent;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -31,23 +30,13 @@ public abstract class MixinBlock extends BlockBehaviour implements InjectionBloc
         super(properties);
     }
 
-    /**
-     * @author wdog5
-     * @reason
-     */
-    @Overwrite
-    private static void popResource(Level level, Supplier<ItemEntity> itemEntitySupplier, ItemStack stack) {
-        if (!level.isClientSide && !stack.isEmpty() && level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS)) {
-            ItemEntity itemEntity = itemEntitySupplier.get();
-            itemEntity.setDefaultPickUpDelay();
-            // CraftBukkit start
-            if (level.bridge$captureDrops() != null) {
-                level.bridge$captureDrops().add(itemEntity);
-            } else {
-                level.addFreshEntity(itemEntity);
-            }
-            // CraftBukkit end
+    @WrapWithCondition(method = "popResource(Lnet/minecraft/world/level/Level;Ljava/util/function/Supplier;Lnet/minecraft/world/item/ItemStack;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    private static boolean banner$addCapture(Level instance, Entity entity) {
+        boolean banner$flag = instance.bridge$captureDrops() != null;
+        if (banner$flag) {
+            instance.bridge$captureDrops().add((ItemEntity) entity);
         }
+        return !banner$flag;
     }
 
     // Spigot start
