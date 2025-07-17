@@ -573,6 +573,13 @@ public final class CraftServer implements Server {
         return bukkitVersion;
     }
 
+    // Paper start - expose game version
+    @Override
+    public String getMinecraftVersion() {
+        return console.getServerVersion();
+    }
+    // Paper end
+
     @Override
     public List<CraftPlayer> getOnlinePlayers() {
         // Banner start - refresh online players
