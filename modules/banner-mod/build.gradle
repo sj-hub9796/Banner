@@ -1,0 +1,16 @@
+archivesBaseName = project.archives_base_name + "-bukkit-manager"
+version = getSubprojectVersion(project)
+
+moduleDependencies(project, [
+        "banner-server",
+        "banner-bootstrap",
+        "banner-api",
+        "banner-bukkit-manager",
+        "banner-plugin",
+        "banner-stackdeobf",
+        "banner-transitive-access-wideners",
+])
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}

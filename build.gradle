@@ -61,6 +61,7 @@ allprojects {
 			parchment("org.parchmentmc.data:parchment-1.20.1:2023.09.03@zip")
 		}
 		modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+		modImplementation(include("com.github.Chocohead:Fabric-ASM:v2.3"))
 
 		// Make a collection of all api modules we wish to use
 		Set<String> apiModules = [
