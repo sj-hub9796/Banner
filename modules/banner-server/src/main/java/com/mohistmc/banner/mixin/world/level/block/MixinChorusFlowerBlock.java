@@ -43,7 +43,7 @@ public abstract class MixinChorusFlowerBlock extends Block {
     // @formatter:on
 
     @Redirect(method = "randomTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", ordinal = 0))
-    private boolean banner$callBlockSpreadEvent0(ServerLevel level, BlockPos pos, BlockState state, int flag, @Local(name = "blockPos") BlockPos blockPos, @Local(name = "i") int i) {
+    private boolean banner$callBlockSpreadEvent0(ServerLevel level, BlockPos pos, BlockState state, int flag, @Local(ordinal = 1) BlockPos blockPos, @Local(ordinal = 0) int i) {
         if (CraftEventFactory.handleBlockSpreadEvent(level, pos, blockPos, this.defaultBlockState().setValue(ChorusFlowerBlock.AGE, i), 2)) {
             level.setBlock(pos, this.plant.getStateForPlacement(level, pos), 2);
             this.placeGrownFlower(level, blockPos, i);
@@ -58,7 +58,7 @@ public abstract class MixinChorusFlowerBlock extends Block {
     }
 
     @Redirect(method = "randomTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/ChorusFlowerBlock;placeGrownFlower(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;I)V", ordinal = 1))
-    private void banner$callBlockSpreadEvent1(ChorusFlowerBlock instance, Level level, BlockPos pos, int age, @Local(name = "blockPos2") BlockPos blockPos2, @Local(name = "i") int i) {
+    private void banner$callBlockSpreadEvent1(ChorusFlowerBlock instance, Level level, BlockPos pos, int age, @Local(ordinal = 2) BlockPos blockPos2, @Local(ordinal = 0) int i) {
         if (CraftEventFactory.handleBlockSpreadEvent(level, pos, blockPos2, this.defaultBlockState().setValue(ChorusFlowerBlock.AGE, i + 1), 2)) {
             this.placeGrownFlower(level, blockPos2, i + 1);
         }
